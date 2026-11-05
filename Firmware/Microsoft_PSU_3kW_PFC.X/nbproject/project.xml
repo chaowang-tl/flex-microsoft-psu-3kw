@@ -24,6 +24,7 @@
                 <sourceRootElem>sources/common</sourceRootElem>
                 <sourceRootElem>sources/drivers/pfc_io</sourceRootElem>
                 <sourceRootElem>sources/drivers/uart_link</sourceRootElem>
+                <sourceRootElem>../../../Microsoft_PSU_3kW_PFC.X</sourceRootElem>
             </sourceRootList>
             <confList>
                 <confElem>

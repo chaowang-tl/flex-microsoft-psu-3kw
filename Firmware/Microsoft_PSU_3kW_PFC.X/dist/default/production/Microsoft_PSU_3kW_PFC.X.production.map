@@ -64,7 +64,7 @@ Command:
   build/default/production/main.o \
   sources\third_party\X2Cscope\libx2cscope-generic-32dsp-dspic33a-mlarge-elf.a \
   --defsym=__MPLAB_BUILD=1 \
-  -Tp33AK256MPS206.00006cf0.00 \
+  -Tp33AK256MPS206.00007f0c.00 \
   --stack=16 \
   --check-sections \
   --data-init \
@@ -139,50 +139,45 @@ Default Code Model: Small
 Default Data Model: Large
 Default Scalar Model: Small
 
-"program" Memory  [Origin = 0x800004, Length = 0x1fffc]
+"program" Memory  [Origin = 0x80d000, Length = 0x13000]
 
 section                    address   length (PC units)   length (bytes) (dec)
 -------                    -------   -----------------   --------------------
-.text                     0x800004              0x1010          0x1010  (4112)
-.text                     0x801014              0xae70          0xae70  (44656)
-.text                     0x80be84               0x110           0x110  (272)
-.text                     0x80bf94                0x6c            0x6c  (108)
-__ivt_0                   0x80c000               0x5b4           0x5b4  (1460)
-.dinit                    0x80c5b4               0x344           0x344  (836)
-.text                     0x80c8f8              0x1e90          0x1e90  (7824)
-.text                     0x80e788               0x4b8           0x4b8  (1208)
-aa5c6aec4e87_0            0x80ec40                0xe0            0xe0  (224)
-.text                     0x80ed20               0x1f4           0x1f4  (500)
-a4886aec4e84_0            0x80ef14                0x98            0x98  (152)
-8a846aec4e84_0            0x80efac                0x98            0x98  (152)
-b5546aec4e84_0            0x80f044                0x98            0x98  (152)
-3b586aec4e84_0            0x80f0dc                0x98            0x98  (152)
-e2ac6aec4e85_0            0x80f174                0x98            0x98  (152)
-.text                     0x80f20c                0xfc            0xfc  (252)
-.text                     0x80f308                0x68            0x68  (104)
-97f46aec4e88_0            0x80f370                0x64            0x64  (100)
-1b3c6aec4e88_0            0x80f3d4                0x64            0x64  (100)
-.text                     0x80f438               0x1d4           0x1d4  (468)
-C:\Users\M71906\AppData\Local\Temp\ccMe7MEg.s.scn1  0x80f60c                0x40            0x40  (64)
-a3246aec4e85_0            0x80f64c                0x34            0x34  (52)
-2bc46aec4e85_0            0x80f680                0x34            0x34  (52)
-bae86aec4e85_0            0x80f6b4                0x34            0x34  (52)
-d8d06aec4e85_0            0x80f6e8                0x34            0x34  (52)
-73ac6aec4e86_0            0x80f71c                0x34            0x34  (52)
-d3b46aec4e86_0            0x80f750                0x34            0x34  (52)
-.text                     0x80f784                0x5c            0x5c  (92)
-91086aec4e86_0            0x80f7e0                0x2c            0x2c  (44)
-1446aec4e86_0             0x80f80c                0x28            0x28  (40)
-86046aec4e86_0            0x80f834                0x28            0x28  (40)
-4cac6aec4e88_0            0x80f85c                0x28            0x28  (40)
-67ac6aec4e88_0            0x80f884                0x20            0x20  (32)
-.text                     0x80f8a4                0x1c            0x1c  (28)
-67ac6aec4e88_1            0x80f8c0                0x18            0x18  (24)
-.text                     0x80f8d8                0x3c            0x3c  (60)
-d1d46aec4e81_0            0x80f914                 0xc             0xc  (12)
-.text                     0x80f920                0x14            0x14  (20)
+.text                     0x80d000              0x1010          0x1010  (4112)
+.text                     0x80e010              0xae70          0xae70  (44656)
+.dinit                    0x818e80               0x344           0x344  (836)
+.text                     0x8191c4              0x2458          0x2458  (9304)
+dbc86aec5007_0            0x81b61c                0xe0            0xe0  (224)
+.text                     0x81b6fc               0x1f4           0x1f4  (500)
+df986aec5004_0            0x81b8f0                0x98            0x98  (152)
+88cc6aec5004_0            0x81b988                0x98            0x98  (152)
+da106aec5004_0            0x81ba20                0x98            0x98  (152)
+cae46aec5005_0            0x81bab8                0x98            0x98  (152)
+71e06aec5004_0            0x81bb50                0x98            0x98  (152)
+.text                     0x81bbe8               0x1d0           0x1d0  (464)
+45d06aec5007_0            0x81bdb8                0x64            0x64  (100)
+e2206aec5007_0            0x81be1c                0x64            0x64  (100)
+.text                     0x81be80               0x1d4           0x1d4  (468)
+C:\Users\M71906\AppData\Local\Temp\ccMe7MEg.s.scn1  0x81c054                0x40            0x40  (64)
+92446aec5004_0            0x81c094                0x34            0x34  (52)
+97206aec5005_0            0x81c0c8                0x34            0x34  (52)
+8d946aec5005_0            0x81c0fc                0x34            0x34  (52)
+37806aec5005_0            0x81c130                0x34            0x34  (52)
+c40c6aec5005_0            0x81c164                0x34            0x34  (52)
+93c46aec5005_0            0x81c198                0x34            0x34  (52)
+.text                     0x81c1cc                0x5c            0x5c  (92)
+56046aec5005_0            0x81c228                0x2c            0x2c  (44)
+44e46aec5005_0            0x81c254                0x28            0x28  (40)
+726c6aec5005_0            0x81c27c                0x28            0x28  (40)
+800c6aec5007_0            0x81c2a4                0x28            0x28  (40)
+a3e86aec5007_0            0x81c2cc                0x20            0x20  (32)
+.text                     0x81c2ec                0x1c            0x1c  (28)
+a3e86aec5007_1            0x81c308                0x18            0x18  (24)
+.text                     0x81c320                0x3c            0x3c  (60)
+72ec6aec5002_0            0x81c35c                 0xc             0xc  (12)
+.text                     0x81c368                0x14            0x14  (20)
 
-                   Total "program" memory used (bytes):         0xf930  (63792) 48%
+                   Total "program" memory used (bytes):         0xf37c  (62332) 80%
 
 
 "data" Memory  [Origin = 0x4000, Length = 0x10000]
@@ -192,23 +187,23 @@ section                    address      alignment gaps    total length  (dec)
 .nbss                       0x4000                   0           0x158  (344)
 .ndata                      0x4158                   0            0x18  (24)
 .nbss                       0x4170                   0            0x10  (16)
-_000001e3031ba3f06aec4e80    0x4180                   0             0xc  (12)
-_000001e3031ba2d06aec4e80    0x418c                   0             0xc  (12)
-_000001e3031ba1b06aec4e80    0x4198                   0             0xc  (12)
-_000001e3031ba0906aec4e80    0x41a4                   0             0xc  (12)
-_000001e3031aaea06aec4e80    0x41b0                   0             0xc  (12)
-_000001e3031aad806aec4e80    0x41bc                   0             0xc  (12)
+_000002512d2df3f06aec5001    0x4180                   0             0xc  (12)
+_000002512d2df2d06aec5001    0x418c                   0             0xc  (12)
+_000002512d2df1b06aec5001    0x4198                   0             0xc  (12)
+_000002512d2df0906aec5001    0x41a4                   0             0xc  (12)
+_000002512d2cfea06aec5001    0x41b0                   0             0xc  (12)
+_000002512d2cfd806aec5001    0x41bc                   0             0xc  (12)
 .nbss                       0x41c8                   0             0xa  (10)
-_000001e3031ba3606aec4e80    0x41d4                   0             0x8  (8)
-_000001e3031ba2406aec4e80    0x41dc                   0             0x8  (8)
-_000001e3031ba1206aec4e80    0x41e4                   0             0x8  (8)
-_000001e3031ba0006aec4e80    0x41ec                   0             0x8  (8)
-_000001e3031aae106aec4e80    0x41f4                   0             0x8  (8)
-_000001e3031aaf306aec4e80    0x41fc                   0             0x8  (8)
+_000002512d2df3606aec5001    0x41d4                   0             0x8  (8)
+_000002512d2df2406aec5001    0x41dc                   0             0x8  (8)
+_000002512d2df1206aec5001    0x41e4                   0             0x8  (8)
+_000002512d2df0006aec5001    0x41ec                   0             0x8  (8)
+_000002512d2cfe106aec5001    0x41f4                   0             0x8  (8)
+_000002512d2cff306aec5001    0x41fc                   0             0x8  (8)
 .nbss                       0x4204                   0            0x40  (64)
 .ndata                      0x4244                   0             0x8  (8)
 .nbss                       0x424c                   0            0x2c  (44)
-abac6aec4e86_0              0x4278                   0             0x4  (4)
+dd306aec5005_0              0x4278                   0             0x4  (4)
 .nbss                       0x427c                   0             0xc  (12)
 .bss                        0x4288                   0          0x2010  (8208)
 .data                       0x6298                   0            0x30  (48)
@@ -230,9 +225,9 @@ stack                       0x6344                              0xdcbc  (56508)
 
 
 Interrupt Handlers:
-  0x800218 __AD1CH1Interrupt
-  0x800148 __AD5CH1Interrupt
-  0x8002d8 __T1Interrupt
+  0x80d214 __AD1CH1Interrupt
+  0x80d144 __AD5CH1Interrupt
+  0x80d2d4 __T1Interrupt
 
 
 Interrupt Vector Tables (IVTs):
@@ -576,669 +571,669 @@ External Symbols in Data Memory (by name):
 
 External Symbols in Program Memory (by address):
 
-                  0x800004                  __resetPRI
-                  0x8000e0                  ___tls_crt_init
-                  0x8000e0                  __crt_return_stmt
-                  0x8000e4                  __data_init_extended
-                  0x8000e4                  __data_init
-                  0x800148                  __AD5CH1Interrupt
-                  0x800218                  __AD1CH1Interrupt
-                  0x8002d8                  __T1Interrupt
-                  0x800f44                  __DefaultInterrupt
-                  0x800f50                  __ctor
-                  0x800f84                  __dtor
-                  0x800fa8                  _sqrtf
-                  0x800fc8                  _memcmp
-                  0x800ff8                  _memcpy
-                  0x801a10                  _PWM_Initialize
-                  0x801ce0                  _PWM_Deinitialize
-                  0x801f24                  _PWM_GeneratorEOCEventCallbackRegister
-                  0x801f38                  _PWM_CommonEventCallbackRegister
-                  0x801f48                  _PWM_GeneratorTasks
-                  0x802010                  _PWM_CommonEventTasks
-                  0x8034b4                  _LLC_LINK_Init
-                  0x803520                  _LLC_LINK_ByteService
-                  0x803678                  _LLC_LINK_Tick1ms
-                  0x803738                  _LLC_LINK_Task
-                  0x8041e4                  _LLC_LINK_TxIdle
-                  0x804208                  _LLC_LINK_Crc16
-                  0x804674                  _Scope_Main_Init
-                  0x804704                  _Scope_Main_Update
-                  0x804c74                  _Scope_Main_Load
-                  0x804d60                  _Scope_Main_Save
-                  0x805604                  _Scope_Main_GetAddress
-                  0x805820                  _PFC_LOOP_Reset
-                  0x8058e8                  _PFC_LOOP_Init
-                  0x805938                  _PFC_LOOP_GridUpdate
-                  0x805948                  _PFC_LOOP_PhaseAUpdate
-                  0x805d64                  _PFC_LOOP_PhaseBUpdate
-                  0x8062f8                  _FAULT_Init
-                  0x806628                  _FAULT_Set
-                  0x806638                  _FAULT_Clear
-                  0x806744                  _FAULT_ClearAll
-                  0x806a8c                  _FAULT_Evaluate
-                  0x806b5c                  _FAULT_IsActive
-                  0x806ba8                  _FAULT_GetLatchedFlags
-                  0x806be8                  _FAULT_GetLockedOutFlags
-                  0x806bf4                  _sendSvNotAvailable
-                  0x8074b0                  _sendError
-                  0x8074c8                  _initServiceTable
-                  0x8074e8                  _addCoreServices
-                  0x807518                  _SOGI_PLL_ConfigDefault
-                  0x8075c8                  _SOGI_PLL_InitConfig
-                  0x807a68                  _SOGI_PLL_Init
-                  0x807ae8                  _SOGI_PLL_Reset
-                  0x807b58                  _SOGI_PLL_Update
-                  0x807e14                  _SMPS_SM_Init
-                  0x807e64                  _SMPS_SM_TaskPhaseA
-                  0x807f50                  _SMPS_SM_TaskPhaseB
-                  0x80803c                  _SMPS_SM_TaskSlow
-                  0x8085b0                  _SMPS_SM_Enable
-                  0x8085bc                  _SMPS_SM_SetVoutRef
-                  0x8085f4                  _SMPS_SM_RequestFaultClear
-                  0x808600                  _SMPS_SM_HealthConsume
-                  0x80860c                  _SMPS_SM_IsPowerGood
-                  0x8086ac                  _MCC_EXT_SystemInitialize
-                  0x8096c4                  _initLNet
-                  0x8098ec                  _ADC4_Initialize
-                  0x8099a4                  _ADC4_Deinitialize
-                  0x809a1c                  _ADC4_SharedCorePowerEnable
-                  0x809a38                  _ADC4_SharedCoreCalibration
-                  0x809a54                  _ADC4_PWMTriggerSourceSet
-                  0x809be0                  _ADC4_ChannelCallbackRegister
-                  0x809bf4                  _ADC4_Result32BitChannelCallbackRegister
-                  0x809cec                  _ADC4_ComparatorCallbackRegister
-                  0x809cf4                  _putRAMBlock
-                  0x809ecc                  _getRAMBlock
-                  0x80a070                  _putBlockData
-                  0x80a16c                  _getBlockData
-                  0x80a24c                  _addBlockServices
-                  0x80a26c                  _addExtendedBlockServices
-                  0x80a27c                  _LLC_SIGNAL_Init
-                  0x80a368                  _LLC_SIGNAL_LoadUpdate
-                  0x80a6c0                  _LLC_SIGNAL_VbusUpdate
-                  0x80a8c4                  _ADC1_Initialize
-                  0x80a964                  _ADC1_Deinitialize
-                  0x80a9d0                  _ADC1_SharedCorePowerEnable
-                  0x80a9ec                  _ADC1_SharedCoreCalibration
-                  0x80aa08                  _ADC1_PWMTriggerSourceSet
-                  0x80ab78                  _ADC1_ChannelCallbackRegister
-                  0x80ab8c                  _ADC1_Result32BitChannelCallbackRegister
-                  0x80aba0                  _ADC1_ComparatorCallbackRegister
-                  0x80ada4                  _ADC5_Initialize
-                  0x80ae44                  _ADC5_Deinitialize
-                  0x80aeb0                  _ADC5_SharedCorePowerEnable
-                  0x80aecc                  _ADC5_SharedCoreCalibration
-                  0x80aee8                  _ADC5_PWMTriggerSourceSet
-                  0x80b058                  _ADC5_ChannelCallbackRegister
-                  0x80b06c                  _ADC5_Result32BitChannelCallbackRegister
-                  0x80b080                  _ADC5_ComparatorCallbackRegister
-                  0x80b284                  _ADC3_Initialize
-                  0x80b31c                  _ADC3_Deinitialize
-                  0x80b37c                  _ADC3_SharedCorePowerEnable
-                  0x80b398                  _ADC3_SharedCoreCalibration
-                  0x80b3b4                  _ADC3_PWMTriggerSourceSet
-                  0x80b524                  _ADC3_ChannelCallbackRegister
-                  0x80b538                  _ADC3_Result32BitChannelCallbackRegister
-                  0x80b54c                  _ADC3_ComparatorCallbackRegister
-                  0x80b750                  _ADC2_Initialize
-                  0x80b7e8                  _ADC2_Deinitialize
-                  0x80b848                  _ADC2_SharedCorePowerEnable
-                  0x80b864                  _ADC2_SharedCoreCalibration
-                  0x80b880                  _ADC2_PWMTriggerSourceSet
-                  0x80b9f0                  _ADC2_ChannelCallbackRegister
-                  0x80ba04                  _ADC2_Result32BitChannelCallbackRegister
-                  0x80ba18                  _ADC2_ComparatorCallbackRegister
-                  0x80bab8                  _GRID_MEAS_Init
-                  0x80bb44                  _GRID_MEAS_SampleUpdate
-                  0x80bc00                  _GRID_MEAS_TaskSlow
-                  0x80be84                  _PINS_Initialize
-                  0x80bf94                  _PFC_IO_Init
-                  0x80bfd0                  _PFC_IO_RelaySet
-                  0x80bfe8                  _PFC_IO_XcapSet
                   0x80c000                  __ivt_0
-                  0x80c8f8                  _UART1_Initialize
-                  0x80c92c                  _UART1_Deinitialize
-                  0x80c948                  _UART1_Read
-                  0x80c980                  _UART1_Write
-                  0x80c9a0                  _UART1_IsRxReady
-                  0x80c9b0                  _UART1_IsTxReady
-                  0x80c9d0                  _UART1_IsTxDone
-                  0x80c9f0                  _UART1_TransmitEnable
-                  0x80c9f8                  _UART1_TransmitDisable
-                  0x80ca00                  _UART1_AutoBaudSet
-                  0x80ca34                  _UART1_AutoBaudQuery
-                  0x80ca40                  _UART1_AutoBaudEventEnableGet
-                  0x80ca4c                  _UART1_ErrorGet
-                  0x80cb30                  _UART1_BRGCountSet
-                  0x80cb38                  _UART1_BRGCountGet
-                  0x80cb40                  _UART1_BaudRateSet
-                  0x80cbbc                  _UART1_BaudRateGet
-                  0x80cc28                  _UART3_Initialize
-                  0x80cc5c                  _UART3_Deinitialize
-                  0x80cc78                  _UART3_Read
-                  0x80ccb0                  _UART3_Write
-                  0x80ccd0                  _UART3_IsRxReady
-                  0x80cce0                  _UART3_IsTxReady
-                  0x80cd00                  _UART3_IsTxDone
-                  0x80cd20                  _UART3_TransmitEnable
-                  0x80cd28                  _UART3_TransmitDisable
-                  0x80cd30                  _UART3_AutoBaudSet
-                  0x80cd64                  _UART3_AutoBaudQuery
-                  0x80cd70                  _UART3_AutoBaudEventEnableGet
-                  0x80cd7c                  _UART3_ErrorGet
-                  0x80ce60                  _UART3_BRGCountSet
-                  0x80ce68                  _UART3_BRGCountGet
-                  0x80ce70                  _UART3_BaudRateSet
-                  0x80ceec                  _UART3_BaudRateGet
-                  0x80cf58                  _SMPS_FloatControllerInit
-                  0x80d134                  _SMPS_FloatController2P2ZUpdate
-                  0x80d1dc                  _SMPS_FloatController2P2ZReset
-                  0x80d20c                  _SMPS_FloatController2P2ZErrorSeed
-                  0x80d234                  _SMPS_FloatController2P2ZTrackOutput
-                  0x80d26c                  _FW_UPDATE_Init
-                  0x80d288                  _FW_UPDATE_Handle
-                  0x80d4d8                  _FW_UPDATE_Tick1ms
-                  0x80d514                  _FW_UPDATE_IsActive
-                  0x80d528                  _FW_UPDATE_NvmImplemented
-                  0x80d52c                  _FW_UPDATE_ActivePartition
-                  0x80d548                  _FW_UPDATE_KeepAlive
-                  0x80d55c                  _CLOCK_Initialize
-                  0x80d7d8                  _sendSerialWrapper
-                  0x80d7e8                  _receiveSerialWrapper
-                  0x80d7f4                  _isReceiveDataAvailableWrapper
-                  0x80d800                  _isSendReadyWrapper
-                  0x80d80c                  _flushSerialWrapper
-                  0x80d824                  _X2Cscope_Communicate
-                  0x80d830                  _X2Cscope_Update
-                  0x80d834                  _X2Cscope_InitialiseEx
-                  0x80d990                  _initSerial
-                  0x80d9bc                  _USER_ISR_AdcScaleInit
-                  0x80db4c                  _IL_CAL_Start
-                  0x80dc44                  _IL_CAL_Update
-                  0x80dcbc                  _IL_CAL_Done
-                  0x80dd2c                  _CMP1_Initialize
-                  0x80dd98                  _CMP1_Deinitialize
-                  0x80ddd0                  _CMP1_Calibrate
-                  0x80de20                  _CMP1_EventCallbackRegister
-                  0x80de34                  _CMP1_Tasks
-                  0x80deb4                  _CMP4_Initialize
-                  0x80df20                  _CMP4_Deinitialize
-                  0x80df58                  _CMP4_Calibrate
-                  0x80dfa8                  _CMP4_EventCallbackRegister
-                  0x80dfbc                  _CMP4_Tasks
-                  0x80e03c                  _CMP5_Initialize
-                  0x80e0a8                  _CMP5_Deinitialize
-                  0x80e0e0                  _CMP5_Calibrate
-                  0x80e130                  _CMP5_EventCallbackRegister
-                  0x80e144                  _CMP5_Tasks
-                  0x80e1c4                  _CMP6_Initialize
-                  0x80e230                  _CMP6_Deinitialize
-                  0x80e268                  _CMP6_Calibrate
-                  0x80e2b8                  _CMP6_EventCallbackRegister
-                  0x80e2cc                  _CMP6_Tasks
-                  0x80e34c                  _CMP7_Initialize
-                  0x80e3b8                  _CMP7_Deinitialize
-                  0x80e3f0                  _CMP7_Calibrate
-                  0x80e440                  _CMP7_EventCallbackRegister
-                  0x80e454                  _CMP7_Tasks
-                  0x80e4d4                  _CMP8_Initialize
-                  0x80e540                  _CMP8_Deinitialize
-                  0x80e578                  _CMP8_Calibrate
-                  0x80e5c8                  _CMP8_EventCallbackRegister
-                  0x80e5dc                  _CMP8_Tasks
-                  0x80e608                  _FAULT_DETECT_Init
-                  0x80e634                  _FAULT_DETECT_Evaluate
-                  0x80e778                  _FAULT_DETECT_Reset
-                  0x80e788                  _PFC_PWM_Init
-                  0x80e7ec                  _PFC_PWM_AllOutputsOff
-                  0x80e82c                  _PFC_PWM_SlowLegSet
-                  0x80e888                  _SCCP1_InputCapture_Initialize
-                  0x80e8c8                  _SCCP1_InputCapture_Deinitialize
-                  0x80e900                  _SCCP1_InputCapture_Start
-                  0x80e908                  _SCCP1_InputCapture_Stop
-                  0x80e910                  _SCCP1_InputCapture_CallbackRegister
-                  0x80e924                  _SCCP1_InputCapture_DataRead
-                  0x80e92c                  _SCCP1_InputCapture_HasBufferOverflowed
-                  0x80e938                  _SCCP1_InputCapture_IsBufferEmpty
-                  0x80e944                  _SCCP1_InputCapture_OverflowFlagClear
-                  0x80e94c                  _SCCP1_InputCapture_Tasks
-                  0x80e978                  _Common_Init
-                  0x80e97c                  _Common_Update
-                  0x80e980                  _Common_Load
-                  0x80e984                  _Common_Save
-                  0x80e99c                  _Common_GetAddress
-                  0x80e9a0                  _getAbsValI8
-                  0x80e9c0                  _getAbsValI16
-                  0x80e9d8                  _getAbsValI32
-                  0x80ea00                  _getAbsValI64
-                  0x80ea38                  _getAbsValR32
-                  0x80ea50                  _getAbsValR64
-                  0x80ea68                  _SCCP2_InputCapture_Initialize
-                  0x80eaa4                  _SCCP2_InputCapture_Deinitialize
-                  0x80eadc                  _SCCP2_InputCapture_Start
-                  0x80eae4                  _SCCP2_InputCapture_Stop
-                  0x80eaec                  _SCCP2_InputCapture_CallbackRegister
-                  0x80eb00                  _SCCP2_InputCapture_DataRead
-                  0x80eb08                  _SCCP2_InputCapture_HasBufferOverflowed
-                  0x80eb14                  _SCCP2_InputCapture_IsBufferEmpty
-                  0x80eb20                  _SCCP2_InputCapture_OverflowFlagClear
-                  0x80eb28                  _SCCP2_InputCapture_Tasks
-                  0x80eb54                  _SCCP3_PWM_Initialize
-                  0x80eba0                  _SCCP3_PWM_Deinitialize
-                  0x80ebd8                  _SCCP3_PWM_Enable
-                  0x80ebe0                  _SCCP3_PWM_Disable
-                  0x80ebe8                  _SCCP3_PWM_PeriodSet
-                  0x80ebf0                  _SCCP3_PWM_DutyCycleSet
-                  0x80ebf8                  _SCCP3_PWM_SoftwareTriggerSet
-                  0x80ec00                  _SCCP3_PWM_CallbackRegister
-                  0x80ec14                  _SCCP3_PWM_Tasks
-                  0x80ec40                  _PWM_HS
-                  0x80ed20                  _DMT_Initialize
-                  0x80ed30                  _DMT_Enable
-                  0x80ed4c                  _DMT_PreClear
-                  0x80ed64                  _DMT_Clear
-                  0x80ed84                  _DMT_IsWindowOpen
-                  0x80ed90                  _DMT_IsPreCleared
-                  0x80ed98                  _DMT_PostEventClear
-                  0x80edb4                  _DMT_TimeoutCounterGet
-                  0x80edbc                  _DMT_WindowTimeoutCounterGet
-                  0x80edc4                  _DMT_StatusGet
-                  0x80edd0                  _DMT_CounterGet
-                  0x80ede8                  _TMR1_Initialize
-                  0x80ee18                  _TMR1_Deinitialize
-                  0x80ee34                  _TMR1_Start
-                  0x80ee3c                  _TMR1_Stop
-                  0x80ee44                  _TMR1_PeriodSet
-                  0x80ee4c                  _TMR1_InterruptPrioritySet
-                  0x80ee64                  _TMR1_TimeoutCallbackRegister
-                  0x80ee78                  _SCHEDULER_Init
-                  0x80ee98                  _SCHEDULER_Run
-                  0x80ef14                  _ADC1
-                  0x80efac                  _ADC5
-                  0x80f044                  _ADC3
-                  0x80f0dc                  _ADC2
-                  0x80f174                  _ADC4
-                  0x80f20c                  _SMPS_FloatSoftStartRampToTarget
-                  0x80f290                  _initTableStruct
-                  0x80f2d4                  _addTableStructProtocol
-                  0x80f308                  _INTERRUPT_Initialize
-                  0x80f33c                  _INTERRUPT_Deinitialize
-                  0x80f370                  _UART1_Drv
-                  0x80f3d4                  _UART3_Drv
-                  0x80f438                  _SYSTEM_Initialize
-                  0x80f4b0                  _initSerialGeneric
-                  0x80f4e4                  _linkSerial
-                  0x80f4f0                  _DMT_CalibratedCounterGet
-                  0x80f510                  _DMT_Calibrate
-                  0x80f53c                  _RESET_CauseGet
-                  0x80f584                  _RESET_CauseClearAll
-                  0x80f58c                  _APP_TASKS_Always
-                  0x80f5a4                  _APP_TASKS_Task100us
-                  0x80f5a8                  _APP_TASKS_Task1ms
-                  0x80f5c4                  _APP_TASKS_Task10ms
-                  0x80f5c8                  _APP_TASKS_Task500ms
-                  0x80f5cc                  _main
-                  0x80f60c                  _parameterIdTable
-                  0x80f61c                  _blockFunctionTable
-                  0x80f64c                  _CMP_DAC1
-                  0x80f680                  _CMP_DAC4
-                  0x80f6b4                  _CMP_DAC5
-                  0x80f6e8                  _CMP_DAC6
-                  0x80f71c                  _CMP_DAC7
-                  0x80f750                  _CMP_DAC8
-                  0x80f784                  _X2Cscope_Init
-                  0x80f7b4                  _UART_LINK_Flush
-                  0x80f7e0                  _PWM3
-                  0x80f80c                  _Input_Capture2
-                  0x80f834                  _Input_Capture1
-                  0x80f85c                  _Timer1
-                  0x80f8a4                  _UREF_Initialize
-                  0x80f8b4                  _UREF_Deinitialize
-                  0x80f8c0                  _compilationDate
-                  0x80f8d8                  _where_was_i
-                  0x80f8ec                  _sendSerial
-                  0x80f8f0                  _receiveSerial
-                  0x80f8f4                  _isReceiveDataAvailable
-                  0x80f8f8                  _isSendReady
-                  0x80f8fc                  _X2CscopeComm_PostInit
-                  0x80f900                  _X2C_Init
-                  0x80f90c                  _X2C_Update
-                  0x80f914                  _fltFastIdMap
-                  0x80f920                  _initVersionInfo
+                  0x80d000                  __resetPRI
+                  0x80d0dc                  __crt_return_stmt
+                  0x80d0dc                  ___tls_crt_init
+                  0x80d0e0                  __data_init_extended
+                  0x80d0e0                  __data_init
+                  0x80d144                  __AD5CH1Interrupt
+                  0x80d214                  __AD1CH1Interrupt
+                  0x80d2d4                  __T1Interrupt
+                  0x80df40                  __DefaultInterrupt
+                  0x80df4c                  __ctor
+                  0x80df80                  __dtor
+                  0x80dfa4                  _sqrtf
+                  0x80dfc4                  _memcmp
+                  0x80dff4                  _memcpy
+                  0x80ea0c                  _PWM_Initialize
+                  0x80ecdc                  _PWM_Deinitialize
+                  0x80ef20                  _PWM_GeneratorEOCEventCallbackRegister
+                  0x80ef34                  _PWM_CommonEventCallbackRegister
+                  0x80ef44                  _PWM_GeneratorTasks
+                  0x80f00c                  _PWM_CommonEventTasks
+                  0x8104b0                  _LLC_LINK_Init
+                  0x81051c                  _LLC_LINK_ByteService
+                  0x810674                  _LLC_LINK_Tick1ms
+                  0x810734                  _LLC_LINK_Task
+                  0x8111e0                  _LLC_LINK_TxIdle
+                  0x811204                  _LLC_LINK_Crc16
+                  0x811670                  _Scope_Main_Init
+                  0x811700                  _Scope_Main_Update
+                  0x811c70                  _Scope_Main_Load
+                  0x811d5c                  _Scope_Main_Save
+                  0x812600                  _Scope_Main_GetAddress
+                  0x81281c                  _PFC_LOOP_Reset
+                  0x8128e4                  _PFC_LOOP_Init
+                  0x812934                  _PFC_LOOP_GridUpdate
+                  0x812944                  _PFC_LOOP_PhaseAUpdate
+                  0x812d60                  _PFC_LOOP_PhaseBUpdate
+                  0x8132f4                  _FAULT_Init
+                  0x813624                  _FAULT_Set
+                  0x813634                  _FAULT_Clear
+                  0x813740                  _FAULT_ClearAll
+                  0x813a88                  _FAULT_Evaluate
+                  0x813b58                  _FAULT_IsActive
+                  0x813ba4                  _FAULT_GetLatchedFlags
+                  0x813be4                  _FAULT_GetLockedOutFlags
+                  0x813bf0                  _sendSvNotAvailable
+                  0x8144ac                  _sendError
+                  0x8144c4                  _initServiceTable
+                  0x8144e4                  _addCoreServices
+                  0x814514                  _SOGI_PLL_ConfigDefault
+                  0x8145c4                  _SOGI_PLL_InitConfig
+                  0x814a64                  _SOGI_PLL_Init
+                  0x814ae4                  _SOGI_PLL_Reset
+                  0x814b54                  _SOGI_PLL_Update
+                  0x814e10                  _SMPS_SM_Init
+                  0x814e60                  _SMPS_SM_TaskPhaseA
+                  0x814f4c                  _SMPS_SM_TaskPhaseB
+                  0x815038                  _SMPS_SM_TaskSlow
+                  0x8155ac                  _SMPS_SM_Enable
+                  0x8155b8                  _SMPS_SM_SetVoutRef
+                  0x8155f0                  _SMPS_SM_RequestFaultClear
+                  0x8155fc                  _SMPS_SM_HealthConsume
+                  0x815608                  _SMPS_SM_IsPowerGood
+                  0x8156a8                  _MCC_EXT_SystemInitialize
+                  0x8166c0                  _initLNet
+                  0x8168e8                  _ADC4_Initialize
+                  0x8169a0                  _ADC4_Deinitialize
+                  0x816a18                  _ADC4_SharedCorePowerEnable
+                  0x816a34                  _ADC4_SharedCoreCalibration
+                  0x816a50                  _ADC4_PWMTriggerSourceSet
+                  0x816bdc                  _ADC4_ChannelCallbackRegister
+                  0x816bf0                  _ADC4_Result32BitChannelCallbackRegister
+                  0x816ce8                  _ADC4_ComparatorCallbackRegister
+                  0x816cf0                  _putRAMBlock
+                  0x816ec8                  _getRAMBlock
+                  0x81706c                  _putBlockData
+                  0x817168                  _getBlockData
+                  0x817248                  _addBlockServices
+                  0x817268                  _addExtendedBlockServices
+                  0x817278                  _LLC_SIGNAL_Init
+                  0x817364                  _LLC_SIGNAL_LoadUpdate
+                  0x8176bc                  _LLC_SIGNAL_VbusUpdate
+                  0x8178c0                  _ADC1_Initialize
+                  0x817960                  _ADC1_Deinitialize
+                  0x8179cc                  _ADC1_SharedCorePowerEnable
+                  0x8179e8                  _ADC1_SharedCoreCalibration
+                  0x817a04                  _ADC1_PWMTriggerSourceSet
+                  0x817b74                  _ADC1_ChannelCallbackRegister
+                  0x817b88                  _ADC1_Result32BitChannelCallbackRegister
+                  0x817b9c                  _ADC1_ComparatorCallbackRegister
+                  0x817da0                  _ADC5_Initialize
+                  0x817e40                  _ADC5_Deinitialize
+                  0x817eac                  _ADC5_SharedCorePowerEnable
+                  0x817ec8                  _ADC5_SharedCoreCalibration
+                  0x817ee4                  _ADC5_PWMTriggerSourceSet
+                  0x818054                  _ADC5_ChannelCallbackRegister
+                  0x818068                  _ADC5_Result32BitChannelCallbackRegister
+                  0x81807c                  _ADC5_ComparatorCallbackRegister
+                  0x818280                  _ADC3_Initialize
+                  0x818318                  _ADC3_Deinitialize
+                  0x818378                  _ADC3_SharedCorePowerEnable
+                  0x818394                  _ADC3_SharedCoreCalibration
+                  0x8183b0                  _ADC3_PWMTriggerSourceSet
+                  0x818520                  _ADC3_ChannelCallbackRegister
+                  0x818534                  _ADC3_Result32BitChannelCallbackRegister
+                  0x818548                  _ADC3_ComparatorCallbackRegister
+                  0x81874c                  _ADC2_Initialize
+                  0x8187e4                  _ADC2_Deinitialize
+                  0x818844                  _ADC2_SharedCorePowerEnable
+                  0x818860                  _ADC2_SharedCoreCalibration
+                  0x81887c                  _ADC2_PWMTriggerSourceSet
+                  0x8189ec                  _ADC2_ChannelCallbackRegister
+                  0x818a00                  _ADC2_Result32BitChannelCallbackRegister
+                  0x818a14                  _ADC2_ComparatorCallbackRegister
+                  0x818ab4                  _GRID_MEAS_Init
+                  0x818b40                  _GRID_MEAS_SampleUpdate
+                  0x818bfc                  _GRID_MEAS_TaskSlow
+                  0x8191c4                  _UART1_Initialize
+                  0x8191f8                  _UART1_Deinitialize
+                  0x819214                  _UART1_Read
+                  0x81924c                  _UART1_Write
+                  0x81926c                  _UART1_IsRxReady
+                  0x81927c                  _UART1_IsTxReady
+                  0x81929c                  _UART1_IsTxDone
+                  0x8192bc                  _UART1_TransmitEnable
+                  0x8192c4                  _UART1_TransmitDisable
+                  0x8192cc                  _UART1_AutoBaudSet
+                  0x819300                  _UART1_AutoBaudQuery
+                  0x81930c                  _UART1_AutoBaudEventEnableGet
+                  0x819318                  _UART1_ErrorGet
+                  0x8193fc                  _UART1_BRGCountSet
+                  0x819404                  _UART1_BRGCountGet
+                  0x81940c                  _UART1_BaudRateSet
+                  0x819488                  _UART1_BaudRateGet
+                  0x8194f4                  _UART3_Initialize
+                  0x819528                  _UART3_Deinitialize
+                  0x819544                  _UART3_Read
+                  0x81957c                  _UART3_Write
+                  0x81959c                  _UART3_IsRxReady
+                  0x8195ac                  _UART3_IsTxReady
+                  0x8195cc                  _UART3_IsTxDone
+                  0x8195ec                  _UART3_TransmitEnable
+                  0x8195f4                  _UART3_TransmitDisable
+                  0x8195fc                  _UART3_AutoBaudSet
+                  0x819630                  _UART3_AutoBaudQuery
+                  0x81963c                  _UART3_AutoBaudEventEnableGet
+                  0x819648                  _UART3_ErrorGet
+                  0x81972c                  _UART3_BRGCountSet
+                  0x819734                  _UART3_BRGCountGet
+                  0x81973c                  _UART3_BaudRateSet
+                  0x8197b8                  _UART3_BaudRateGet
+                  0x819824                  _SMPS_FloatControllerInit
+                  0x819a00                  _SMPS_FloatController2P2ZUpdate
+                  0x819aa8                  _SMPS_FloatController2P2ZReset
+                  0x819ad8                  _SMPS_FloatController2P2ZErrorSeed
+                  0x819b00                  _SMPS_FloatController2P2ZTrackOutput
+                  0x819b38                  _FW_UPDATE_Init
+                  0x819b54                  _FW_UPDATE_Handle
+                  0x819da4                  _FW_UPDATE_Tick1ms
+                  0x819de0                  _FW_UPDATE_IsActive
+                  0x819df4                  _FW_UPDATE_NvmImplemented
+                  0x819df8                  _FW_UPDATE_ActivePartition
+                  0x819e14                  _FW_UPDATE_KeepAlive
+                  0x819e28                  _CLOCK_Initialize
+                  0x81a0a4                  _sendSerialWrapper
+                  0x81a0b4                  _receiveSerialWrapper
+                  0x81a0c0                  _isReceiveDataAvailableWrapper
+                  0x81a0cc                  _isSendReadyWrapper
+                  0x81a0d8                  _flushSerialWrapper
+                  0x81a0f0                  _X2Cscope_Communicate
+                  0x81a0fc                  _X2Cscope_Update
+                  0x81a100                  _X2Cscope_InitialiseEx
+                  0x81a25c                  _initSerial
+                  0x81a288                  _USER_ISR_AdcScaleInit
+                  0x81a418                  _IL_CAL_Start
+                  0x81a510                  _IL_CAL_Update
+                  0x81a588                  _IL_CAL_Done
+                  0x81a5f8                  _CMP1_Initialize
+                  0x81a664                  _CMP1_Deinitialize
+                  0x81a69c                  _CMP1_Calibrate
+                  0x81a6ec                  _CMP1_EventCallbackRegister
+                  0x81a700                  _CMP1_Tasks
+                  0x81a780                  _CMP4_Initialize
+                  0x81a7ec                  _CMP4_Deinitialize
+                  0x81a824                  _CMP4_Calibrate
+                  0x81a874                  _CMP4_EventCallbackRegister
+                  0x81a888                  _CMP4_Tasks
+                  0x81a908                  _CMP5_Initialize
+                  0x81a974                  _CMP5_Deinitialize
+                  0x81a9ac                  _CMP5_Calibrate
+                  0x81a9fc                  _CMP5_EventCallbackRegister
+                  0x81aa10                  _CMP5_Tasks
+                  0x81aa90                  _CMP6_Initialize
+                  0x81aafc                  _CMP6_Deinitialize
+                  0x81ab34                  _CMP6_Calibrate
+                  0x81ab84                  _CMP6_EventCallbackRegister
+                  0x81ab98                  _CMP6_Tasks
+                  0x81ac18                  _CMP7_Initialize
+                  0x81ac84                  _CMP7_Deinitialize
+                  0x81acbc                  _CMP7_Calibrate
+                  0x81ad0c                  _CMP7_EventCallbackRegister
+                  0x81ad20                  _CMP7_Tasks
+                  0x81ada0                  _CMP8_Initialize
+                  0x81ae0c                  _CMP8_Deinitialize
+                  0x81ae44                  _CMP8_Calibrate
+                  0x81ae94                  _CMP8_EventCallbackRegister
+                  0x81aea8                  _CMP8_Tasks
+                  0x81aed4                  _FAULT_DETECT_Init
+                  0x81af00                  _FAULT_DETECT_Evaluate
+                  0x81b044                  _FAULT_DETECT_Reset
+                  0x81b054                  _PINS_Initialize
+                  0x81b164                  _PFC_PWM_Init
+                  0x81b1c8                  _PFC_PWM_AllOutputsOff
+                  0x81b208                  _PFC_PWM_SlowLegSet
+                  0x81b264                  _SCCP1_InputCapture_Initialize
+                  0x81b2a4                  _SCCP1_InputCapture_Deinitialize
+                  0x81b2dc                  _SCCP1_InputCapture_Start
+                  0x81b2e4                  _SCCP1_InputCapture_Stop
+                  0x81b2ec                  _SCCP1_InputCapture_CallbackRegister
+                  0x81b300                  _SCCP1_InputCapture_DataRead
+                  0x81b308                  _SCCP1_InputCapture_HasBufferOverflowed
+                  0x81b314                  _SCCP1_InputCapture_IsBufferEmpty
+                  0x81b320                  _SCCP1_InputCapture_OverflowFlagClear
+                  0x81b328                  _SCCP1_InputCapture_Tasks
+                  0x81b354                  _Common_Init
+                  0x81b358                  _Common_Update
+                  0x81b35c                  _Common_Load
+                  0x81b360                  _Common_Save
+                  0x81b378                  _Common_GetAddress
+                  0x81b37c                  _getAbsValI8
+                  0x81b39c                  _getAbsValI16
+                  0x81b3b4                  _getAbsValI32
+                  0x81b3dc                  _getAbsValI64
+                  0x81b414                  _getAbsValR32
+                  0x81b42c                  _getAbsValR64
+                  0x81b444                  _SCCP2_InputCapture_Initialize
+                  0x81b480                  _SCCP2_InputCapture_Deinitialize
+                  0x81b4b8                  _SCCP2_InputCapture_Start
+                  0x81b4c0                  _SCCP2_InputCapture_Stop
+                  0x81b4c8                  _SCCP2_InputCapture_CallbackRegister
+                  0x81b4dc                  _SCCP2_InputCapture_DataRead
+                  0x81b4e4                  _SCCP2_InputCapture_HasBufferOverflowed
+                  0x81b4f0                  _SCCP2_InputCapture_IsBufferEmpty
+                  0x81b4fc                  _SCCP2_InputCapture_OverflowFlagClear
+                  0x81b504                  _SCCP2_InputCapture_Tasks
+                  0x81b530                  _SCCP3_PWM_Initialize
+                  0x81b57c                  _SCCP3_PWM_Deinitialize
+                  0x81b5b4                  _SCCP3_PWM_Enable
+                  0x81b5bc                  _SCCP3_PWM_Disable
+                  0x81b5c4                  _SCCP3_PWM_PeriodSet
+                  0x81b5cc                  _SCCP3_PWM_DutyCycleSet
+                  0x81b5d4                  _SCCP3_PWM_SoftwareTriggerSet
+                  0x81b5dc                  _SCCP3_PWM_CallbackRegister
+                  0x81b5f0                  _SCCP3_PWM_Tasks
+                  0x81b61c                  _PWM_HS
+                  0x81b6fc                  _DMT_Initialize
+                  0x81b70c                  _DMT_Enable
+                  0x81b728                  _DMT_PreClear
+                  0x81b740                  _DMT_Clear
+                  0x81b760                  _DMT_IsWindowOpen
+                  0x81b76c                  _DMT_IsPreCleared
+                  0x81b774                  _DMT_PostEventClear
+                  0x81b790                  _DMT_TimeoutCounterGet
+                  0x81b798                  _DMT_WindowTimeoutCounterGet
+                  0x81b7a0                  _DMT_StatusGet
+                  0x81b7ac                  _DMT_CounterGet
+                  0x81b7c4                  _TMR1_Initialize
+                  0x81b7f4                  _TMR1_Deinitialize
+                  0x81b810                  _TMR1_Start
+                  0x81b818                  _TMR1_Stop
+                  0x81b820                  _TMR1_PeriodSet
+                  0x81b828                  _TMR1_InterruptPrioritySet
+                  0x81b840                  _TMR1_TimeoutCallbackRegister
+                  0x81b854                  _SCHEDULER_Init
+                  0x81b874                  _SCHEDULER_Run
+                  0x81b8f0                  _ADC1
+                  0x81b988                  _ADC5
+                  0x81ba20                  _ADC3
+                  0x81bab8                  _ADC2
+                  0x81bb50                  _ADC4
+                  0x81bbe8                  _SMPS_FloatSoftStartRampToTarget
+                  0x81bc6c                  _initTableStruct
+                  0x81bcb0                  _addTableStructProtocol
+                  0x81bce4                  _PFC_IO_Init
+                  0x81bd20                  _PFC_IO_RelaySet
+                  0x81bd38                  _PFC_IO_XcapSet
+                  0x81bd50                  _INTERRUPT_Initialize
+                  0x81bd84                  _INTERRUPT_Deinitialize
+                  0x81bdb8                  _UART1_Drv
+                  0x81be1c                  _UART3_Drv
+                  0x81be80                  _SYSTEM_Initialize
+                  0x81bef8                  _initSerialGeneric
+                  0x81bf2c                  _linkSerial
+                  0x81bf38                  _DMT_CalibratedCounterGet
+                  0x81bf58                  _DMT_Calibrate
+                  0x81bf84                  _RESET_CauseGet
+                  0x81bfcc                  _RESET_CauseClearAll
+                  0x81bfd4                  _APP_TASKS_Always
+                  0x81bfec                  _APP_TASKS_Task100us
+                  0x81bff0                  _APP_TASKS_Task1ms
+                  0x81c00c                  _APP_TASKS_Task10ms
+                  0x81c010                  _APP_TASKS_Task500ms
+                  0x81c014                  _main
+                  0x81c054                  _parameterIdTable
+                  0x81c064                  _blockFunctionTable
+                  0x81c094                  _CMP_DAC1
+                  0x81c0c8                  _CMP_DAC4
+                  0x81c0fc                  _CMP_DAC5
+                  0x81c130                  _CMP_DAC6
+                  0x81c164                  _CMP_DAC7
+                  0x81c198                  _CMP_DAC8
+                  0x81c1cc                  _X2Cscope_Init
+                  0x81c1fc                  _UART_LINK_Flush
+                  0x81c228                  _PWM3
+                  0x81c254                  _Input_Capture2
+                  0x81c27c                  _Input_Capture1
+                  0x81c2a4                  _Timer1
+                  0x81c2ec                  _UREF_Initialize
+                  0x81c2fc                  _UREF_Deinitialize
+                  0x81c308                  _compilationDate
+                  0x81c320                  _where_was_i
+                  0x81c334                  _sendSerial
+                  0x81c338                  _receiveSerial
+                  0x81c33c                  _isReceiveDataAvailable
+                  0x81c340                  _isSendReady
+                  0x81c344                  _X2CscopeComm_PostInit
+                  0x81c348                  _X2C_Init
+                  0x81c354                  _X2C_Update
+                  0x81c35c                  _fltFastIdMap
+                  0x81c368                  _initVersionInfo
 
 External Symbols in Program Memory (by name):
 
-                  0x80ef14                  _ADC1
-                  0x80ab78                  _ADC1_ChannelCallbackRegister
-                  0x80aba0                  _ADC1_ComparatorCallbackRegister
-                  0x80a964                  _ADC1_Deinitialize
-                  0x80a8c4                  _ADC1_Initialize
-                  0x80aa08                  _ADC1_PWMTriggerSourceSet
-                  0x80ab8c                  _ADC1_Result32BitChannelCallbackRegister
-                  0x80a9ec                  _ADC1_SharedCoreCalibration
-                  0x80a9d0                  _ADC1_SharedCorePowerEnable
-                  0x80f0dc                  _ADC2
-                  0x80b9f0                  _ADC2_ChannelCallbackRegister
-                  0x80ba18                  _ADC2_ComparatorCallbackRegister
-                  0x80b7e8                  _ADC2_Deinitialize
-                  0x80b750                  _ADC2_Initialize
-                  0x80b880                  _ADC2_PWMTriggerSourceSet
-                  0x80ba04                  _ADC2_Result32BitChannelCallbackRegister
-                  0x80b864                  _ADC2_SharedCoreCalibration
-                  0x80b848                  _ADC2_SharedCorePowerEnable
-                  0x80f044                  _ADC3
-                  0x80b524                  _ADC3_ChannelCallbackRegister
-                  0x80b54c                  _ADC3_ComparatorCallbackRegister
-                  0x80b31c                  _ADC3_Deinitialize
-                  0x80b284                  _ADC3_Initialize
-                  0x80b3b4                  _ADC3_PWMTriggerSourceSet
-                  0x80b538                  _ADC3_Result32BitChannelCallbackRegister
-                  0x80b398                  _ADC3_SharedCoreCalibration
-                  0x80b37c                  _ADC3_SharedCorePowerEnable
-                  0x80f174                  _ADC4
-                  0x809be0                  _ADC4_ChannelCallbackRegister
-                  0x809cec                  _ADC4_ComparatorCallbackRegister
-                  0x8099a4                  _ADC4_Deinitialize
-                  0x8098ec                  _ADC4_Initialize
-                  0x809a54                  _ADC4_PWMTriggerSourceSet
-                  0x809bf4                  _ADC4_Result32BitChannelCallbackRegister
-                  0x809a38                  _ADC4_SharedCoreCalibration
-                  0x809a1c                  _ADC4_SharedCorePowerEnable
-                  0x80efac                  _ADC5
-                  0x80b058                  _ADC5_ChannelCallbackRegister
-                  0x80b080                  _ADC5_ComparatorCallbackRegister
-                  0x80ae44                  _ADC5_Deinitialize
-                  0x80ada4                  _ADC5_Initialize
-                  0x80aee8                  _ADC5_PWMTriggerSourceSet
-                  0x80b06c                  _ADC5_Result32BitChannelCallbackRegister
-                  0x80aecc                  _ADC5_SharedCoreCalibration
-                  0x80aeb0                  _ADC5_SharedCorePowerEnable
-                  0x80f58c                  _APP_TASKS_Always
-                  0x80f5a4                  _APP_TASKS_Task100us
-                  0x80f5c4                  _APP_TASKS_Task10ms
-                  0x80f5a8                  _APP_TASKS_Task1ms
-                  0x80f5c8                  _APP_TASKS_Task500ms
-                  0x80d55c                  _CLOCK_Initialize
-                  0x80ddd0                  _CMP1_Calibrate
-                  0x80dd98                  _CMP1_Deinitialize
-                  0x80de20                  _CMP1_EventCallbackRegister
-                  0x80dd2c                  _CMP1_Initialize
-                  0x80de34                  _CMP1_Tasks
-                  0x80df58                  _CMP4_Calibrate
-                  0x80df20                  _CMP4_Deinitialize
-                  0x80dfa8                  _CMP4_EventCallbackRegister
-                  0x80deb4                  _CMP4_Initialize
-                  0x80dfbc                  _CMP4_Tasks
-                  0x80e0e0                  _CMP5_Calibrate
-                  0x80e0a8                  _CMP5_Deinitialize
-                  0x80e130                  _CMP5_EventCallbackRegister
-                  0x80e03c                  _CMP5_Initialize
-                  0x80e144                  _CMP5_Tasks
-                  0x80e268                  _CMP6_Calibrate
-                  0x80e230                  _CMP6_Deinitialize
-                  0x80e2b8                  _CMP6_EventCallbackRegister
-                  0x80e1c4                  _CMP6_Initialize
-                  0x80e2cc                  _CMP6_Tasks
-                  0x80e3f0                  _CMP7_Calibrate
-                  0x80e3b8                  _CMP7_Deinitialize
-                  0x80e440                  _CMP7_EventCallbackRegister
-                  0x80e34c                  _CMP7_Initialize
-                  0x80e454                  _CMP7_Tasks
-                  0x80e578                  _CMP8_Calibrate
-                  0x80e540                  _CMP8_Deinitialize
-                  0x80e5c8                  _CMP8_EventCallbackRegister
-                  0x80e4d4                  _CMP8_Initialize
-                  0x80e5dc                  _CMP8_Tasks
-                  0x80f64c                  _CMP_DAC1
-                  0x80f680                  _CMP_DAC4
-                  0x80f6b4                  _CMP_DAC5
-                  0x80f6e8                  _CMP_DAC6
-                  0x80f71c                  _CMP_DAC7
-                  0x80f750                  _CMP_DAC8
-                  0x80e99c                  _Common_GetAddress
-                  0x80e978                  _Common_Init
-                  0x80e980                  _Common_Load
-                  0x80e984                  _Common_Save
-                  0x80e97c                  _Common_Update
-                  0x80f510                  _DMT_Calibrate
-                  0x80f4f0                  _DMT_CalibratedCounterGet
-                  0x80ed64                  _DMT_Clear
-                  0x80edd0                  _DMT_CounterGet
-                  0x80ed30                  _DMT_Enable
-                  0x80ed20                  _DMT_Initialize
-                  0x80ed90                  _DMT_IsPreCleared
-                  0x80ed84                  _DMT_IsWindowOpen
-                  0x80ed98                  _DMT_PostEventClear
-                  0x80ed4c                  _DMT_PreClear
-                  0x80edc4                  _DMT_StatusGet
-                  0x80edb4                  _DMT_TimeoutCounterGet
-                  0x80edbc                  _DMT_WindowTimeoutCounterGet
-                  0x806638                  _FAULT_Clear
-                  0x806744                  _FAULT_ClearAll
-                  0x80e634                  _FAULT_DETECT_Evaluate
-                  0x80e608                  _FAULT_DETECT_Init
-                  0x80e778                  _FAULT_DETECT_Reset
-                  0x806a8c                  _FAULT_Evaluate
-                  0x806ba8                  _FAULT_GetLatchedFlags
-                  0x806be8                  _FAULT_GetLockedOutFlags
-                  0x8062f8                  _FAULT_Init
-                  0x806b5c                  _FAULT_IsActive
-                  0x806628                  _FAULT_Set
-                  0x80d52c                  _FW_UPDATE_ActivePartition
-                  0x80d288                  _FW_UPDATE_Handle
-                  0x80d26c                  _FW_UPDATE_Init
-                  0x80d514                  _FW_UPDATE_IsActive
-                  0x80d548                  _FW_UPDATE_KeepAlive
-                  0x80d528                  _FW_UPDATE_NvmImplemented
-                  0x80d4d8                  _FW_UPDATE_Tick1ms
-                  0x80bab8                  _GRID_MEAS_Init
-                  0x80bb44                  _GRID_MEAS_SampleUpdate
-                  0x80bc00                  _GRID_MEAS_TaskSlow
-                  0x80dcbc                  _IL_CAL_Done
-                  0x80db4c                  _IL_CAL_Start
-                  0x80dc44                  _IL_CAL_Update
-                  0x80f33c                  _INTERRUPT_Deinitialize
-                  0x80f308                  _INTERRUPT_Initialize
-                  0x80f834                  _Input_Capture1
-                  0x80f80c                  _Input_Capture2
-                  0x803520                  _LLC_LINK_ByteService
-                  0x804208                  _LLC_LINK_Crc16
-                  0x8034b4                  _LLC_LINK_Init
-                  0x803738                  _LLC_LINK_Task
-                  0x803678                  _LLC_LINK_Tick1ms
-                  0x8041e4                  _LLC_LINK_TxIdle
-                  0x80a27c                  _LLC_SIGNAL_Init
-                  0x80a368                  _LLC_SIGNAL_LoadUpdate
-                  0x80a6c0                  _LLC_SIGNAL_VbusUpdate
-                  0x8086ac                  _MCC_EXT_SystemInitialize
-                  0x80bf94                  _PFC_IO_Init
-                  0x80bfd0                  _PFC_IO_RelaySet
-                  0x80bfe8                  _PFC_IO_XcapSet
-                  0x805938                  _PFC_LOOP_GridUpdate
-                  0x8058e8                  _PFC_LOOP_Init
-                  0x805948                  _PFC_LOOP_PhaseAUpdate
-                  0x805d64                  _PFC_LOOP_PhaseBUpdate
-                  0x805820                  _PFC_LOOP_Reset
-                  0x80e7ec                  _PFC_PWM_AllOutputsOff
-                  0x80e788                  _PFC_PWM_Init
-                  0x80e82c                  _PFC_PWM_SlowLegSet
-                  0x80be84                  _PINS_Initialize
-                  0x80f7e0                  _PWM3
-                  0x801f38                  _PWM_CommonEventCallbackRegister
-                  0x802010                  _PWM_CommonEventTasks
-                  0x801ce0                  _PWM_Deinitialize
-                  0x801f24                  _PWM_GeneratorEOCEventCallbackRegister
-                  0x801f48                  _PWM_GeneratorTasks
-                  0x80ec40                  _PWM_HS
-                  0x801a10                  _PWM_Initialize
-                  0x80f584                  _RESET_CauseClearAll
-                  0x80f53c                  _RESET_CauseGet
-                  0x80e910                  _SCCP1_InputCapture_CallbackRegister
-                  0x80e924                  _SCCP1_InputCapture_DataRead
-                  0x80e8c8                  _SCCP1_InputCapture_Deinitialize
-                  0x80e92c                  _SCCP1_InputCapture_HasBufferOverflowed
-                  0x80e888                  _SCCP1_InputCapture_Initialize
-                  0x80e938                  _SCCP1_InputCapture_IsBufferEmpty
-                  0x80e944                  _SCCP1_InputCapture_OverflowFlagClear
-                  0x80e900                  _SCCP1_InputCapture_Start
-                  0x80e908                  _SCCP1_InputCapture_Stop
-                  0x80e94c                  _SCCP1_InputCapture_Tasks
-                  0x80eaec                  _SCCP2_InputCapture_CallbackRegister
-                  0x80eb00                  _SCCP2_InputCapture_DataRead
-                  0x80eaa4                  _SCCP2_InputCapture_Deinitialize
-                  0x80eb08                  _SCCP2_InputCapture_HasBufferOverflowed
-                  0x80ea68                  _SCCP2_InputCapture_Initialize
-                  0x80eb14                  _SCCP2_InputCapture_IsBufferEmpty
-                  0x80eb20                  _SCCP2_InputCapture_OverflowFlagClear
-                  0x80eadc                  _SCCP2_InputCapture_Start
-                  0x80eae4                  _SCCP2_InputCapture_Stop
-                  0x80eb28                  _SCCP2_InputCapture_Tasks
-                  0x80ec00                  _SCCP3_PWM_CallbackRegister
-                  0x80eba0                  _SCCP3_PWM_Deinitialize
-                  0x80ebe0                  _SCCP3_PWM_Disable
-                  0x80ebf0                  _SCCP3_PWM_DutyCycleSet
-                  0x80ebd8                  _SCCP3_PWM_Enable
-                  0x80eb54                  _SCCP3_PWM_Initialize
-                  0x80ebe8                  _SCCP3_PWM_PeriodSet
-                  0x80ebf8                  _SCCP3_PWM_SoftwareTriggerSet
-                  0x80ec14                  _SCCP3_PWM_Tasks
-                  0x80ee78                  _SCHEDULER_Init
-                  0x80ee98                  _SCHEDULER_Run
-                  0x80d20c                  _SMPS_FloatController2P2ZErrorSeed
-                  0x80d1dc                  _SMPS_FloatController2P2ZReset
-                  0x80d234                  _SMPS_FloatController2P2ZTrackOutput
-                  0x80d134                  _SMPS_FloatController2P2ZUpdate
-                  0x80cf58                  _SMPS_FloatControllerInit
-                  0x80f20c                  _SMPS_FloatSoftStartRampToTarget
-                  0x8085b0                  _SMPS_SM_Enable
-                  0x808600                  _SMPS_SM_HealthConsume
-                  0x807e14                  _SMPS_SM_Init
-                  0x80860c                  _SMPS_SM_IsPowerGood
-                  0x8085f4                  _SMPS_SM_RequestFaultClear
-                  0x8085bc                  _SMPS_SM_SetVoutRef
-                  0x807e64                  _SMPS_SM_TaskPhaseA
-                  0x807f50                  _SMPS_SM_TaskPhaseB
-                  0x80803c                  _SMPS_SM_TaskSlow
-                  0x807518                  _SOGI_PLL_ConfigDefault
-                  0x807a68                  _SOGI_PLL_Init
-                  0x8075c8                  _SOGI_PLL_InitConfig
-                  0x807ae8                  _SOGI_PLL_Reset
-                  0x807b58                  _SOGI_PLL_Update
-                  0x80f438                  _SYSTEM_Initialize
-                  0x805604                  _Scope_Main_GetAddress
-                  0x804674                  _Scope_Main_Init
-                  0x804c74                  _Scope_Main_Load
-                  0x804d60                  _Scope_Main_Save
-                  0x804704                  _Scope_Main_Update
-                  0x80ee18                  _TMR1_Deinitialize
-                  0x80ede8                  _TMR1_Initialize
-                  0x80ee4c                  _TMR1_InterruptPrioritySet
-                  0x80ee44                  _TMR1_PeriodSet
-                  0x80ee34                  _TMR1_Start
-                  0x80ee3c                  _TMR1_Stop
-                  0x80ee64                  _TMR1_TimeoutCallbackRegister
-                  0x80f85c                  _Timer1
-                  0x80ca40                  _UART1_AutoBaudEventEnableGet
-                  0x80ca34                  _UART1_AutoBaudQuery
-                  0x80ca00                  _UART1_AutoBaudSet
-                  0x80cb38                  _UART1_BRGCountGet
-                  0x80cb30                  _UART1_BRGCountSet
-                  0x80cbbc                  _UART1_BaudRateGet
-                  0x80cb40                  _UART1_BaudRateSet
-                  0x80c92c                  _UART1_Deinitialize
-                  0x80f370                  _UART1_Drv
-                  0x80ca4c                  _UART1_ErrorGet
-                  0x80c8f8                  _UART1_Initialize
-                  0x80c9a0                  _UART1_IsRxReady
-                  0x80c9d0                  _UART1_IsTxDone
-                  0x80c9b0                  _UART1_IsTxReady
-                  0x80c948                  _UART1_Read
-                  0x80c9f8                  _UART1_TransmitDisable
-                  0x80c9f0                  _UART1_TransmitEnable
-                  0x80c980                  _UART1_Write
-                  0x80cd70                  _UART3_AutoBaudEventEnableGet
-                  0x80cd64                  _UART3_AutoBaudQuery
-                  0x80cd30                  _UART3_AutoBaudSet
-                  0x80ce68                  _UART3_BRGCountGet
-                  0x80ce60                  _UART3_BRGCountSet
-                  0x80ceec                  _UART3_BaudRateGet
-                  0x80ce70                  _UART3_BaudRateSet
-                  0x80cc5c                  _UART3_Deinitialize
-                  0x80f3d4                  _UART3_Drv
-                  0x80cd7c                  _UART3_ErrorGet
-                  0x80cc28                  _UART3_Initialize
-                  0x80ccd0                  _UART3_IsRxReady
-                  0x80cd00                  _UART3_IsTxDone
-                  0x80cce0                  _UART3_IsTxReady
-                  0x80cc78                  _UART3_Read
-                  0x80cd28                  _UART3_TransmitDisable
-                  0x80cd20                  _UART3_TransmitEnable
-                  0x80ccb0                  _UART3_Write
-                  0x80f7b4                  _UART_LINK_Flush
-                  0x80f8b4                  _UREF_Deinitialize
-                  0x80f8a4                  _UREF_Initialize
-                  0x80d9bc                  _USER_ISR_AdcScaleInit
-                  0x80f900                  _X2C_Init
-                  0x80f90c                  _X2C_Update
-                  0x80f8fc                  _X2CscopeComm_PostInit
-                  0x80d824                  _X2Cscope_Communicate
-                  0x80f784                  _X2Cscope_Init
-                  0x80d834                  _X2Cscope_InitialiseEx
-                  0x80d830                  _X2Cscope_Update
-                  0x800218                  __AD1CH1Interrupt
-                  0x800148                  __AD5CH1Interrupt
-                  0x800f44                  __DefaultInterrupt
-                  0x8002d8                  __T1Interrupt
-                  0x8000e0                  ___tls_crt_init
-                  0x8000e0                  __crt_return_stmt
-                  0x800f50                  __ctor
-                  0x8000e4                  __data_init
-                  0x8000e4                  __data_init_extended
-                  0x800f84                  __dtor
+                  0x81b8f0                  _ADC1
+                  0x817b74                  _ADC1_ChannelCallbackRegister
+                  0x817b9c                  _ADC1_ComparatorCallbackRegister
+                  0x817960                  _ADC1_Deinitialize
+                  0x8178c0                  _ADC1_Initialize
+                  0x817a04                  _ADC1_PWMTriggerSourceSet
+                  0x817b88                  _ADC1_Result32BitChannelCallbackRegister
+                  0x8179e8                  _ADC1_SharedCoreCalibration
+                  0x8179cc                  _ADC1_SharedCorePowerEnable
+                  0x81bab8                  _ADC2
+                  0x8189ec                  _ADC2_ChannelCallbackRegister
+                  0x818a14                  _ADC2_ComparatorCallbackRegister
+                  0x8187e4                  _ADC2_Deinitialize
+                  0x81874c                  _ADC2_Initialize
+                  0x81887c                  _ADC2_PWMTriggerSourceSet
+                  0x818a00                  _ADC2_Result32BitChannelCallbackRegister
+                  0x818860                  _ADC2_SharedCoreCalibration
+                  0x818844                  _ADC2_SharedCorePowerEnable
+                  0x81ba20                  _ADC3
+                  0x818520                  _ADC3_ChannelCallbackRegister
+                  0x818548                  _ADC3_ComparatorCallbackRegister
+                  0x818318                  _ADC3_Deinitialize
+                  0x818280                  _ADC3_Initialize
+                  0x8183b0                  _ADC3_PWMTriggerSourceSet
+                  0x818534                  _ADC3_Result32BitChannelCallbackRegister
+                  0x818394                  _ADC3_SharedCoreCalibration
+                  0x818378                  _ADC3_SharedCorePowerEnable
+                  0x81bb50                  _ADC4
+                  0x816bdc                  _ADC4_ChannelCallbackRegister
+                  0x816ce8                  _ADC4_ComparatorCallbackRegister
+                  0x8169a0                  _ADC4_Deinitialize
+                  0x8168e8                  _ADC4_Initialize
+                  0x816a50                  _ADC4_PWMTriggerSourceSet
+                  0x816bf0                  _ADC4_Result32BitChannelCallbackRegister
+                  0x816a34                  _ADC4_SharedCoreCalibration
+                  0x816a18                  _ADC4_SharedCorePowerEnable
+                  0x81b988                  _ADC5
+                  0x818054                  _ADC5_ChannelCallbackRegister
+                  0x81807c                  _ADC5_ComparatorCallbackRegister
+                  0x817e40                  _ADC5_Deinitialize
+                  0x817da0                  _ADC5_Initialize
+                  0x817ee4                  _ADC5_PWMTriggerSourceSet
+                  0x818068                  _ADC5_Result32BitChannelCallbackRegister
+                  0x817ec8                  _ADC5_SharedCoreCalibration
+                  0x817eac                  _ADC5_SharedCorePowerEnable
+                  0x81bfd4                  _APP_TASKS_Always
+                  0x81bfec                  _APP_TASKS_Task100us
+                  0x81c00c                  _APP_TASKS_Task10ms
+                  0x81bff0                  _APP_TASKS_Task1ms
+                  0x81c010                  _APP_TASKS_Task500ms
+                  0x819e28                  _CLOCK_Initialize
+                  0x81a69c                  _CMP1_Calibrate
+                  0x81a664                  _CMP1_Deinitialize
+                  0x81a6ec                  _CMP1_EventCallbackRegister
+                  0x81a5f8                  _CMP1_Initialize
+                  0x81a700                  _CMP1_Tasks
+                  0x81a824                  _CMP4_Calibrate
+                  0x81a7ec                  _CMP4_Deinitialize
+                  0x81a874                  _CMP4_EventCallbackRegister
+                  0x81a780                  _CMP4_Initialize
+                  0x81a888                  _CMP4_Tasks
+                  0x81a9ac                  _CMP5_Calibrate
+                  0x81a974                  _CMP5_Deinitialize
+                  0x81a9fc                  _CMP5_EventCallbackRegister
+                  0x81a908                  _CMP5_Initialize
+                  0x81aa10                  _CMP5_Tasks
+                  0x81ab34                  _CMP6_Calibrate
+                  0x81aafc                  _CMP6_Deinitialize
+                  0x81ab84                  _CMP6_EventCallbackRegister
+                  0x81aa90                  _CMP6_Initialize
+                  0x81ab98                  _CMP6_Tasks
+                  0x81acbc                  _CMP7_Calibrate
+                  0x81ac84                  _CMP7_Deinitialize
+                  0x81ad0c                  _CMP7_EventCallbackRegister
+                  0x81ac18                  _CMP7_Initialize
+                  0x81ad20                  _CMP7_Tasks
+                  0x81ae44                  _CMP8_Calibrate
+                  0x81ae0c                  _CMP8_Deinitialize
+                  0x81ae94                  _CMP8_EventCallbackRegister
+                  0x81ada0                  _CMP8_Initialize
+                  0x81aea8                  _CMP8_Tasks
+                  0x81c094                  _CMP_DAC1
+                  0x81c0c8                  _CMP_DAC4
+                  0x81c0fc                  _CMP_DAC5
+                  0x81c130                  _CMP_DAC6
+                  0x81c164                  _CMP_DAC7
+                  0x81c198                  _CMP_DAC8
+                  0x81b378                  _Common_GetAddress
+                  0x81b354                  _Common_Init
+                  0x81b35c                  _Common_Load
+                  0x81b360                  _Common_Save
+                  0x81b358                  _Common_Update
+                  0x81bf58                  _DMT_Calibrate
+                  0x81bf38                  _DMT_CalibratedCounterGet
+                  0x81b740                  _DMT_Clear
+                  0x81b7ac                  _DMT_CounterGet
+                  0x81b70c                  _DMT_Enable
+                  0x81b6fc                  _DMT_Initialize
+                  0x81b76c                  _DMT_IsPreCleared
+                  0x81b760                  _DMT_IsWindowOpen
+                  0x81b774                  _DMT_PostEventClear
+                  0x81b728                  _DMT_PreClear
+                  0x81b7a0                  _DMT_StatusGet
+                  0x81b790                  _DMT_TimeoutCounterGet
+                  0x81b798                  _DMT_WindowTimeoutCounterGet
+                  0x813634                  _FAULT_Clear
+                  0x813740                  _FAULT_ClearAll
+                  0x81af00                  _FAULT_DETECT_Evaluate
+                  0x81aed4                  _FAULT_DETECT_Init
+                  0x81b044                  _FAULT_DETECT_Reset
+                  0x813a88                  _FAULT_Evaluate
+                  0x813ba4                  _FAULT_GetLatchedFlags
+                  0x813be4                  _FAULT_GetLockedOutFlags
+                  0x8132f4                  _FAULT_Init
+                  0x813b58                  _FAULT_IsActive
+                  0x813624                  _FAULT_Set
+                  0x819df8                  _FW_UPDATE_ActivePartition
+                  0x819b54                  _FW_UPDATE_Handle
+                  0x819b38                  _FW_UPDATE_Init
+                  0x819de0                  _FW_UPDATE_IsActive
+                  0x819e14                  _FW_UPDATE_KeepAlive
+                  0x819df4                  _FW_UPDATE_NvmImplemented
+                  0x819da4                  _FW_UPDATE_Tick1ms
+                  0x818ab4                  _GRID_MEAS_Init
+                  0x818b40                  _GRID_MEAS_SampleUpdate
+                  0x818bfc                  _GRID_MEAS_TaskSlow
+                  0x81a588                  _IL_CAL_Done
+                  0x81a418                  _IL_CAL_Start
+                  0x81a510                  _IL_CAL_Update
+                  0x81bd84                  _INTERRUPT_Deinitialize
+                  0x81bd50                  _INTERRUPT_Initialize
+                  0x81c27c                  _Input_Capture1
+                  0x81c254                  _Input_Capture2
+                  0x81051c                  _LLC_LINK_ByteService
+                  0x811204                  _LLC_LINK_Crc16
+                  0x8104b0                  _LLC_LINK_Init
+                  0x810734                  _LLC_LINK_Task
+                  0x810674                  _LLC_LINK_Tick1ms
+                  0x8111e0                  _LLC_LINK_TxIdle
+                  0x817278                  _LLC_SIGNAL_Init
+                  0x817364                  _LLC_SIGNAL_LoadUpdate
+                  0x8176bc                  _LLC_SIGNAL_VbusUpdate
+                  0x8156a8                  _MCC_EXT_SystemInitialize
+                  0x81bce4                  _PFC_IO_Init
+                  0x81bd20                  _PFC_IO_RelaySet
+                  0x81bd38                  _PFC_IO_XcapSet
+                  0x812934                  _PFC_LOOP_GridUpdate
+                  0x8128e4                  _PFC_LOOP_Init
+                  0x812944                  _PFC_LOOP_PhaseAUpdate
+                  0x812d60                  _PFC_LOOP_PhaseBUpdate
+                  0x81281c                  _PFC_LOOP_Reset
+                  0x81b1c8                  _PFC_PWM_AllOutputsOff
+                  0x81b164                  _PFC_PWM_Init
+                  0x81b208                  _PFC_PWM_SlowLegSet
+                  0x81b054                  _PINS_Initialize
+                  0x81c228                  _PWM3
+                  0x80ef34                  _PWM_CommonEventCallbackRegister
+                  0x80f00c                  _PWM_CommonEventTasks
+                  0x80ecdc                  _PWM_Deinitialize
+                  0x80ef20                  _PWM_GeneratorEOCEventCallbackRegister
+                  0x80ef44                  _PWM_GeneratorTasks
+                  0x81b61c                  _PWM_HS
+                  0x80ea0c                  _PWM_Initialize
+                  0x81bfcc                  _RESET_CauseClearAll
+                  0x81bf84                  _RESET_CauseGet
+                  0x81b2ec                  _SCCP1_InputCapture_CallbackRegister
+                  0x81b300                  _SCCP1_InputCapture_DataRead
+                  0x81b2a4                  _SCCP1_InputCapture_Deinitialize
+                  0x81b308                  _SCCP1_InputCapture_HasBufferOverflowed
+                  0x81b264                  _SCCP1_InputCapture_Initialize
+                  0x81b314                  _SCCP1_InputCapture_IsBufferEmpty
+                  0x81b320                  _SCCP1_InputCapture_OverflowFlagClear
+                  0x81b2dc                  _SCCP1_InputCapture_Start
+                  0x81b2e4                  _SCCP1_InputCapture_Stop
+                  0x81b328                  _SCCP1_InputCapture_Tasks
+                  0x81b4c8                  _SCCP2_InputCapture_CallbackRegister
+                  0x81b4dc                  _SCCP2_InputCapture_DataRead
+                  0x81b480                  _SCCP2_InputCapture_Deinitialize
+                  0x81b4e4                  _SCCP2_InputCapture_HasBufferOverflowed
+                  0x81b444                  _SCCP2_InputCapture_Initialize
+                  0x81b4f0                  _SCCP2_InputCapture_IsBufferEmpty
+                  0x81b4fc                  _SCCP2_InputCapture_OverflowFlagClear
+                  0x81b4b8                  _SCCP2_InputCapture_Start
+                  0x81b4c0                  _SCCP2_InputCapture_Stop
+                  0x81b504                  _SCCP2_InputCapture_Tasks
+                  0x81b5dc                  _SCCP3_PWM_CallbackRegister
+                  0x81b57c                  _SCCP3_PWM_Deinitialize
+                  0x81b5bc                  _SCCP3_PWM_Disable
+                  0x81b5cc                  _SCCP3_PWM_DutyCycleSet
+                  0x81b5b4                  _SCCP3_PWM_Enable
+                  0x81b530                  _SCCP3_PWM_Initialize
+                  0x81b5c4                  _SCCP3_PWM_PeriodSet
+                  0x81b5d4                  _SCCP3_PWM_SoftwareTriggerSet
+                  0x81b5f0                  _SCCP3_PWM_Tasks
+                  0x81b854                  _SCHEDULER_Init
+                  0x81b874                  _SCHEDULER_Run
+                  0x819ad8                  _SMPS_FloatController2P2ZErrorSeed
+                  0x819aa8                  _SMPS_FloatController2P2ZReset
+                  0x819b00                  _SMPS_FloatController2P2ZTrackOutput
+                  0x819a00                  _SMPS_FloatController2P2ZUpdate
+                  0x819824                  _SMPS_FloatControllerInit
+                  0x81bbe8                  _SMPS_FloatSoftStartRampToTarget
+                  0x8155ac                  _SMPS_SM_Enable
+                  0x8155fc                  _SMPS_SM_HealthConsume
+                  0x814e10                  _SMPS_SM_Init
+                  0x815608                  _SMPS_SM_IsPowerGood
+                  0x8155f0                  _SMPS_SM_RequestFaultClear
+                  0x8155b8                  _SMPS_SM_SetVoutRef
+                  0x814e60                  _SMPS_SM_TaskPhaseA
+                  0x814f4c                  _SMPS_SM_TaskPhaseB
+                  0x815038                  _SMPS_SM_TaskSlow
+                  0x814514                  _SOGI_PLL_ConfigDefault
+                  0x814a64                  _SOGI_PLL_Init
+                  0x8145c4                  _SOGI_PLL_InitConfig
+                  0x814ae4                  _SOGI_PLL_Reset
+                  0x814b54                  _SOGI_PLL_Update
+                  0x81be80                  _SYSTEM_Initialize
+                  0x812600                  _Scope_Main_GetAddress
+                  0x811670                  _Scope_Main_Init
+                  0x811c70                  _Scope_Main_Load
+                  0x811d5c                  _Scope_Main_Save
+                  0x811700                  _Scope_Main_Update
+                  0x81b7f4                  _TMR1_Deinitialize
+                  0x81b7c4                  _TMR1_Initialize
+                  0x81b828                  _TMR1_InterruptPrioritySet
+                  0x81b820                  _TMR1_PeriodSet
+                  0x81b810                  _TMR1_Start
+                  0x81b818                  _TMR1_Stop
+                  0x81b840                  _TMR1_TimeoutCallbackRegister
+                  0x81c2a4                  _Timer1
+                  0x81930c                  _UART1_AutoBaudEventEnableGet
+                  0x819300                  _UART1_AutoBaudQuery
+                  0x8192cc                  _UART1_AutoBaudSet
+                  0x819404                  _UART1_BRGCountGet
+                  0x8193fc                  _UART1_BRGCountSet
+                  0x819488                  _UART1_BaudRateGet
+                  0x81940c                  _UART1_BaudRateSet
+                  0x8191f8                  _UART1_Deinitialize
+                  0x81bdb8                  _UART1_Drv
+                  0x819318                  _UART1_ErrorGet
+                  0x8191c4                  _UART1_Initialize
+                  0x81926c                  _UART1_IsRxReady
+                  0x81929c                  _UART1_IsTxDone
+                  0x81927c                  _UART1_IsTxReady
+                  0x819214                  _UART1_Read
+                  0x8192c4                  _UART1_TransmitDisable
+                  0x8192bc                  _UART1_TransmitEnable
+                  0x81924c                  _UART1_Write
+                  0x81963c                  _UART3_AutoBaudEventEnableGet
+                  0x819630                  _UART3_AutoBaudQuery
+                  0x8195fc                  _UART3_AutoBaudSet
+                  0x819734                  _UART3_BRGCountGet
+                  0x81972c                  _UART3_BRGCountSet
+                  0x8197b8                  _UART3_BaudRateGet
+                  0x81973c                  _UART3_BaudRateSet
+                  0x819528                  _UART3_Deinitialize
+                  0x81be1c                  _UART3_Drv
+                  0x819648                  _UART3_ErrorGet
+                  0x8194f4                  _UART3_Initialize
+                  0x81959c                  _UART3_IsRxReady
+                  0x8195cc                  _UART3_IsTxDone
+                  0x8195ac                  _UART3_IsTxReady
+                  0x819544                  _UART3_Read
+                  0x8195f4                  _UART3_TransmitDisable
+                  0x8195ec                  _UART3_TransmitEnable
+                  0x81957c                  _UART3_Write
+                  0x81c1fc                  _UART_LINK_Flush
+                  0x81c2fc                  _UREF_Deinitialize
+                  0x81c2ec                  _UREF_Initialize
+                  0x81a288                  _USER_ISR_AdcScaleInit
+                  0x81c348                  _X2C_Init
+                  0x81c354                  _X2C_Update
+                  0x81c344                  _X2CscopeComm_PostInit
+                  0x81a0f0                  _X2Cscope_Communicate
+                  0x81c1cc                  _X2Cscope_Init
+                  0x81a100                  _X2Cscope_InitialiseEx
+                  0x81a0fc                  _X2Cscope_Update
+                  0x80d214                  __AD1CH1Interrupt
+                  0x80d144                  __AD5CH1Interrupt
+                  0x80df40                  __DefaultInterrupt
+                  0x80d2d4                  __T1Interrupt
+                  0x80d0dc                  ___tls_crt_init
+                  0x80d0dc                  __crt_return_stmt
+                  0x80df4c                  __ctor
+                  0x80d0e0                  __data_init
+                  0x80d0e0                  __data_init_extended
+                  0x80df80                  __dtor
                   0x80c000                  __ivt_0
-                  0x800004                  __resetPRI
-                  0x80a24c                  _addBlockServices
-                  0x8074e8                  _addCoreServices
-                  0x80a26c                  _addExtendedBlockServices
-                  0x80f2d4                  _addTableStructProtocol
-                  0x80f61c                  _blockFunctionTable
-                  0x80f8c0                  _compilationDate
-                  0x80f914                  _fltFastIdMap
-                  0x80d80c                  _flushSerialWrapper
-                  0x80e9c0                  _getAbsValI16
-                  0x80e9d8                  _getAbsValI32
-                  0x80ea00                  _getAbsValI64
-                  0x80e9a0                  _getAbsValI8
-                  0x80ea38                  _getAbsValR32
-                  0x80ea50                  _getAbsValR64
-                  0x80a16c                  _getBlockData
-                  0x809ecc                  _getRAMBlock
-                  0x8096c4                  _initLNet
-                  0x80d990                  _initSerial
-                  0x80f4b0                  _initSerialGeneric
-                  0x8074c8                  _initServiceTable
-                  0x80f290                  _initTableStruct
-                  0x80f920                  _initVersionInfo
-                  0x80f8f4                  _isReceiveDataAvailable
-                  0x80d7f4                  _isReceiveDataAvailableWrapper
-                  0x80f8f8                  _isSendReady
-                  0x80d800                  _isSendReadyWrapper
-                  0x80f4e4                  _linkSerial
-                  0x80f5cc                  _main
-                  0x800fc8                  _memcmp
-                  0x800ff8                  _memcpy
-                  0x80f60c                  _parameterIdTable
-                  0x80a070                  _putBlockData
-                  0x809cf4                  _putRAMBlock
-                  0x80f8f0                  _receiveSerial
-                  0x80d7e8                  _receiveSerialWrapper
-                  0x8074b0                  _sendError
-                  0x80f8ec                  _sendSerial
-                  0x80d7d8                  _sendSerialWrapper
-                  0x806bf4                  _sendSvNotAvailable
-                  0x800fa8                  _sqrtf
-                  0x80f8d8                  _where_was_i
+                  0x80d000                  __resetPRI
+                  0x817248                  _addBlockServices
+                  0x8144e4                  _addCoreServices
+                  0x817268                  _addExtendedBlockServices
+                  0x81bcb0                  _addTableStructProtocol
+                  0x81c064                  _blockFunctionTable
+                  0x81c308                  _compilationDate
+                  0x81c35c                  _fltFastIdMap
+                  0x81a0d8                  _flushSerialWrapper
+                  0x81b39c                  _getAbsValI16
+                  0x81b3b4                  _getAbsValI32
+                  0x81b3dc                  _getAbsValI64
+                  0x81b37c                  _getAbsValI8
+                  0x81b414                  _getAbsValR32
+                  0x81b42c                  _getAbsValR64
+                  0x817168                  _getBlockData
+                  0x816ec8                  _getRAMBlock
+                  0x8166c0                  _initLNet
+                  0x81a25c                  _initSerial
+                  0x81bef8                  _initSerialGeneric
+                  0x8144c4                  _initServiceTable
+                  0x81bc6c                  _initTableStruct
+                  0x81c368                  _initVersionInfo
+                  0x81c33c                  _isReceiveDataAvailable
+                  0x81a0c0                  _isReceiveDataAvailableWrapper
+                  0x81c340                  _isSendReady
+                  0x81a0cc                  _isSendReadyWrapper
+                  0x81bf2c                  _linkSerial
+                  0x81c014                  _main
+                  0x80dfc4                  _memcmp
+                  0x80dff4                  _memcpy
+                  0x81c054                  _parameterIdTable
+                  0x81706c                  _putBlockData
+                  0x816cf0                  _putRAMBlock
+                  0x81c338                  _receiveSerial
+                  0x81a0b4                  _receiveSerialWrapper
+                  0x8144ac                  _sendError
+                  0x81c334                  _sendSerial
+                  0x81a0a4                  _sendSerialWrapper
+                  0x813bf0                  _sendSvNotAvailable
+                  0x80dfa4                  _sqrtf
+                  0x81c320                  _where_was_i
 
 
 #pragma config definitions maximum
@@ -1557,7 +1552,7 @@ FPED             0x7f40a0           0x000002
 FEPUCB           0x7f40b0           0x000002  
 FWPUCB           0x7f40c0           0x000002  
 reset            0x800000           0x000004  
-program          0x800004           0x01fffc           xr
+program          0x80d000           0x013000           xr
 *default*        0x000000           0xffffffff  
 
 Linker script and memory map
@@ -1714,74 +1709,74 @@ LOAD c:/program files/microchip/xc-dsc/v4.00/bin/bin/../../lib\libfx-elf.a
                     0x7f40c0                  __FWPUCB = 0x7f40c0
                     0x7f40c0                  __FWPUCB = 0x7f40c0
                     0x7f40c0                  __FWPUCB = 0x7f40c0
-                    0x801000                  __CODE_BASE = 0x801000
-                    0x1f000                  __CODE_LENGTH = 0x1f000
+                    0x80d000                  __CODE_BASE = 0x80d000
+                    0x13000                  __CODE_LENGTH = 0x13000
                     0x4000                  __DATA_BASE = 0x4000
                     0x10000                  __DATA_LENGTH = 0x10000
                     0xc000                  __YDATA_BASE = 0xc000
                     0x14000                  __YDATA_END = 0x14000
 
 .reset            0x800000          0x4
-                  0x800000          0x4 LONG 0x800004 ABSOLUTE (__reset)
+                  0x800000          0x4 LONG 0x80d000 ABSOLUTE (__reset)
 
-.text             0x800004       0x1010
+.text             0x80d000       0x1010
  *(.init)
- .init            0x800004         0xe0 c:/program files/microchip/xc-dsc/v4.00/bin/bin/../../lib\libc99-pic30-elf.a(crt0_extendedaa.o)
-                  0x800004                  __reset
-                  0x800004                  __resetPRI
-                  0x8000e0                  __crt_return_stmt
-                  0x8000e0                  ___tls_crt_init
- .init            0x8000e4         0x64 c:/program files/microchip/xc-dsc/v4.00/bin/bin/../../lib\libc99-pic30-elf.a(data_init_extendedaa.o)
-                  0x8000e4                  __data_init_extended
-                  0x8000e4                  __data_init
+ .init            0x80d000         0xe0 c:/program files/microchip/xc-dsc/v4.00/bin/bin/../../lib\libc99-pic30-elf.a(crt0_extendedaa.o)
+                  0x80d000                  __reset
+                  0x80d000                  __resetPRI
+                  0x80d0dc                  __crt_return_stmt
+                  0x80d0dc                  ___tls_crt_init
+ .init            0x80d0e0         0x64 c:/program files/microchip/xc-dsc/v4.00/bin/bin/../../lib\libc99-pic30-elf.a(data_init_extendedaa.o)
+                  0x80d0e0                  __data_init_extended
+                  0x80d0e0                  __data_init
  *(.user_init)
  *(.handle)
  *(.isr*)
- .isr.isr.text    0x800148        0x250 build/default/production/sources/isr/user_isr.o
-                  0x800148                  __AD5CH1Interrupt
-                  0x800218                  __AD1CH1Interrupt
-                  0x8002d8                  __T1Interrupt
- .isr.isr.text    0x800398        0x128 build/default/production/mcc_generated_files/adc/src/adc1.o
-                  0x800398                  __AD1CH0Interrupt
- .isr.isr.text    0x8004c0        0x128 build/default/production/mcc_generated_files/adc/src/adc5.o
-                  0x8004c0                  __AD5CH0Interrupt
- .isr.isr.text    0x8005e8        0x128 build/default/production/mcc_generated_files/adc/src/adc3.o
-                  0x8005e8                  __AD3CH0Interrupt
-                  0x80067c                  __AD3CH1Interrupt
- .isr.isr.text    0x800710        0x128 build/default/production/mcc_generated_files/adc/src/adc2.o
-                  0x800710                  __AD2CH0Interrupt
-                  0x8007a4                  __AD2CH1Interrupt
- .isr.isr.text    0x800838        0x1bc build/default/production/mcc_generated_files/adc/src/adc4.o
-                  0x800838                  __AD4CH0Interrupt
-                  0x8008cc                  __AD4CH1Interrupt
-                  0x800960                  __AD4CH2Interrupt
- .isr.isr.text    0x8009f4        0x4f0 build/default/production/mcc_generated_files/system/src/traps.o
-                  0x8009f4                  __BusErrorTrap
-                  0x800ad0                  __MathErrorTrap
-                  0x800ca4                  __AddressErrorTrap
-                  0x800d04                  __GeneralTrap
-                  0x800e10                  __StackErrorTrap
-                  0x800e84                  __IllegalInstructionTrap
- .isr.isr.text    0x800ee4         0x60 build/default/production/mcc_generated_files/timer/src/tmr1.o
- .isr             0x800f44          0x8 default_isr
-                  0x800f44                  __DefaultInterrupt
+ .isr.isr.text    0x80d144        0x250 build/default/production/sources/isr/user_isr.o
+                  0x80d144                  __AD5CH1Interrupt
+                  0x80d214                  __AD1CH1Interrupt
+                  0x80d2d4                  __T1Interrupt
+ .isr.isr.text    0x80d394        0x128 build/default/production/mcc_generated_files/adc/src/adc1.o
+                  0x80d394                  __AD1CH0Interrupt
+ .isr.isr.text    0x80d4bc        0x128 build/default/production/mcc_generated_files/adc/src/adc5.o
+                  0x80d4bc                  __AD5CH0Interrupt
+ .isr.isr.text    0x80d5e4        0x128 build/default/production/mcc_generated_files/adc/src/adc3.o
+                  0x80d5e4                  __AD3CH0Interrupt
+                  0x80d678                  __AD3CH1Interrupt
+ .isr.isr.text    0x80d70c        0x128 build/default/production/mcc_generated_files/adc/src/adc2.o
+                  0x80d70c                  __AD2CH0Interrupt
+                  0x80d7a0                  __AD2CH1Interrupt
+ .isr.isr.text    0x80d834        0x1bc build/default/production/mcc_generated_files/adc/src/adc4.o
+                  0x80d834                  __AD4CH0Interrupt
+                  0x80d8c8                  __AD4CH1Interrupt
+                  0x80d95c                  __AD4CH2Interrupt
+ .isr.isr.text    0x80d9f0        0x4f0 build/default/production/mcc_generated_files/system/src/traps.o
+                  0x80d9f0                  __BusErrorTrap
+                  0x80dacc                  __MathErrorTrap
+                  0x80dca0                  __AddressErrorTrap
+                  0x80dd00                  __GeneralTrap
+                  0x80de0c                  __StackErrorTrap
+                  0x80de80                  __IllegalInstructionTrap
+ .isr.isr.text    0x80dee0         0x60 build/default/production/mcc_generated_files/timer/src/tmr1.o
+ .isr             0x80df40          0x8 default_isr
+                  0x80df40                  __DefaultInterrupt
  *(.libc)
  *(.libm)
  *(.libdsp)
  *(.lib*)
  .libpic30_crt_start_mode
-                  0x800f4c          0x4 c:/program files/microchip/xc-dsc/v4.00/bin/bin/../../lib\libc99-pic30-elf.a(crt_start_mode_normal.AAMeo)
-                  0x800f4c                  __crt_start_mode
-                  0x800f4c                  __crt_start_mode_normal
- .lib.ctor        0x800f50         0x58 c:/program files/microchip/xc-dsc/v4.00/bin/bin/../../lib\libc99-pic30-elf.a(crt_ctor.aa.AAMeo)
-                  0x800f50                  __ctor
-                  0x800f84                  __dtor
- .libc.sqrtf      0x800fa8         0x20 c:/program files/microchip/xc-dsc/v4.00/bin/bin/../../lib\libm-elf.a(sqrtf.AA_o)
-                  0x800fa8                  _sqrtf
- .libc.memcmp     0x800fc8         0x30 c:/program files/microchip/xc-dsc/v4.00/bin/bin/../../lib\libc99-elf.a(memcmp.AA_o)
-                  0x800fc8                  _memcmp
- .libc.memcpy     0x800ff8         0x1c c:/program files/microchip/xc-dsc/v4.00/bin/bin/../../lib\libc99-elf.a(memcpy.AA_o)
-                  0x800ff8                  _memcpy
+                  0x80df48          0x4 c:/program files/microchip/xc-dsc/v4.00/bin/bin/../../lib\libc99-pic30-elf.a(crt_start_mode_normal.AAMeo)
+                  0x80df48                  __crt_start_mode
+                  0x80df48                  __crt_start_mode_normal
+ .lib.ctor        0x80df4c         0x58 c:/program files/microchip/xc-dsc/v4.00/bin/bin/../../lib\libc99-pic30-elf.a(crt_ctor.aa.AAMeo)
+                  0x80df4c                  __ctor
+                  0x80df80                  __dtor
+ .libc.sqrtf      0x80dfa4         0x20 c:/program files/microchip/xc-dsc/v4.00/bin/bin/../../lib\libm-elf.a(sqrtf.AA_o)
+                  0x80dfa4                  _sqrtf
+ .libc.memcmp     0x80dfc4         0x30 c:/program files/microchip/xc-dsc/v4.00/bin/bin/../../lib\libc99-elf.a(memcmp.AA_o)
+                  0x80dfc4                  _memcmp
+ .libc.memcpy     0x80dff4         0x1c c:/program files/microchip/xc-dsc/v4.00/bin/bin/../../lib\libc99-elf.a(memcpy.AA_o)
+                  0x80dff4                  _memcpy
 
 usercode
  *(usercode)
@@ -7805,39 +7800,39 @@ __c30_signature
                     0x4178                  _g_fwUpdateNextOffset
                     0x417c                  _g_fwUpdateState
 
-_000001e3031ba3f06aec4e80
+_000002512d2df3f06aec5001
                     0x4180          0xc
- _000001e3031ba3f06aec4e80
+ _000002512d2df3f06aec5001
                     0x4180          0xc build/default/production/sources/apps/control/smps_control.o
                     0x4180                  _ibFloatComp2p2zErrorHistory
 
-_000001e3031ba2d06aec4e80
+_000002512d2df2d06aec5001
                     0x418c          0xc
- _000001e3031ba2d06aec4e80
+ _000002512d2df2d06aec5001
                     0x418c          0xc build/default/production/sources/apps/control/smps_control.o
                     0x418c                  _ibFloatComp2p2zBCoefficients
 
-_000001e3031ba1b06aec4e80
+_000002512d2df1b06aec5001
                     0x4198          0xc
- _000001e3031ba1b06aec4e80
+ _000002512d2df1b06aec5001
                     0x4198          0xc build/default/production/sources/apps/control/smps_control.o
                     0x4198                  _iaFloatComp2p2zErrorHistory
 
-_000001e3031ba0906aec4e80
+_000002512d2df0906aec5001
                     0x41a4          0xc
- _000001e3031ba0906aec4e80
+ _000002512d2df0906aec5001
                     0x41a4          0xc build/default/production/sources/apps/control/smps_control.o
                     0x41a4                  _iaFloatComp2p2zBCoefficients
 
-_000001e3031aaea06aec4e80
+_000002512d2cfea06aec5001
                     0x41b0          0xc
- _000001e3031aaea06aec4e80
+ _000002512d2cfea06aec5001
                     0x41b0          0xc build/default/production/sources/apps/control/smps_control.o
                     0x41b0                  _vFloatComp2p2zErrorHistory
 
-_000001e3031aad806aec4e80
+_000002512d2cfd806aec5001
                     0x41bc          0xc
- _000001e3031aad806aec4e80
+ _000002512d2cfd806aec5001
                     0x41bc          0xc build/default/production/sources/apps/control/smps_control.o
                     0x41bc                  _vFloatComp2p2zBCoefficients
 
@@ -7849,39 +7844,39 @@ _000001e3031aad806aec4e80
                     0x41ce                  _schedLocalTick
                     0x41d0                  _g_schedulerTickCount
 
-_000001e3031ba3606aec4e80
+_000002512d2df3606aec5001
                     0x41d4          0x8
- _000001e3031ba3606aec4e80
+ _000002512d2df3606aec5001
                     0x41d4          0x8 build/default/production/sources/apps/control/smps_control.o
                     0x41d4                  _ibFloatComp2p2zControlHistory
 
-_000001e3031ba2406aec4e80
+_000002512d2df2406aec5001
                     0x41dc          0x8
- _000001e3031ba2406aec4e80
+ _000002512d2df2406aec5001
                     0x41dc          0x8 build/default/production/sources/apps/control/smps_control.o
                     0x41dc                  _ibFloatComp2p2zACoefficients
 
-_000001e3031ba1206aec4e80
+_000002512d2df1206aec5001
                     0x41e4          0x8
- _000001e3031ba1206aec4e80
+ _000002512d2df1206aec5001
                     0x41e4          0x8 build/default/production/sources/apps/control/smps_control.o
                     0x41e4                  _iaFloatComp2p2zControlHistory
 
-_000001e3031ba0006aec4e80
+_000002512d2df0006aec5001
                     0x41ec          0x8
- _000001e3031ba0006aec4e80
+ _000002512d2df0006aec5001
                     0x41ec          0x8 build/default/production/sources/apps/control/smps_control.o
                     0x41ec                  _iaFloatComp2p2zACoefficients
 
-_000001e3031aae106aec4e80
+_000002512d2cfe106aec5001
                     0x41f4          0x8
- _000001e3031aae106aec4e80
+ _000002512d2cfe106aec5001
                     0x41f4          0x8 build/default/production/sources/apps/control/smps_control.o
                     0x41f4                  _vFloatComp2p2zControlHistory
 
-_000001e3031aaf306aec4e80
+_000002512d2cff306aec5001
                     0x41fc          0x8
- _000001e3031aaf306aec4e80
+ _000002512d2cff306aec5001
                     0x41fc          0x8 build/default/production/sources/apps/control/smps_control.o
                     0x41fc                  _vFloatComp2p2zACoefficients
 
@@ -7919,8 +7914,8 @@ _000001e3031aaf306aec4e80
  .nbss              0x4270          0x4 build/default/production/mcc_generated_files/input_capture/src/sccp1.o
  .nbss              0x4274          0x4 build/default/production/mcc_generated_files/pwm/src/sccp3.o
 
-abac6aec4e86_0      0x4278          0x4
- abac6aec4e86_0
+dd306aec5005_0      0x4278          0x4
+ dd306aec5005_0
                     0x4278          0x4 build/default/production/mcc_generated_files/system/src/where_was_i.o
                     0x4278                  _trapSrcAddr
 
@@ -8314,528 +8309,521 @@ __ivt_0           0x80c000        0x5b4
  .config_BKUP_WPUCA
                   0x7f3800          0x4 build/default/production/mcc_generated_files/system/src/config_bits.o
 
-.text             0x801014       0xae70
- .text            0x801014       0x1e50 build/default/production/mcc_generated_files/pwm_hs/src/pwm.o
-                  0x801a10                  _PWM_Initialize
-                  0x801ce0                  _PWM_Deinitialize
-                  0x801f24                  _PWM_GeneratorEOCEventCallbackRegister
-                  0x801f34                  _PWM_GeneratorEOCEventCallback
-                  0x801f38                  _PWM_CommonEventCallbackRegister
-                  0x801f48                  _PWM_GeneratorTasks
-                  0x802010                  _PWM_CommonEventTasks
-                  0x802e60                  _PWM_CommonEventCallback
- .text            0x802e64       0x13ec build/default/production/sources/apps/comm/llc_link.o
-                  0x8034b4                  _LLC_LINK_Init
-                  0x803520                  _LLC_LINK_ByteService
-                  0x803678                  _LLC_LINK_Tick1ms
-                  0x803738                  _LLC_LINK_Task
-                  0x8041e4                  _LLC_LINK_TxIdle
-                  0x804208                  _LLC_LINK_Crc16
- .text            0x804250       0x13b8 sources\third_party\X2Cscope\libx2cscope-generic-32dsp-dspic33a-mlarge-elf.a(generic-32dsp-akScope_Main.o)
-                  0x804674                  _Scope_Main_Init
-                  0x804704                  _Scope_Main_Update
-                  0x804c74                  _Scope_Main_Load
-                  0x804d60                  _Scope_Main_Save
-                  0x805604                  _Scope_Main_GetAddress
- .text            0x805608        0xca8 build/default/production/sources/apps/control/pfc_loop.o
-                  0x805820                  _PFC_LOOP_Reset
-                  0x8058e8                  _PFC_LOOP_Init
-                  0x805938                  _PFC_LOOP_GridUpdate
-                  0x805948                  _PFC_LOOP_PhaseAUpdate
-                  0x805d64                  _PFC_LOOP_PhaseBUpdate
- .text            0x8062b0        0x944 build/default/production/sources/apps/fault/fault.o
-                  0x8062f8                  _FAULT_Init
-                  0x806628                  _FAULT_Set
-                  0x806638                  _FAULT_Clear
-                  0x806744                  _FAULT_ClearAll
-                  0x806a8c                  _FAULT_Evaluate
-                  0x806b5c                  _FAULT_IsActive
-                  0x806ba8                  _FAULT_GetLatchedFlags
-                  0x806be8                  _FAULT_GetLockedOutFlags
- .text            0x806bf4        0x924 sources\third_party\X2Cscope\libx2cscope-generic-32dsp-dspic33a-mlarge-elf.a(generic-32dsp-akServices.o)
-                  0x806bf4                  _sendSvNotAvailable
-                  0x8074b0                  _sendError
-                  0x8074c8                  _initServiceTable
-                  0x8074e8                  _addCoreServices
- .text            0x807518        0x8d4 build/default/production/sources/apps/pll/sogi_pll.o
-                  0x807518                  _SOGI_PLL_ConfigDefault
-                  0x8075c8                  _SOGI_PLL_InitConfig
-                  0x807a68                  _SOGI_PLL_Init
-                  0x807ae8                  _SOGI_PLL_Reset
-                  0x807b58                  _SOGI_PLL_Update
- .text            0x807dec        0x8c0 build/default/production/sources/apps/control/smps_sm.o
-                  0x807e14                  _SMPS_SM_Init
-                  0x807e64                  _SMPS_SM_TaskPhaseA
-                  0x807f50                  _SMPS_SM_TaskPhaseB
-                  0x80803c                  _SMPS_SM_TaskSlow
-                  0x8085b0                  _SMPS_SM_Enable
-                  0x8085bc                  _SMPS_SM_SetVoutRef
-                  0x8085f4                  _SMPS_SM_RequestFaultClear
-                  0x808600                  _SMPS_SM_HealthConsume
-                  0x80860c                  _SMPS_SM_IsPowerGood
- .text            0x8086ac        0x888 build/default/production/sources/drivers/mcc_extended/mcc_ext.o
-                  0x8086ac                  _MCC_EXT_SystemInitialize
- .text            0x808f34        0x7bc sources\third_party\X2Cscope\libx2cscope-generic-32dsp-dspic33a-mlarge-elf.a(generic-32dsp-akLNet.o)
-                  0x8096c4                  _initLNet
- .text            0x8096f0        0x604 build/default/production/mcc_generated_files/adc/src/adc4.o
-                  0x8098ec                  _ADC4_Initialize
-                  0x8099a4                  _ADC4_Deinitialize
-                  0x809a1c                  _ADC4_SharedCorePowerEnable
-                  0x809a38                  _ADC4_SharedCoreCalibration
-                  0x809a54                  _ADC4_PWMTriggerSourceSet
-                  0x809be0                  _ADC4_ChannelCallbackRegister
-                  0x809bf0                  _ADC4_ChannelCallback
-                  0x809bf4                  _ADC4_Result32BitChannelCallbackRegister
-                  0x809c04                  _ADC4_Result32BitChannelCallback
-                  0x809c08                  _ADC4_ChannelTasks
-                  0x809cec                  _ADC4_ComparatorCallbackRegister
-                  0x809cf0                  _ADC4_ComparatorCallback
- .text            0x809cf4        0x588 sources\third_party\X2Cscope\libx2cscope-generic-32dsp-dspic33a-mlarge-elf.a(generic-32dsp-akBlockServicesX2C.o)
-                  0x809cf4                  _putRAMBlock
-                  0x809ecc                  _getRAMBlock
-                  0x80a070                  _putBlockData
-                  0x80a16c                  _getBlockData
-                  0x80a24c                  _addBlockServices
-                  0x80a26c                  _addExtendedBlockServices
- .text            0x80a27c        0x4e4 build/default/production/sources/drivers/llc_signal/llc_signal.o
-                  0x80a27c                  _LLC_SIGNAL_Init
-                  0x80a368                  _LLC_SIGNAL_LoadUpdate
-                  0x80a6c0                  _LLC_SIGNAL_VbusUpdate
- .text            0x80a760        0x4e0 build/default/production/mcc_generated_files/adc/src/adc1.o
-                  0x80a8c4                  _ADC1_Initialize
-                  0x80a964                  _ADC1_Deinitialize
-                  0x80a9d0                  _ADC1_SharedCorePowerEnable
-                  0x80a9ec                  _ADC1_SharedCoreCalibration
-                  0x80aa08                  _ADC1_PWMTriggerSourceSet
-                  0x80ab78                  _ADC1_ChannelCallbackRegister
-                  0x80ab88                  _ADC1_ChannelCallback
-                  0x80ab8c                  _ADC1_Result32BitChannelCallbackRegister
-                  0x80ab9c                  _ADC1_Result32BitChannelCallback
-                  0x80aba0                  _ADC1_ComparatorCallbackRegister
-                  0x80aba4                  _ADC1_ComparatorCallback
-                  0x80aba8                  _ADC1_ChannelTasks
- .text            0x80ac40        0x4e0 build/default/production/mcc_generated_files/adc/src/adc5.o
-                  0x80ada4                  _ADC5_Initialize
-                  0x80ae44                  _ADC5_Deinitialize
-                  0x80aeb0                  _ADC5_SharedCorePowerEnable
-                  0x80aecc                  _ADC5_SharedCoreCalibration
-                  0x80aee8                  _ADC5_PWMTriggerSourceSet
-                  0x80b058                  _ADC5_ChannelCallbackRegister
-                  0x80b068                  _ADC5_ChannelCallback
-                  0x80b06c                  _ADC5_Result32BitChannelCallbackRegister
-                  0x80b07c                  _ADC5_Result32BitChannelCallback
-                  0x80b080                  _ADC5_ComparatorCallbackRegister
-                  0x80b084                  _ADC5_ComparatorCallback
-                  0x80b088                  _ADC5_ChannelTasks
- .text            0x80b120        0x4cc build/default/production/mcc_generated_files/adc/src/adc3.o
-                  0x80b284                  _ADC3_Initialize
-                  0x80b31c                  _ADC3_Deinitialize
-                  0x80b37c                  _ADC3_SharedCorePowerEnable
-                  0x80b398                  _ADC3_SharedCoreCalibration
-                  0x80b3b4                  _ADC3_PWMTriggerSourceSet
-                  0x80b524                  _ADC3_ChannelCallbackRegister
-                  0x80b534                  _ADC3_ChannelCallback
-                  0x80b538                  _ADC3_Result32BitChannelCallbackRegister
-                  0x80b548                  _ADC3_Result32BitChannelCallback
-                  0x80b54c                  _ADC3_ComparatorCallbackRegister
-                  0x80b550                  _ADC3_ComparatorCallback
-                  0x80b554                  _ADC3_ChannelTasks
- .text            0x80b5ec        0x4cc build/default/production/mcc_generated_files/adc/src/adc2.o
-                  0x80b750                  _ADC2_Initialize
-                  0x80b7e8                  _ADC2_Deinitialize
-                  0x80b848                  _ADC2_SharedCorePowerEnable
-                  0x80b864                  _ADC2_SharedCoreCalibration
-                  0x80b880                  _ADC2_PWMTriggerSourceSet
-                  0x80b9f0                  _ADC2_ChannelCallbackRegister
-                  0x80ba00                  _ADC2_ChannelCallback
-                  0x80ba04                  _ADC2_Result32BitChannelCallbackRegister
-                  0x80ba14                  _ADC2_Result32BitChannelCallback
-                  0x80ba18                  _ADC2_ComparatorCallbackRegister
-                  0x80ba1c                  _ADC2_ComparatorCallback
-                  0x80ba20                  _ADC2_ChannelTasks
- .text            0x80bab8        0x3cc build/default/production/sources/apps/meas/grid_meas.o
-                  0x80bab8                  _GRID_MEAS_Init
-                  0x80bb44                  _GRID_MEAS_SampleUpdate
-                  0x80bc00                  _GRID_MEAS_TaskSlow
+.text             0x80e010       0xae70
+ .text            0x80e010       0x1e50 build/default/production/mcc_generated_files/pwm_hs/src/pwm.o
+                  0x80ea0c                  _PWM_Initialize
+                  0x80ecdc                  _PWM_Deinitialize
+                  0x80ef20                  _PWM_GeneratorEOCEventCallbackRegister
+                  0x80ef30                  _PWM_GeneratorEOCEventCallback
+                  0x80ef34                  _PWM_CommonEventCallbackRegister
+                  0x80ef44                  _PWM_GeneratorTasks
+                  0x80f00c                  _PWM_CommonEventTasks
+                  0x80fe5c                  _PWM_CommonEventCallback
+ .text            0x80fe60       0x13ec build/default/production/sources/apps/comm/llc_link.o
+                  0x8104b0                  _LLC_LINK_Init
+                  0x81051c                  _LLC_LINK_ByteService
+                  0x810674                  _LLC_LINK_Tick1ms
+                  0x810734                  _LLC_LINK_Task
+                  0x8111e0                  _LLC_LINK_TxIdle
+                  0x811204                  _LLC_LINK_Crc16
+ .text            0x81124c       0x13b8 sources\third_party\X2Cscope\libx2cscope-generic-32dsp-dspic33a-mlarge-elf.a(generic-32dsp-akScope_Main.o)
+                  0x811670                  _Scope_Main_Init
+                  0x811700                  _Scope_Main_Update
+                  0x811c70                  _Scope_Main_Load
+                  0x811d5c                  _Scope_Main_Save
+                  0x812600                  _Scope_Main_GetAddress
+ .text            0x812604        0xca8 build/default/production/sources/apps/control/pfc_loop.o
+                  0x81281c                  _PFC_LOOP_Reset
+                  0x8128e4                  _PFC_LOOP_Init
+                  0x812934                  _PFC_LOOP_GridUpdate
+                  0x812944                  _PFC_LOOP_PhaseAUpdate
+                  0x812d60                  _PFC_LOOP_PhaseBUpdate
+ .text            0x8132ac        0x944 build/default/production/sources/apps/fault/fault.o
+                  0x8132f4                  _FAULT_Init
+                  0x813624                  _FAULT_Set
+                  0x813634                  _FAULT_Clear
+                  0x813740                  _FAULT_ClearAll
+                  0x813a88                  _FAULT_Evaluate
+                  0x813b58                  _FAULT_IsActive
+                  0x813ba4                  _FAULT_GetLatchedFlags
+                  0x813be4                  _FAULT_GetLockedOutFlags
+ .text            0x813bf0        0x924 sources\third_party\X2Cscope\libx2cscope-generic-32dsp-dspic33a-mlarge-elf.a(generic-32dsp-akServices.o)
+                  0x813bf0                  _sendSvNotAvailable
+                  0x8144ac                  _sendError
+                  0x8144c4                  _initServiceTable
+                  0x8144e4                  _addCoreServices
+ .text            0x814514        0x8d4 build/default/production/sources/apps/pll/sogi_pll.o
+                  0x814514                  _SOGI_PLL_ConfigDefault
+                  0x8145c4                  _SOGI_PLL_InitConfig
+                  0x814a64                  _SOGI_PLL_Init
+                  0x814ae4                  _SOGI_PLL_Reset
+                  0x814b54                  _SOGI_PLL_Update
+ .text            0x814de8        0x8c0 build/default/production/sources/apps/control/smps_sm.o
+                  0x814e10                  _SMPS_SM_Init
+                  0x814e60                  _SMPS_SM_TaskPhaseA
+                  0x814f4c                  _SMPS_SM_TaskPhaseB
+                  0x815038                  _SMPS_SM_TaskSlow
+                  0x8155ac                  _SMPS_SM_Enable
+                  0x8155b8                  _SMPS_SM_SetVoutRef
+                  0x8155f0                  _SMPS_SM_RequestFaultClear
+                  0x8155fc                  _SMPS_SM_HealthConsume
+                  0x815608                  _SMPS_SM_IsPowerGood
+ .text            0x8156a8        0x888 build/default/production/sources/drivers/mcc_extended/mcc_ext.o
+                  0x8156a8                  _MCC_EXT_SystemInitialize
+ .text            0x815f30        0x7bc sources\third_party\X2Cscope\libx2cscope-generic-32dsp-dspic33a-mlarge-elf.a(generic-32dsp-akLNet.o)
+                  0x8166c0                  _initLNet
+ .text            0x8166ec        0x604 build/default/production/mcc_generated_files/adc/src/adc4.o
+                  0x8168e8                  _ADC4_Initialize
+                  0x8169a0                  _ADC4_Deinitialize
+                  0x816a18                  _ADC4_SharedCorePowerEnable
+                  0x816a34                  _ADC4_SharedCoreCalibration
+                  0x816a50                  _ADC4_PWMTriggerSourceSet
+                  0x816bdc                  _ADC4_ChannelCallbackRegister
+                  0x816bec                  _ADC4_ChannelCallback
+                  0x816bf0                  _ADC4_Result32BitChannelCallbackRegister
+                  0x816c00                  _ADC4_Result32BitChannelCallback
+                  0x816c04                  _ADC4_ChannelTasks
+                  0x816ce8                  _ADC4_ComparatorCallbackRegister
+                  0x816cec                  _ADC4_ComparatorCallback
+ .text            0x816cf0        0x588 sources\third_party\X2Cscope\libx2cscope-generic-32dsp-dspic33a-mlarge-elf.a(generic-32dsp-akBlockServicesX2C.o)
+                  0x816cf0                  _putRAMBlock
+                  0x816ec8                  _getRAMBlock
+                  0x81706c                  _putBlockData
+                  0x817168                  _getBlockData
+                  0x817248                  _addBlockServices
+                  0x817268                  _addExtendedBlockServices
+ .text            0x817278        0x4e4 build/default/production/sources/drivers/llc_signal/llc_signal.o
+                  0x817278                  _LLC_SIGNAL_Init
+                  0x817364                  _LLC_SIGNAL_LoadUpdate
+                  0x8176bc                  _LLC_SIGNAL_VbusUpdate
+ .text            0x81775c        0x4e0 build/default/production/mcc_generated_files/adc/src/adc1.o
+                  0x8178c0                  _ADC1_Initialize
+                  0x817960                  _ADC1_Deinitialize
+                  0x8179cc                  _ADC1_SharedCorePowerEnable
+                  0x8179e8                  _ADC1_SharedCoreCalibration
+                  0x817a04                  _ADC1_PWMTriggerSourceSet
+                  0x817b74                  _ADC1_ChannelCallbackRegister
+                  0x817b84                  _ADC1_ChannelCallback
+                  0x817b88                  _ADC1_Result32BitChannelCallbackRegister
+                  0x817b98                  _ADC1_Result32BitChannelCallback
+                  0x817b9c                  _ADC1_ComparatorCallbackRegister
+                  0x817ba0                  _ADC1_ComparatorCallback
+                  0x817ba4                  _ADC1_ChannelTasks
+ .text            0x817c3c        0x4e0 build/default/production/mcc_generated_files/adc/src/adc5.o
+                  0x817da0                  _ADC5_Initialize
+                  0x817e40                  _ADC5_Deinitialize
+                  0x817eac                  _ADC5_SharedCorePowerEnable
+                  0x817ec8                  _ADC5_SharedCoreCalibration
+                  0x817ee4                  _ADC5_PWMTriggerSourceSet
+                  0x818054                  _ADC5_ChannelCallbackRegister
+                  0x818064                  _ADC5_ChannelCallback
+                  0x818068                  _ADC5_Result32BitChannelCallbackRegister
+                  0x818078                  _ADC5_Result32BitChannelCallback
+                  0x81807c                  _ADC5_ComparatorCallbackRegister
+                  0x818080                  _ADC5_ComparatorCallback
+                  0x818084                  _ADC5_ChannelTasks
+ .text            0x81811c        0x4cc build/default/production/mcc_generated_files/adc/src/adc3.o
+                  0x818280                  _ADC3_Initialize
+                  0x818318                  _ADC3_Deinitialize
+                  0x818378                  _ADC3_SharedCorePowerEnable
+                  0x818394                  _ADC3_SharedCoreCalibration
+                  0x8183b0                  _ADC3_PWMTriggerSourceSet
+                  0x818520                  _ADC3_ChannelCallbackRegister
+                  0x818530                  _ADC3_ChannelCallback
+                  0x818534                  _ADC3_Result32BitChannelCallbackRegister
+                  0x818544                  _ADC3_Result32BitChannelCallback
+                  0x818548                  _ADC3_ComparatorCallbackRegister
+                  0x81854c                  _ADC3_ComparatorCallback
+                  0x818550                  _ADC3_ChannelTasks
+ .text            0x8185e8        0x4cc build/default/production/mcc_generated_files/adc/src/adc2.o
+                  0x81874c                  _ADC2_Initialize
+                  0x8187e4                  _ADC2_Deinitialize
+                  0x818844                  _ADC2_SharedCorePowerEnable
+                  0x818860                  _ADC2_SharedCoreCalibration
+                  0x81887c                  _ADC2_PWMTriggerSourceSet
+                  0x8189ec                  _ADC2_ChannelCallbackRegister
+                  0x8189fc                  _ADC2_ChannelCallback
+                  0x818a00                  _ADC2_Result32BitChannelCallbackRegister
+                  0x818a10                  _ADC2_Result32BitChannelCallback
+                  0x818a14                  _ADC2_ComparatorCallbackRegister
+                  0x818a18                  _ADC2_ComparatorCallback
+                  0x818a1c                  _ADC2_ChannelTasks
+ .text            0x818ab4        0x3cc build/default/production/sources/apps/meas/grid_meas.o
+                  0x818ab4                  _GRID_MEAS_Init
+                  0x818b40                  _GRID_MEAS_SampleUpdate
+                  0x818bfc                  _GRID_MEAS_TaskSlow
 
-.dinit            0x80c5b4        0x344
- .dinit           0x80c5b4        0x344 data_init
+.dinit            0x818e80        0x344
+ .dinit           0x818e80        0x344 data_init
 
-.text             0x80c8f8       0x1e90
- .text            0x80c8f8        0x330 build/default/production/mcc_generated_files/uart/src/uart1.o
-                  0x80c8f8                  _UART1_Initialize
-                  0x80c92c                  _UART1_Deinitialize
-                  0x80c948                  _UART1_Read
-                  0x80c980                  _UART1_Write
-                  0x80c9a0                  _UART1_IsRxReady
-                  0x80c9b0                  _UART1_IsTxReady
-                  0x80c9d0                  _UART1_IsTxDone
-                  0x80c9f0                  _UART1_TransmitEnable
-                  0x80c9f8                  _UART1_TransmitDisable
-                  0x80ca00                  _UART1_AutoBaudSet
-                  0x80ca34                  _UART1_AutoBaudQuery
-                  0x80ca40                  _UART1_AutoBaudEventEnableGet
-                  0x80ca4c                  _UART1_ErrorGet
-                  0x80cb30                  _UART1_BRGCountSet
-                  0x80cb38                  _UART1_BRGCountGet
-                  0x80cb40                  _UART1_BaudRateSet
-                  0x80cbbc                  _UART1_BaudRateGet
- .text            0x80cc28        0x330 build/default/production/mcc_generated_files/uart/src/uart3.o
-                  0x80cc28                  _UART3_Initialize
-                  0x80cc5c                  _UART3_Deinitialize
-                  0x80cc78                  _UART3_Read
-                  0x80ccb0                  _UART3_Write
-                  0x80ccd0                  _UART3_IsRxReady
-                  0x80cce0                  _UART3_IsTxReady
-                  0x80cd00                  _UART3_IsTxDone
-                  0x80cd20                  _UART3_TransmitEnable
-                  0x80cd28                  _UART3_TransmitDisable
-                  0x80cd30                  _UART3_AutoBaudSet
-                  0x80cd64                  _UART3_AutoBaudQuery
-                  0x80cd70                  _UART3_AutoBaudEventEnableGet
-                  0x80cd7c                  _UART3_ErrorGet
-                  0x80ce60                  _UART3_BRGCountSet
-                  0x80ce68                  _UART3_BRGCountGet
-                  0x80ce70                  _UART3_BaudRateSet
-                  0x80ceec                  _UART3_BaudRateGet
- .text            0x80cf58        0x314 build/default/production/sources/apps/control/smps_control.o
-                  0x80cf58                  _SMPS_FloatControllerInit
-                  0x80d134                  _SMPS_FloatController2P2ZUpdate
-                  0x80d1dc                  _SMPS_FloatController2P2ZReset
-                  0x80d20c                  _SMPS_FloatController2P2ZErrorSeed
-                  0x80d234                  _SMPS_FloatController2P2ZTrackOutput
- .text            0x80d26c        0x2f0 build/default/production/sources/apps/comm/fw_update.o
-                  0x80d26c                  _FW_UPDATE_Init
-                  0x80d288                  _FW_UPDATE_Handle
-                  0x80d4d8                  _FW_UPDATE_Tick1ms
-                  0x80d514                  _FW_UPDATE_IsActive
-                  0x80d528                  _FW_UPDATE_NvmImplemented
-                  0x80d52c                  _FW_UPDATE_ActivePartition
-                  0x80d548                  _FW_UPDATE_KeepAlive
- .text            0x80d55c        0x27c build/default/production/mcc_generated_files/system/src/clock.o
-                  0x80d55c                  _CLOCK_Initialize
- .text            0x80d7d8        0x1e4 sources\third_party\X2Cscope\libx2cscope-generic-32dsp-dspic33a-mlarge-elf.a(generic-32dsp-akX2CScopeWrapper.o)
-                  0x80d7d8                  _sendSerialWrapper
-                  0x80d7e8                  _receiveSerialWrapper
-                  0x80d7f4                  _isReceiveDataAvailableWrapper
-                  0x80d800                  _isSendReadyWrapper
-                  0x80d80c                  _flushSerialWrapper
-                  0x80d824                  _X2Cscope_Communicate
-                  0x80d830                  _X2Cscope_Update
-                  0x80d834                  _X2Cscope_InitialiseEx
-                  0x80d990                  _initSerial
- .text            0x80d9bc        0x190 build/default/production/sources/isr/user_isr.o
-                  0x80d9bc                  _USER_ISR_AdcScaleInit
- .text            0x80db4c        0x18c build/default/production/sources/apps/meas/il_cal.o
-                  0x80db4c                  _IL_CAL_Start
-                  0x80dc44                  _IL_CAL_Update
-                  0x80dcbc                  _IL_CAL_Done
- .text            0x80dcd8        0x188 build/default/production/mcc_generated_files/cmp/src/cmp1.o
-                  0x80dd2c                  _CMP1_Initialize
-                  0x80dd98                  _CMP1_Deinitialize
-                  0x80ddd0                  _CMP1_Calibrate
-                  0x80de20                  _CMP1_EventCallbackRegister
-                  0x80de30                  _CMP1_EventCallback
-                  0x80de34                  _CMP1_Tasks
- .text            0x80de60        0x188 build/default/production/mcc_generated_files/cmp/src/cmp4.o
-                  0x80deb4                  _CMP4_Initialize
-                  0x80df20                  _CMP4_Deinitialize
-                  0x80df58                  _CMP4_Calibrate
-                  0x80dfa8                  _CMP4_EventCallbackRegister
-                  0x80dfb8                  _CMP4_EventCallback
-                  0x80dfbc                  _CMP4_Tasks
- .text            0x80dfe8        0x188 build/default/production/mcc_generated_files/cmp/src/cmp5.o
-                  0x80e03c                  _CMP5_Initialize
-                  0x80e0a8                  _CMP5_Deinitialize
-                  0x80e0e0                  _CMP5_Calibrate
-                  0x80e130                  _CMP5_EventCallbackRegister
-                  0x80e140                  _CMP5_EventCallback
-                  0x80e144                  _CMP5_Tasks
- .text            0x80e170        0x188 build/default/production/mcc_generated_files/cmp/src/cmp6.o
-                  0x80e1c4                  _CMP6_Initialize
-                  0x80e230                  _CMP6_Deinitialize
-                  0x80e268                  _CMP6_Calibrate
-                  0x80e2b8                  _CMP6_EventCallbackRegister
-                  0x80e2c8                  _CMP6_EventCallback
-                  0x80e2cc                  _CMP6_Tasks
- .text            0x80e2f8        0x188 build/default/production/mcc_generated_files/cmp/src/cmp7.o
-                  0x80e34c                  _CMP7_Initialize
-                  0x80e3b8                  _CMP7_Deinitialize
-                  0x80e3f0                  _CMP7_Calibrate
-                  0x80e440                  _CMP7_EventCallbackRegister
-                  0x80e450                  _CMP7_EventCallback
-                  0x80e454                  _CMP7_Tasks
- .text            0x80e480        0x188 build/default/production/mcc_generated_files/cmp/src/cmp8.o
-                  0x80e4d4                  _CMP8_Initialize
-                  0x80e540                  _CMP8_Deinitialize
-                  0x80e578                  _CMP8_Calibrate
-                  0x80e5c8                  _CMP8_EventCallbackRegister
-                  0x80e5d8                  _CMP8_EventCallback
-                  0x80e5dc                  _CMP8_Tasks
- .text            0x80e608        0x180 build/default/production/sources/apps/fault/fault_common.o
-                  0x80e608                  _FAULT_DETECT_Init
-                  0x80e634                  _FAULT_DETECT_Evaluate
-                  0x80e778                  _FAULT_DETECT_Reset
+.text             0x8191c4       0x2458
+ .text            0x8191c4        0x330 build/default/production/mcc_generated_files/uart/src/uart1.o
+                  0x8191c4                  _UART1_Initialize
+                  0x8191f8                  _UART1_Deinitialize
+                  0x819214                  _UART1_Read
+                  0x81924c                  _UART1_Write
+                  0x81926c                  _UART1_IsRxReady
+                  0x81927c                  _UART1_IsTxReady
+                  0x81929c                  _UART1_IsTxDone
+                  0x8192bc                  _UART1_TransmitEnable
+                  0x8192c4                  _UART1_TransmitDisable
+                  0x8192cc                  _UART1_AutoBaudSet
+                  0x819300                  _UART1_AutoBaudQuery
+                  0x81930c                  _UART1_AutoBaudEventEnableGet
+                  0x819318                  _UART1_ErrorGet
+                  0x8193fc                  _UART1_BRGCountSet
+                  0x819404                  _UART1_BRGCountGet
+                  0x81940c                  _UART1_BaudRateSet
+                  0x819488                  _UART1_BaudRateGet
+ .text            0x8194f4        0x330 build/default/production/mcc_generated_files/uart/src/uart3.o
+                  0x8194f4                  _UART3_Initialize
+                  0x819528                  _UART3_Deinitialize
+                  0x819544                  _UART3_Read
+                  0x81957c                  _UART3_Write
+                  0x81959c                  _UART3_IsRxReady
+                  0x8195ac                  _UART3_IsTxReady
+                  0x8195cc                  _UART3_IsTxDone
+                  0x8195ec                  _UART3_TransmitEnable
+                  0x8195f4                  _UART3_TransmitDisable
+                  0x8195fc                  _UART3_AutoBaudSet
+                  0x819630                  _UART3_AutoBaudQuery
+                  0x81963c                  _UART3_AutoBaudEventEnableGet
+                  0x819648                  _UART3_ErrorGet
+                  0x81972c                  _UART3_BRGCountSet
+                  0x819734                  _UART3_BRGCountGet
+                  0x81973c                  _UART3_BaudRateSet
+                  0x8197b8                  _UART3_BaudRateGet
+ .text            0x819824        0x314 build/default/production/sources/apps/control/smps_control.o
+                  0x819824                  _SMPS_FloatControllerInit
+                  0x819a00                  _SMPS_FloatController2P2ZUpdate
+                  0x819aa8                  _SMPS_FloatController2P2ZReset
+                  0x819ad8                  _SMPS_FloatController2P2ZErrorSeed
+                  0x819b00                  _SMPS_FloatController2P2ZTrackOutput
+ .text            0x819b38        0x2f0 build/default/production/sources/apps/comm/fw_update.o
+                  0x819b38                  _FW_UPDATE_Init
+                  0x819b54                  _FW_UPDATE_Handle
+                  0x819da4                  _FW_UPDATE_Tick1ms
+                  0x819de0                  _FW_UPDATE_IsActive
+                  0x819df4                  _FW_UPDATE_NvmImplemented
+                  0x819df8                  _FW_UPDATE_ActivePartition
+                  0x819e14                  _FW_UPDATE_KeepAlive
+ .text            0x819e28        0x27c build/default/production/mcc_generated_files/system/src/clock.o
+                  0x819e28                  _CLOCK_Initialize
+ .text            0x81a0a4        0x1e4 sources\third_party\X2Cscope\libx2cscope-generic-32dsp-dspic33a-mlarge-elf.a(generic-32dsp-akX2CScopeWrapper.o)
+                  0x81a0a4                  _sendSerialWrapper
+                  0x81a0b4                  _receiveSerialWrapper
+                  0x81a0c0                  _isReceiveDataAvailableWrapper
+                  0x81a0cc                  _isSendReadyWrapper
+                  0x81a0d8                  _flushSerialWrapper
+                  0x81a0f0                  _X2Cscope_Communicate
+                  0x81a0fc                  _X2Cscope_Update
+                  0x81a100                  _X2Cscope_InitialiseEx
+                  0x81a25c                  _initSerial
+ .text            0x81a288        0x190 build/default/production/sources/isr/user_isr.o
+                  0x81a288                  _USER_ISR_AdcScaleInit
+ .text            0x81a418        0x18c build/default/production/sources/apps/meas/il_cal.o
+                  0x81a418                  _IL_CAL_Start
+                  0x81a510                  _IL_CAL_Update
+                  0x81a588                  _IL_CAL_Done
+ .text            0x81a5a4        0x188 build/default/production/mcc_generated_files/cmp/src/cmp1.o
+                  0x81a5f8                  _CMP1_Initialize
+                  0x81a664                  _CMP1_Deinitialize
+                  0x81a69c                  _CMP1_Calibrate
+                  0x81a6ec                  _CMP1_EventCallbackRegister
+                  0x81a6fc                  _CMP1_EventCallback
+                  0x81a700                  _CMP1_Tasks
+ .text            0x81a72c        0x188 build/default/production/mcc_generated_files/cmp/src/cmp4.o
+                  0x81a780                  _CMP4_Initialize
+                  0x81a7ec                  _CMP4_Deinitialize
+                  0x81a824                  _CMP4_Calibrate
+                  0x81a874                  _CMP4_EventCallbackRegister
+                  0x81a884                  _CMP4_EventCallback
+                  0x81a888                  _CMP4_Tasks
+ .text            0x81a8b4        0x188 build/default/production/mcc_generated_files/cmp/src/cmp5.o
+                  0x81a908                  _CMP5_Initialize
+                  0x81a974                  _CMP5_Deinitialize
+                  0x81a9ac                  _CMP5_Calibrate
+                  0x81a9fc                  _CMP5_EventCallbackRegister
+                  0x81aa0c                  _CMP5_EventCallback
+                  0x81aa10                  _CMP5_Tasks
+ .text            0x81aa3c        0x188 build/default/production/mcc_generated_files/cmp/src/cmp6.o
+                  0x81aa90                  _CMP6_Initialize
+                  0x81aafc                  _CMP6_Deinitialize
+                  0x81ab34                  _CMP6_Calibrate
+                  0x81ab84                  _CMP6_EventCallbackRegister
+                  0x81ab94                  _CMP6_EventCallback
+                  0x81ab98                  _CMP6_Tasks
+ .text            0x81abc4        0x188 build/default/production/mcc_generated_files/cmp/src/cmp7.o
+                  0x81ac18                  _CMP7_Initialize
+                  0x81ac84                  _CMP7_Deinitialize
+                  0x81acbc                  _CMP7_Calibrate
+                  0x81ad0c                  _CMP7_EventCallbackRegister
+                  0x81ad1c                  _CMP7_EventCallback
+                  0x81ad20                  _CMP7_Tasks
+ .text            0x81ad4c        0x188 build/default/production/mcc_generated_files/cmp/src/cmp8.o
+                  0x81ada0                  _CMP8_Initialize
+                  0x81ae0c                  _CMP8_Deinitialize
+                  0x81ae44                  _CMP8_Calibrate
+                  0x81ae94                  _CMP8_EventCallbackRegister
+                  0x81aea4                  _CMP8_EventCallback
+                  0x81aea8                  _CMP8_Tasks
+ .text            0x81aed4        0x180 build/default/production/sources/apps/fault/fault_common.o
+                  0x81aed4                  _FAULT_DETECT_Init
+                  0x81af00                  _FAULT_DETECT_Evaluate
+                  0x81b044                  _FAULT_DETECT_Reset
+ .text            0x81b054        0x110 build/default/production/mcc_generated_files/system/src/pins.o
+                  0x81b054                  _PINS_Initialize
+ .text            0x81b164        0x100 build/default/production/sources/drivers/pfc_pwm/pfc_pwm.o
+                  0x81b164                  _PFC_PWM_Init
+                  0x81b1c8                  _PFC_PWM_AllOutputsOff
+                  0x81b208                  _PFC_PWM_SlowLegSet
+ .text            0x81b264         0xf0 build/default/production/mcc_generated_files/input_capture/src/sccp1.o
+                  0x81b264                  _SCCP1_InputCapture_Initialize
+                  0x81b2a4                  _SCCP1_InputCapture_Deinitialize
+                  0x81b2dc                  _SCCP1_InputCapture_Start
+                  0x81b2e4                  _SCCP1_InputCapture_Stop
+                  0x81b2ec                  _SCCP1_InputCapture_CallbackRegister
+                  0x81b2fc                  _SCCP1_InputCapture_Callback
+                  0x81b300                  _SCCP1_InputCapture_DataRead
+                  0x81b308                  _SCCP1_InputCapture_HasBufferOverflowed
+                  0x81b314                  _SCCP1_InputCapture_IsBufferEmpty
+                  0x81b320                  _SCCP1_InputCapture_OverflowFlagClear
+                  0x81b328                  _SCCP1_InputCapture_Tasks
+ .text            0x81b354         0xf0 sources\third_party\X2Cscope\libx2cscope-generic-32dsp-dspic33a-mlarge-elf.a(generic-32dsp-akCommonFcts.o)
+                  0x81b354                  _Common_Init
+                  0x81b358                  _Common_Update
+                  0x81b35c                  _Common_Load
+                  0x81b360                  _Common_Save
+                  0x81b378                  _Common_GetAddress
+                  0x81b37c                  _getAbsValI8
+                  0x81b39c                  _getAbsValI16
+                  0x81b3b4                  _getAbsValI32
+                  0x81b3dc                  _getAbsValI64
+                  0x81b414                  _getAbsValR32
+                  0x81b42c                  _getAbsValR64
+ .text            0x81b444         0xec build/default/production/mcc_generated_files/input_capture/src/sccp2.o
+                  0x81b444                  _SCCP2_InputCapture_Initialize
+                  0x81b480                  _SCCP2_InputCapture_Deinitialize
+                  0x81b4b8                  _SCCP2_InputCapture_Start
+                  0x81b4c0                  _SCCP2_InputCapture_Stop
+                  0x81b4c8                  _SCCP2_InputCapture_CallbackRegister
+                  0x81b4d8                  _SCCP2_InputCapture_Callback
+                  0x81b4dc                  _SCCP2_InputCapture_DataRead
+                  0x81b4e4                  _SCCP2_InputCapture_HasBufferOverflowed
+                  0x81b4f0                  _SCCP2_InputCapture_IsBufferEmpty
+                  0x81b4fc                  _SCCP2_InputCapture_OverflowFlagClear
+                  0x81b504                  _SCCP2_InputCapture_Tasks
+ .text            0x81b530         0xec build/default/production/mcc_generated_files/pwm/src/sccp3.o
+                  0x81b530                  _SCCP3_PWM_Initialize
+                  0x81b57c                  _SCCP3_PWM_Deinitialize
+                  0x81b5b4                  _SCCP3_PWM_Enable
+                  0x81b5bc                  _SCCP3_PWM_Disable
+                  0x81b5c4                  _SCCP3_PWM_PeriodSet
+                  0x81b5cc                  _SCCP3_PWM_DutyCycleSet
+                  0x81b5d4                  _SCCP3_PWM_SoftwareTriggerSet
+                  0x81b5dc                  _SCCP3_PWM_CallbackRegister
+                  0x81b5ec                  _SCCP3_PWM_Callback
+                  0x81b5f0                  _SCCP3_PWM_Tasks
 
-.text             0x80be84        0x110
- .text            0x80be84        0x110 build/default/production/mcc_generated_files/system/src/pins.o
-                  0x80be84                  _PINS_Initialize
+dbc86aec5007_0    0x81b61c         0xe0
+ dbc86aec5007_0
+                  0x81b61c         0xe0 build/default/production/mcc_generated_files/pwm_hs/src/pwm.o
+                  0x81b61c                  _PWM_HS
 
-.text             0x80e788        0x4b8
- .text            0x80e788        0x100 build/default/production/sources/drivers/pfc_pwm/pfc_pwm.o
-                  0x80e788                  _PFC_PWM_Init
-                  0x80e7ec                  _PFC_PWM_AllOutputsOff
-                  0x80e82c                  _PFC_PWM_SlowLegSet
- .text            0x80e888         0xf0 build/default/production/mcc_generated_files/input_capture/src/sccp1.o
-                  0x80e888                  _SCCP1_InputCapture_Initialize
-                  0x80e8c8                  _SCCP1_InputCapture_Deinitialize
-                  0x80e900                  _SCCP1_InputCapture_Start
-                  0x80e908                  _SCCP1_InputCapture_Stop
-                  0x80e910                  _SCCP1_InputCapture_CallbackRegister
-                  0x80e920                  _SCCP1_InputCapture_Callback
-                  0x80e924                  _SCCP1_InputCapture_DataRead
-                  0x80e92c                  _SCCP1_InputCapture_HasBufferOverflowed
-                  0x80e938                  _SCCP1_InputCapture_IsBufferEmpty
-                  0x80e944                  _SCCP1_InputCapture_OverflowFlagClear
-                  0x80e94c                  _SCCP1_InputCapture_Tasks
- .text            0x80e978         0xf0 sources\third_party\X2Cscope\libx2cscope-generic-32dsp-dspic33a-mlarge-elf.a(generic-32dsp-akCommonFcts.o)
-                  0x80e978                  _Common_Init
-                  0x80e97c                  _Common_Update
-                  0x80e980                  _Common_Load
-                  0x80e984                  _Common_Save
-                  0x80e99c                  _Common_GetAddress
-                  0x80e9a0                  _getAbsValI8
-                  0x80e9c0                  _getAbsValI16
-                  0x80e9d8                  _getAbsValI32
-                  0x80ea00                  _getAbsValI64
-                  0x80ea38                  _getAbsValR32
-                  0x80ea50                  _getAbsValR64
- .text            0x80ea68         0xec build/default/production/mcc_generated_files/input_capture/src/sccp2.o
-                  0x80ea68                  _SCCP2_InputCapture_Initialize
-                  0x80eaa4                  _SCCP2_InputCapture_Deinitialize
-                  0x80eadc                  _SCCP2_InputCapture_Start
-                  0x80eae4                  _SCCP2_InputCapture_Stop
-                  0x80eaec                  _SCCP2_InputCapture_CallbackRegister
-                  0x80eafc                  _SCCP2_InputCapture_Callback
-                  0x80eb00                  _SCCP2_InputCapture_DataRead
-                  0x80eb08                  _SCCP2_InputCapture_HasBufferOverflowed
-                  0x80eb14                  _SCCP2_InputCapture_IsBufferEmpty
-                  0x80eb20                  _SCCP2_InputCapture_OverflowFlagClear
-                  0x80eb28                  _SCCP2_InputCapture_Tasks
- .text            0x80eb54         0xec build/default/production/mcc_generated_files/pwm/src/sccp3.o
-                  0x80eb54                  _SCCP3_PWM_Initialize
-                  0x80eba0                  _SCCP3_PWM_Deinitialize
-                  0x80ebd8                  _SCCP3_PWM_Enable
-                  0x80ebe0                  _SCCP3_PWM_Disable
-                  0x80ebe8                  _SCCP3_PWM_PeriodSet
-                  0x80ebf0                  _SCCP3_PWM_DutyCycleSet
-                  0x80ebf8                  _SCCP3_PWM_SoftwareTriggerSet
-                  0x80ec00                  _SCCP3_PWM_CallbackRegister
-                  0x80ec10                  _SCCP3_PWM_Callback
-                  0x80ec14                  _SCCP3_PWM_Tasks
+.text             0x81b6fc        0x1f4
+ .text            0x81b6fc         0xb8 build/default/production/mcc_generated_files/system/src/dmt.o
+                  0x81b6fc                  _DMT_Initialize
+                  0x81b70c                  _DMT_Enable
+                  0x81b728                  _DMT_PreClear
+                  0x81b740                  _DMT_Clear
+                  0x81b760                  _DMT_IsWindowOpen
+                  0x81b76c                  _DMT_IsPreCleared
+                  0x81b774                  _DMT_PostEventClear
+                  0x81b790                  _DMT_TimeoutCounterGet
+                  0x81b798                  _DMT_WindowTimeoutCounterGet
+                  0x81b7a0                  _DMT_StatusGet
+                  0x81b7ac                  _DMT_CounterGet
+ .text            0x81b7b4         0xa0 build/default/production/mcc_generated_files/timer/src/tmr1.o
+                  0x81b7c4                  _TMR1_Initialize
+                  0x81b7f4                  _TMR1_Deinitialize
+                  0x81b810                  _TMR1_Start
+                  0x81b818                  _TMR1_Stop
+                  0x81b820                  _TMR1_PeriodSet
+                  0x81b828                  _TMR1_InterruptPrioritySet
+                  0x81b840                  _TMR1_TimeoutCallbackRegister
+                  0x81b850                  _TMR1_TimeoutCallback
+ .text            0x81b854         0x9c build/default/production/sources/scheduler/scheduler.o
+                  0x81b854                  _SCHEDULER_Init
+                  0x81b874                  _SCHEDULER_Run
 
-aa5c6aec4e87_0    0x80ec40         0xe0
- aa5c6aec4e87_0
-                  0x80ec40         0xe0 build/default/production/mcc_generated_files/pwm_hs/src/pwm.o
-                  0x80ec40                  _PWM_HS
+df986aec5004_0    0x81b8f0         0x98
+ df986aec5004_0
+                  0x81b8f0         0x98 build/default/production/mcc_generated_files/adc/src/adc1.o
+                  0x81b8f0                  _ADC1
 
-.text             0x80ed20        0x1f4
- .text            0x80ed20         0xb8 build/default/production/mcc_generated_files/system/src/dmt.o
-                  0x80ed20                  _DMT_Initialize
-                  0x80ed30                  _DMT_Enable
-                  0x80ed4c                  _DMT_PreClear
-                  0x80ed64                  _DMT_Clear
-                  0x80ed84                  _DMT_IsWindowOpen
-                  0x80ed90                  _DMT_IsPreCleared
-                  0x80ed98                  _DMT_PostEventClear
-                  0x80edb4                  _DMT_TimeoutCounterGet
-                  0x80edbc                  _DMT_WindowTimeoutCounterGet
-                  0x80edc4                  _DMT_StatusGet
-                  0x80edd0                  _DMT_CounterGet
- .text            0x80edd8         0xa0 build/default/production/mcc_generated_files/timer/src/tmr1.o
-                  0x80ede8                  _TMR1_Initialize
-                  0x80ee18                  _TMR1_Deinitialize
-                  0x80ee34                  _TMR1_Start
-                  0x80ee3c                  _TMR1_Stop
-                  0x80ee44                  _TMR1_PeriodSet
-                  0x80ee4c                  _TMR1_InterruptPrioritySet
-                  0x80ee64                  _TMR1_TimeoutCallbackRegister
-                  0x80ee74                  _TMR1_TimeoutCallback
- .text            0x80ee78         0x9c build/default/production/sources/scheduler/scheduler.o
-                  0x80ee78                  _SCHEDULER_Init
-                  0x80ee98                  _SCHEDULER_Run
+88cc6aec5004_0    0x81b988         0x98
+ 88cc6aec5004_0
+                  0x81b988         0x98 build/default/production/mcc_generated_files/adc/src/adc5.o
+                  0x81b988                  _ADC5
 
-a4886aec4e84_0    0x80ef14         0x98
- a4886aec4e84_0
-                  0x80ef14         0x98 build/default/production/mcc_generated_files/adc/src/adc1.o
-                  0x80ef14                  _ADC1
+da106aec5004_0    0x81ba20         0x98
+ da106aec5004_0
+                  0x81ba20         0x98 build/default/production/mcc_generated_files/adc/src/adc3.o
+                  0x81ba20                  _ADC3
 
-8a846aec4e84_0    0x80efac         0x98
- 8a846aec4e84_0
-                  0x80efac         0x98 build/default/production/mcc_generated_files/adc/src/adc5.o
-                  0x80efac                  _ADC5
+cae46aec5005_0    0x81bab8         0x98
+ cae46aec5005_0
+                  0x81bab8         0x98 build/default/production/mcc_generated_files/adc/src/adc2.o
+                  0x81bab8                  _ADC2
 
-b5546aec4e84_0    0x80f044         0x98
- b5546aec4e84_0
-                  0x80f044         0x98 build/default/production/mcc_generated_files/adc/src/adc3.o
-                  0x80f044                  _ADC3
+71e06aec5004_0    0x81bb50         0x98
+ 71e06aec5004_0
+                  0x81bb50         0x98 build/default/production/mcc_generated_files/adc/src/adc4.o
+                  0x81bb50                  _ADC4
 
-3b586aec4e84_0    0x80f0dc         0x98
- 3b586aec4e84_0
-                  0x80f0dc         0x98 build/default/production/mcc_generated_files/adc/src/adc2.o
-                  0x80f0dc                  _ADC2
+.text             0x81bbe8        0x1d0
+ .text            0x81bbe8         0x84 build/default/production/sources/apps/control/smps_common.o
+                  0x81bbe8                  _SMPS_FloatSoftStartRampToTarget
+ .text            0x81bc6c         0x78 sources\third_party\X2Cscope\libx2cscope-generic-32dsp-dspic33a-mlarge-elf.a(generic-32dsp-akTableStruct.o)
+                  0x81bc6c                  _initTableStruct
+                  0x81bcb0                  _addTableStructProtocol
+ .text            0x81bce4         0x6c build/default/production/sources/drivers/pfc_io/pfc_io.o
+                  0x81bce4                  _PFC_IO_Init
+                  0x81bd20                  _PFC_IO_RelaySet
+                  0x81bd38                  _PFC_IO_XcapSet
+ .text            0x81bd50         0x68 build/default/production/mcc_generated_files/system/src/interrupt.o
+                  0x81bd50                  _INTERRUPT_Initialize
+                  0x81bd84                  _INTERRUPT_Deinitialize
 
-e2ac6aec4e85_0    0x80f174         0x98
- e2ac6aec4e85_0
-                  0x80f174         0x98 build/default/production/mcc_generated_files/adc/src/adc4.o
-                  0x80f174                  _ADC4
+45d06aec5007_0    0x81bdb8         0x64
+ 45d06aec5007_0
+                  0x81bdb8         0x64 build/default/production/mcc_generated_files/uart/src/uart1.o
+                  0x81bdb8                  _UART1_Drv
 
-.text             0x80f20c         0xfc
- .text            0x80f20c         0x84 build/default/production/sources/apps/control/smps_common.o
-                  0x80f20c                  _SMPS_FloatSoftStartRampToTarget
- .text            0x80f290         0x78 sources\third_party\X2Cscope\libx2cscope-generic-32dsp-dspic33a-mlarge-elf.a(generic-32dsp-akTableStruct.o)
-                  0x80f290                  _initTableStruct
-                  0x80f2d4                  _addTableStructProtocol
+e2206aec5007_0    0x81be1c         0x64
+ e2206aec5007_0
+                  0x81be1c         0x64 build/default/production/mcc_generated_files/uart/src/uart3.o
+                  0x81be1c                  _UART3_Drv
 
-.text             0x80bf94         0x6c
- .text            0x80bf94         0x6c build/default/production/sources/drivers/pfc_io/pfc_io.o
-                  0x80bf94                  _PFC_IO_Init
-                  0x80bfd0                  _PFC_IO_RelaySet
-                  0x80bfe8                  _PFC_IO_XcapSet
-
-.text             0x80f308         0x68
- .text            0x80f308         0x68 build/default/production/mcc_generated_files/system/src/interrupt.o
-                  0x80f308                  _INTERRUPT_Initialize
-                  0x80f33c                  _INTERRUPT_Deinitialize
-
-97f46aec4e88_0    0x80f370         0x64
- 97f46aec4e88_0
-                  0x80f370         0x64 build/default/production/mcc_generated_files/uart/src/uart1.o
-                  0x80f370                  _UART1_Drv
-
-1b3c6aec4e88_0    0x80f3d4         0x64
- 1b3c6aec4e88_0
-                  0x80f3d4         0x64 build/default/production/mcc_generated_files/uart/src/uart3.o
-                  0x80f3d4                  _UART3_Drv
-
-.text             0x80f438        0x1d4
- .text            0x80f438         0x60 build/default/production/mcc_generated_files/system/src/system.o
-                  0x80f438                  _SYSTEM_Initialize
- .text            0x80f498         0x54 sources\third_party\X2Cscope\libx2cscope-generic-32dsp-dspic33a-mlarge-elf.a(generic-32dsp-akSerialGeneric.o)
-                  0x80f4b0                  _initSerialGeneric
-                  0x80f4e4                  _linkSerial
- .text            0x80f4ec         0x50 build/default/production/mcc_generated_files/system/src/dmt_asm.o
-                  0x80f4f0                  _DMT_CalibratedCounterGet
-                  0x80f510                  _DMT_Calibrate
- .text            0x80f53c         0x50 build/default/production/mcc_generated_files/system/src/reset.o
-                  0x80f53c                  _RESET_CauseGet
-                  0x80f544                  _RESET_CauseHandler
-                  0x80f584                  _RESET_CauseClearAll
- .text            0x80f58c         0x40 build/default/production/sources/scheduler/app_tasks.o
-                  0x80f58c                  _APP_TASKS_Always
-                  0x80f5a4                  _APP_TASKS_Task100us
-                  0x80f5a8                  _APP_TASKS_Task1ms
-                  0x80f5c4                  _APP_TASKS_Task10ms
-                  0x80f5c8                  _APP_TASKS_Task500ms
- .text            0x80f5cc         0x40 build/default/production/main.o
-                  0x80f5cc                  _main
+.text             0x81be80        0x1d4
+ .text            0x81be80         0x60 build/default/production/mcc_generated_files/system/src/system.o
+                  0x81be80                  _SYSTEM_Initialize
+ .text            0x81bee0         0x54 sources\third_party\X2Cscope\libx2cscope-generic-32dsp-dspic33a-mlarge-elf.a(generic-32dsp-akSerialGeneric.o)
+                  0x81bef8                  _initSerialGeneric
+                  0x81bf2c                  _linkSerial
+ .text            0x81bf34         0x50 build/default/production/mcc_generated_files/system/src/dmt_asm.o
+                  0x81bf38                  _DMT_CalibratedCounterGet
+                  0x81bf58                  _DMT_Calibrate
+ .text            0x81bf84         0x50 build/default/production/mcc_generated_files/system/src/reset.o
+                  0x81bf84                  _RESET_CauseGet
+                  0x81bf8c                  _RESET_CauseHandler
+                  0x81bfcc                  _RESET_CauseClearAll
+ .text            0x81bfd4         0x40 build/default/production/sources/scheduler/app_tasks.o
+                  0x81bfd4                  _APP_TASKS_Always
+                  0x81bfec                  _APP_TASKS_Task100us
+                  0x81bff0                  _APP_TASKS_Task1ms
+                  0x81c00c                  _APP_TASKS_Task10ms
+                  0x81c010                  _APP_TASKS_Task500ms
+ .text            0x81c014         0x40 build/default/production/main.o
+                  0x81c014                  _main
 
 C:\Users\M71906\AppData\Local\Temp\ccMe7MEg.s.scn1
-                  0x80f60c         0x40
+                  0x81c054         0x40
  C:\Users\M71906\AppData\Local\Temp\ccMe7MEg.s.scn1
-                  0x80f60c         0x40 sources\third_party\X2Cscope\libx2cscope-generic-32dsp-dspic33a-mlarge-elf.a(generic-32dsp-akX2C.o)
-                  0x80f60c                  _parameterIdTable
-                  0x80f61c                  _blockFunctionTable
+                  0x81c054         0x40 sources\third_party\X2Cscope\libx2cscope-generic-32dsp-dspic33a-mlarge-elf.a(generic-32dsp-akX2C.o)
+                  0x81c054                  _parameterIdTable
+                  0x81c064                  _blockFunctionTable
 
-a3246aec4e85_0    0x80f64c         0x34
- a3246aec4e85_0
-                  0x80f64c         0x34 build/default/production/mcc_generated_files/cmp/src/cmp1.o
-                  0x80f64c                  _CMP_DAC1
+92446aec5004_0    0x81c094         0x34
+ 92446aec5004_0
+                  0x81c094         0x34 build/default/production/mcc_generated_files/cmp/src/cmp1.o
+                  0x81c094                  _CMP_DAC1
 
-2bc46aec4e85_0    0x80f680         0x34
- 2bc46aec4e85_0
-                  0x80f680         0x34 build/default/production/mcc_generated_files/cmp/src/cmp4.o
-                  0x80f680                  _CMP_DAC4
+97206aec5005_0    0x81c0c8         0x34
+ 97206aec5005_0
+                  0x81c0c8         0x34 build/default/production/mcc_generated_files/cmp/src/cmp4.o
+                  0x81c0c8                  _CMP_DAC4
 
-bae86aec4e85_0    0x80f6b4         0x34
- bae86aec4e85_0
-                  0x80f6b4         0x34 build/default/production/mcc_generated_files/cmp/src/cmp5.o
-                  0x80f6b4                  _CMP_DAC5
+8d946aec5005_0    0x81c0fc         0x34
+ 8d946aec5005_0
+                  0x81c0fc         0x34 build/default/production/mcc_generated_files/cmp/src/cmp5.o
+                  0x81c0fc                  _CMP_DAC5
 
-d8d06aec4e85_0    0x80f6e8         0x34
- d8d06aec4e85_0
-                  0x80f6e8         0x34 build/default/production/mcc_generated_files/cmp/src/cmp6.o
-                  0x80f6e8                  _CMP_DAC6
+37806aec5005_0    0x81c130         0x34
+ 37806aec5005_0
+                  0x81c130         0x34 build/default/production/mcc_generated_files/cmp/src/cmp6.o
+                  0x81c130                  _CMP_DAC6
 
-73ac6aec4e86_0    0x80f71c         0x34
- 73ac6aec4e86_0
-                  0x80f71c         0x34 build/default/production/mcc_generated_files/cmp/src/cmp7.o
-                  0x80f71c                  _CMP_DAC7
+c40c6aec5005_0    0x81c164         0x34
+ c40c6aec5005_0
+                  0x81c164         0x34 build/default/production/mcc_generated_files/cmp/src/cmp7.o
+                  0x81c164                  _CMP_DAC7
 
-d3b46aec4e86_0    0x80f750         0x34
- d3b46aec4e86_0
-                  0x80f750         0x34 build/default/production/mcc_generated_files/cmp/src/cmp8.o
-                  0x80f750                  _CMP_DAC8
+93c46aec5005_0    0x81c198         0x34
+ 93c46aec5005_0
+                  0x81c198         0x34 build/default/production/mcc_generated_files/cmp/src/cmp8.o
+                  0x81c198                  _CMP_DAC8
 
-.text             0x80f784         0x5c
- .text            0x80f784         0x30 build/default/production/sources/third_party/X2Cscope/X2Cscope.o
-                  0x80f784                  _X2Cscope_Init
- .text            0x80f7b4         0x2c build/default/production/sources/drivers/uart_link/uart_link.o
-                  0x80f7b4                  _UART_LINK_Flush
+.text             0x81c1cc         0x5c
+ .text            0x81c1cc         0x30 build/default/production/sources/third_party/X2Cscope/X2Cscope.o
+                  0x81c1cc                  _X2Cscope_Init
+ .text            0x81c1fc         0x2c build/default/production/sources/drivers/uart_link/uart_link.o
+                  0x81c1fc                  _UART_LINK_Flush
 
-91086aec4e86_0    0x80f7e0         0x2c
- 91086aec4e86_0
-                  0x80f7e0         0x2c build/default/production/mcc_generated_files/pwm/src/sccp3.o
-                  0x80f7e0                  _PWM3
+56046aec5005_0    0x81c228         0x2c
+ 56046aec5005_0
+                  0x81c228         0x2c build/default/production/mcc_generated_files/pwm/src/sccp3.o
+                  0x81c228                  _PWM3
 
-1446aec4e86_0     0x80f80c         0x28
- 1446aec4e86_0    0x80f80c         0x28 build/default/production/mcc_generated_files/input_capture/src/sccp2.o
-                  0x80f80c                  _Input_Capture2
+44e46aec5005_0    0x81c254         0x28
+ 44e46aec5005_0
+                  0x81c254         0x28 build/default/production/mcc_generated_files/input_capture/src/sccp2.o
+                  0x81c254                  _Input_Capture2
 
-86046aec4e86_0    0x80f834         0x28
- 86046aec4e86_0
-                  0x80f834         0x28 build/default/production/mcc_generated_files/input_capture/src/sccp1.o
-                  0x80f834                  _Input_Capture1
+726c6aec5005_0    0x81c27c         0x28
+ 726c6aec5005_0
+                  0x81c27c         0x28 build/default/production/mcc_generated_files/input_capture/src/sccp1.o
+                  0x81c27c                  _Input_Capture1
 
-4cac6aec4e88_0    0x80f85c         0x28
- 4cac6aec4e88_0
-                  0x80f85c         0x28 build/default/production/mcc_generated_files/timer/src/tmr1.o
-                  0x80f85c                  _Timer1
+800c6aec5007_0    0x81c2a4         0x28
+ 800c6aec5007_0
+                  0x81c2a4         0x28 build/default/production/mcc_generated_files/timer/src/tmr1.o
+                  0x81c2a4                  _Timer1
 
-67ac6aec4e88_0    0x80f884         0x20
- 67ac6aec4e88_0
-                  0x80f884         0x20 build/default/production/sources/third_party/X2Cscope/X2Cscope.o
+a3e86aec5007_0    0x81c2cc         0x20
+ a3e86aec5007_0
+                  0x81c2cc         0x20 build/default/production/sources/third_party/X2Cscope/X2Cscope.o
 
-.text             0x80f8a4         0x1c
- .text            0x80f8a4         0x1c build/default/production/mcc_generated_files/uref/src/uref.o
-                  0x80f8a4                  _UREF_Initialize
-                  0x80f8b4                  _UREF_Deinitialize
+.text             0x81c2ec         0x1c
+ .text            0x81c2ec         0x1c build/default/production/mcc_generated_files/uref/src/uref.o
+                  0x81c2ec                  _UREF_Initialize
+                  0x81c2fc                  _UREF_Deinitialize
 
-67ac6aec4e88_1    0x80f8c0         0x18
- 67ac6aec4e88_1
-                  0x80f8c0         0x18 build/default/production/sources/third_party/X2Cscope/X2Cscope.o
-                  0x80f8c0                  _compilationDate
+a3e86aec5007_1    0x81c308         0x18
+ a3e86aec5007_1
+                  0x81c308         0x18 build/default/production/sources/third_party/X2Cscope/X2Cscope.o
+                  0x81c308                  _compilationDate
 
-.text             0x80f8d8         0x3c
- .text            0x80f8d8         0x14 build/default/production/mcc_generated_files/system/src/where_was_i.o
-                  0x80f8d8                  _where_was_i
- .text            0x80f8ec         0x14 build/default/production/sources/third_party/X2Cscope/X2CscopeComm.o
-                  0x80f8ec                  _sendSerial
-                  0x80f8f0                  _receiveSerial
-                  0x80f8f4                  _isReceiveDataAvailable
-                  0x80f8f8                  _isSendReady
-                  0x80f8fc                  _X2CscopeComm_PostInit
- .text            0x80f900         0x14 sources\third_party\X2Cscope\libx2cscope-generic-32dsp-dspic33a-mlarge-elf.a(generic-32dsp-akX2C.o)
-                  0x80f900                  _X2C_Init
-                  0x80f90c                  _X2C_Update
+.text             0x81c320         0x3c
+ .text            0x81c320         0x14 build/default/production/mcc_generated_files/system/src/where_was_i.o
+                  0x81c320                  _where_was_i
+ .text            0x81c334         0x14 build/default/production/sources/third_party/X2Cscope/X2CscopeComm.o
+                  0x81c334                  _sendSerial
+                  0x81c338                  _receiveSerial
+                  0x81c33c                  _isReceiveDataAvailable
+                  0x81c340                  _isSendReady
+                  0x81c344                  _X2CscopeComm_PostInit
+ .text            0x81c348         0x14 sources\third_party\X2Cscope\libx2cscope-generic-32dsp-dspic33a-mlarge-elf.a(generic-32dsp-akX2C.o)
+                  0x81c348                  _X2C_Init
+                  0x81c354                  _X2C_Update
 
-d1d46aec4e81_0    0x80f914          0xc
- d1d46aec4e81_0
-                  0x80f914          0xc build/default/production/sources/apps/fault/fault.o
-                  0x80f914                  _fltFastIdMap
+72ec6aec5002_0    0x81c35c          0xc
+ 72ec6aec5002_0
+                  0x81c35c          0xc build/default/production/sources/apps/fault/fault.o
+                  0x81c35c                  _fltFastIdMap
 
-.text             0x80f920         0x14
- .text            0x80f920          0xc sources\third_party\X2Cscope\libx2cscope-generic-32dsp-dspic33a-mlarge-elf.a(generic-32dsp-akVersionInfo.o)
-                  0x80f920                  _initVersionInfo
- .text            0x80f92c          0x8 build/default/production/mcc_generated_files/system/src/traps.o
-                  0x80f92c                  _TRAPS_halt_on_error
+.text             0x81c368         0x14
+ .text            0x81c368          0xc sources\third_party\X2Cscope\libx2cscope-generic-32dsp-dspic33a-mlarge-elf.a(generic-32dsp-akVersionInfo.o)
+                  0x81c368                  _initVersionInfo
+ .text            0x81c374          0x8 build/default/production/mcc_generated_files/system/src/traps.o
+                  0x81c374                  _TRAPS_halt_on_error
