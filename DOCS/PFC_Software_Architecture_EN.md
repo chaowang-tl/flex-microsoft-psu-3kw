@@ -7,7 +7,7 @@
 | Original Author | Chao Wang <chao.wang@microchip.com> |
 | Created on | 2026/10/27 |
 | Modified by | Chao Wang |
-| Modified on | 2026/11/01 |
+| Modified on | 2026/11/05 |
 | Language | [中文](PFC_Software_Architecture_CN.md) · English |
 | Project | `Microsoft_PSU_3kW_PFC.X` |
 | MCU | dsPIC33AK256MPS206 (32-bit dsPIC33A, hardware single-precision FPU) |
@@ -478,6 +478,87 @@ Scope of the four MPLAB X include-directory properties (obtained by setting each
 ### 3.4 Link Libraries
 
 X2Cscope uses the precompiled library `sources/third_party/X2Cscope/libx2cscope-generic-32dsp-dspic33a-mlarge-elf.a` (large memory model version), referenced in `linkerLibFileItem` in `configurations.xml`.
+
+### 3.5 Flash Partitioning and APP Link Layout
+
+The project-root [p33AK256MPS206.gld](../p33AK256MPS206.gld) is a device linker script modified from **dsPIC33AK-MP_DFP 1.6.273** for the 3 kW project's Boot + APP layout. All addresses below are byte addresses, with inclusive start and end addresses; capacities consistently use **KiB**.
+
+> **Capacity Units (KiB vs. kB)**:
+> - **KiB** is the symbol for **kibibyte**, using the IEC binary prefix `Ki` (kibi, meaning 2¹⁰). The `i` identifies the binary prefix; `B` means byte, not bit. **1 KiB = 2¹⁰ bytes = 1024 bytes**.
+> - **kB** uses the SI decimal prefix `k` (kilo, meaning 10³), so **1 kB = 1000 bytes**. The standard symbol uses a lowercase `k`.
+> - Embedded documentation often uses “KB” to mean either 1024 or 1000 bytes, creating ambiguity. This manual uses **KiB** to explicitly express Flash capacity in multiples of 1024 bytes.
+> - For example, `0x1000` = 4096 bytes = **4 KiB**, and `0x20000` = 131072 bytes = **128 KiB**. Using KiB standardizes the notation without changing the actual capacity or address ranges.
+
+#### 3.5.1 Memory Allocation in Dual-Partition Mode
+
+This project uses **dual-partition mode**: Flash is divided into an **Active Panel** and an **Inactive Panel**, each with a capacity of `0x20000` (128 KiB), for **256 KiB total**.
+
+| Panel | First Byte Address | Start Address of the Last 32-Bit Word | Last Byte Address | Complete Byte Address Window | Capacity |
+|---|---|---|---|---|---|
+| Active Panel | `0x800000` | `0x81FFFC` | `0x81FFFF` | `0x800000–0x81FFFF` | 128 KiB |
+| Inactive Panel | `0xC00000` | `0xC1FFFC` | `0xC1FFFF` | `0xC00000–0xC1FFFF` | 128 KiB |
+
+> **End-Address Convention**: the Inactive Panel is often written as `0xC00000–0xC1FFFC`, where `0xC1FFFC` is the start address of the last 32-bit word (4 bytes), covering `0xC1FFFC–0xC1FFFF`. Using inclusive byte addresses, its capacity is `0xC1FFFF - 0xC00000 + 1 = 0x20000` (128 KiB); do not treat `0xC1FFFC` as the last byte address when calculating capacity. The same convention applies to the end of the Active Panel.
+
+**The following table describes the Boot + APP layout within the Active Panel**, not a capacity allocation between the two panels:
+
+| Region | Start Address | End Address | Length (bytes) | Capacity | Purpose |
+|---|---|---|---|---|---|
+| Complete Boot | `0x800000` | `0x80BFFF` | `0xC000` | 48 KiB | Includes the Boot vector region and code region |
+| ↳ Boot vector region | `0x800000` | `0x800FFF` | `0x1000` | 4 KiB | Reserved region containing the reset entry and Boot vector table |
+| ↳ Boot code region | `0x801000` | `0x80BFFF` | `0xB000` | 44 KiB | Boot program code region |
+| Complete APP | `0x80C000` | `0x81FFFF` | `0x14000` | 80 KiB | Includes the APP vector-table region and code region |
+| ↳ APP vector-table region (IVT) | `0x80C000` | `0x80CFFF` | `0x1000` | 4 KiB | Space reserved for the vector table at the start of the APP |
+| ↳ APP code region | `0x80D000` | `0x81FFFF` | `0x13000` | 76 KiB | The 3 kW APP's `program (xr)` region |
+
+Within the Active Panel, **48 KiB Boot + 80 KiB APP = 128 KiB**. The separate **128 KiB Inactive Panel** brings the total across both panels to **256 KiB**. Within the Active Panel:
+
+- **48 KiB Boot = 4 KiB vector region + 44 KiB code region**;
+- **80 KiB APP = 4 KiB IVT + 76 KiB code region**.
+
+The complete Boot starts at `0x800000`, and its code region starts at `0x801000`; the complete APP starts at `0x80C000`, and its code region starts at `0x80D000`. The start address of a complete image and that of its code region are not interchangeable.
+
+#### 3.5.2 Code Region Definitions in the Linker Script
+
+In the dual-partition branch (`__DUAL_PARTITION`) of `p33AK256MPS206.gld`, the current toolchain links APP code into the **Active Panel**, with the program memory region defined as:
+
+```ld
+program (xr)   : ORIGIN = 0x80D000,      LENGTH = 0x13000
+```
+
+The corresponding code base and length symbols are:
+
+```ld
+__CODE_BASE = 0x80D000;
+__CODE_LENGTH = 0x13000;
+```
+
+These two sets of definitions must remain consistent. The exclusive upper bound is `0x80D000 + 0x13000 = 0x820000`, so the last byte address is `0x81FFFF`. These changes are in the `__XC16_VERSION__ >= 3020` branch; the single-partition and older-toolchain branches retain their original layouts and must not be mistaken for the current APP address definitions.
+
+#### 3.5.3 IDE Vector-Table Address and Build Checks
+
+The MPLAB X IDE linker properties include the following option to set the APP vector-table base to `0x80C000`:
+
+```text
+--ivt=0x80C000
+```
+
+This option is recorded under the `C30-LD` node in [nbproject/configurations.xml](../nbproject/configurations.xml):
+
+```xml
+<appendMe value="--ivt=0x80C000"/>
+```
+
+The first 4 KiB of the APP (`0x80C000–0x80CFFF`) is allocated to the vector-table layout, and code starts at the next region, `0x80D000`. `--ivt` specifies the vector-table base; 4 KiB is the region size allocated by this project, not a table-length setting made by that option.
+
+When building or upgrading the DFP, check the following:
+
+1. The project enables dual-partition mode and actually uses the modified project-root `p33AK256MPS206.gld`, not the DFP's default script.
+2. The actual link command includes `--ivt=0x80C000`; the generated `.map` places the APP vector table within its reserved region and APP program sections within `0x80D000–0x81FFFF`.
+3. The MPLAB X and VS Code builds use the same linker script, dual-partition option and IVT address. The current [.vscode/Microsoft_PSU_3kW_PFC.mplab.json](../.vscode/Microsoft_PSU_3kW_PFC.mplab.json) does not explicitly record `0x80C000`; when building in VS Code, inspect the actual link command rather than assuming it matches the MPLAB X properties.
+4. After upgrading the DFP, recheck and retain this custom layout; do not overwrite the project script with the new version's default script.
+
+> **Scope**: this section records Flash allocation and APP linking conventions; it does not mean online firmware update is implemented. Flash erase/write, image validation and partition swapping remain pending, as described in Section 16 and the protocol document.
 
 ---
 
@@ -2037,7 +2118,7 @@ The numbering stays fixed (Chapter 0 and code comments refer to these numbers). 
 | 12a | Zero-crossing hysteresis narrows at low voltage | `pfcZcEnterPU` / `pfcZcExitPU` | At 90 Vac the hysteresis is about 3.1 V; with high vac sampling noise BLANK may be entered and exited repeatedly | Measure vac noise on hardware; add a voltage floor to the thresholds if necessary |
 | 12b | Zero-crossing soft-start cycle count not tuned | `PFC_ZC_SS_CYCLES` | 16 cycles is an initial value: too small gives a large zero-crossing current spike, too large degrades THD | Tune with an oscilloscope at low and high voltage using the method in Section 9.2 |
 | 16 | Firmware update implements only the session framework | `FwUpdateNvm*()` in `fw_update.c` | `BOOT_ERASE` returns `NOT_IMPLEMENTED`; in-field update is not possible | Implement the NVM driver (erase, quad-word write, read-back CRC32, boot partition swap), then set `FW_UPDATE_NVM_IMPLEMENTED` to 1; protocol document Section 6.8 |
-| 17 | Partition swap configuration bit not enabled | `config_bits.c`: `FICD_NOBTSWP = BTSWP_DISABLED` | Cannot switch to the new partition | Enable it in MCC when implementing the update; the device is dsPIC33AK256MPS206 (nbproject and MCC already use this part; the device in `.vscode/*.mplab.json` is corrected by the user), 124 KB per partition |
+| 17 | Partition swap configuration bit not enabled | `config_bits.c`: `FICD_NOBTSWP = BTSWP_DISABLED` | Cannot switch to the new partition | Enable it in MCC when implementing the update; the device is dsPIC33AK256MPS206 (nbproject and MCC already use this part; the device in `.vscode/*.mplab.json` is corrected by the user), in dual-partition mode, the Active/Inactive Panels each provide 128 KiB, for 256 KiB total; see Section 3.5 for the Active Panel Boot/APP layout |
 | 18 | Uncalibrated feed-forward efficiency gain | PFC_LOAD_FF_GAIN | Negative PI can cancel it, but wrong gain still affects dynamics | Calibrate efficiency and validate load steps |
 | 19 | Polarity, levels and isolator delay of RD6 / RC4 not verified | `llc_signal.c` | Reading offset, or the feed-forward injects a wrong load | Inject a 10 kHz square wave from a signal generator to verify RD6; measure RC4 with an oscilloscope; once the LLC is ready, do a closed-loop comparison with `GET_LOAD_ECHO` |
 | 20 | PFC does not stop on link loss; demand fields of `LLC_STATUS` are not executed | `llc_link.c` | This is the design per protocol 1.0; if the system requires a stop on link loss, it must be defined separately | Bump the protocol to 1.1 once the system-level policy is decided |

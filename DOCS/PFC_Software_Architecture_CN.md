@@ -7,7 +7,7 @@
 | 原作者 | Chao Wang <chao.wang@microchip.com> |
 | 创建日期 | 2026/10/27 |
 | 修改人 | Chao Wang |
-| 修改日期 | 2026/11/01 |
+| 修改日期 | 2026/11/05 |
 | 语言 | 中文 · [English](PFC_Software_Architecture_EN.md) |
 | 适用工程 | `Microsoft_PSU_3kW_PFC.X` |
 | MCU | dsPIC33AK256MPS206（32 位 dsPIC33A，硬件单精度 FPU） |
@@ -477,6 +477,87 @@ MPLAB X 里四个 include 目录属性的作用范围（在实验副本里逐项
 ### 3.4 链接库
 
 X2Cscope 使用预编译库 `sources/third_party/X2Cscope/libx2cscope-generic-32dsp-dspic33a-mlarge-elf.a`（large memory model 版本），在 `configurations.xml` 的 `linkerLibFileItem` 中引用。
+
+### 3.5 Flash 分区与 APP 链接布局
+
+工程根目录的 [p33AK256MPS206.gld](../p33AK256MPS206.gld) 是基于 **dsPIC33AK-MP_DFP 1.6.273** 的器件链接脚本修改的，用于 3 kW 项目的 Boot + APP 布局。以下地址均为字节地址，起止地址均包含在范围内；容量统一使用 **KiB**。
+
+> **容量单位说明（KiB 与 kB）**：
+> - **KiB** 是 **kibibyte（二进制千字节）** 的符号，采用 IEC 二进制前缀 `Ki`（kibi，表示 2¹⁰）；其中 `i` 用于标识二进制前缀，`B` 表示 byte（字节），不是 bit（位）。**1 KiB = 2¹⁰ byte = 1024 byte**。
+> - **kB** 使用 SI 十进制前缀 `k`（kilo，表示 10³），因此 **1 kB = 1000 byte**。规范写法中的 `k` 为小写。
+> - 嵌入式资料中常见的“KB”有时指 1024 byte，有时指 1000 byte，存在歧义；本文用 **KiB** 明确表示按 1024 计算的 Flash 容量。
+> - 例如，`0x1000` = 4096 byte = **4 KiB**；`0x20000` = 131072 byte = **128 KiB**。改用 KiB 仅规范单位写法，不改变实际容量或地址范围。
+
+#### 3.5.1 双分区模式下的空间分配
+
+本工程使用**双分区模式**：Flash 分为 **Active Panel（活动分区）** 和 **Inactive Panel（非活动分区）**，每个 Panel 为 `0x20000`（128 KiB），总容量为 **256 KiB**。
+
+| Panel | 起始字节地址 | 最后一个 32 位字的起始地址 | 最后一个字节地址 | 完整字节地址窗口 | 容量 |
+|---|---|---|---|---|---|
+| Active Panel | `0x800000` | `0x81FFFC` | `0x81FFFF` | `0x800000–0x81FFFF` | 128 KiB |
+| Inactive Panel | `0xC00000` | `0xC1FFFC` | `0xC1FFFF` | `0xC00000–0xC1FFFF` | 128 KiB |
+
+> **末尾地址口径**：Inactive Panel 常写为 `0xC00000–0xC1FFFC`，其中 `0xC1FFFC` 是最后一个 32 位字（4 byte）的起始地址，该字覆盖 `0xC1FFFC–0xC1FFFF`。按包含首尾的字节范围计算，容量为 `0xC1FFFF - 0xC00000 + 1 = 0x20000`（128 KiB）；不能将 `0xC1FFFC` 当作最后一个字节地址来计算容量。Active Panel 的末尾同理。
+
+**下表描述 Active Panel 内部的 Boot + APP 布局**，不是两块 Panel 之间的容量分配：
+
+| 区域 | 起始地址 | 结束地址 | 长度（byte） | 容量 | 用途 |
+|---|---|---|---|---|---|
+| Boot 整体 | `0x800000` | `0x80BFFF` | `0xC000` | 48 KiB | 包含 Boot 向量区和代码区 |
+| ↳ Boot 向量区 | `0x800000` | `0x800FFF` | `0x1000` | 4 KiB | 包含复位入口及 Boot 向量表的预留区 |
+| ↳ Boot 代码区 | `0x801000` | `0x80BFFF` | `0xB000` | 44 KiB | Boot 程序代码区 |
+| APP 整体 | `0x80C000` | `0x81FFFF` | `0x14000` | 80 KiB | 包含 APP 向量表区和代码区 |
+| ↳ APP 向量表区（IVT） | `0x80C000` | `0x80CFFF` | `0x1000` | 4 KiB | APP 起始处为向量表保留的空间 |
+| ↳ APP 代码区 | `0x80D000` | `0x81FFFF` | `0x13000` | 76 KiB | 3 kW APP 的 `program (xr)` 区域 |
+
+Active Panel 内的容量关系为 **48 KiB Boot + 80 KiB APP = 128 KiB**；另外还有独立的 **128 KiB Inactive Panel**，两块 Panel 合计 **256 KiB**。其中：
+
+- **48 KiB Boot = 4 KiB 向量区 + 44 KiB 代码区**；
+- **80 KiB APP = 4 KiB IVT + 76 KiB 代码区**。
+
+Boot 整体起始地址是 `0x800000`，代码区起始地址是 `0x801000`；APP 整体起始地址是 `0x80C000`，代码区起始地址是 `0x80D000`。整体起始地址与代码区起始地址不能混用。
+
+#### 3.5.2 链接脚本中的代码区定义
+
+在 `p33AK256MPS206.gld` 的双分区分支（`__DUAL_PARTITION`）中，当前工具链将 APP 代码链接到 **Active Panel**，程序存储区定义为：
+
+```ld
+program (xr)   : ORIGIN = 0x80D000,      LENGTH = 0x13000
+```
+
+对应的代码起始地址和长度符号为：
+
+```ld
+__CODE_BASE = 0x80D000;
+__CODE_LENGTH = 0x13000;
+```
+
+两组定义必须保持一致。代码区的上界为 `0x80D000 + 0x13000 = 0x820000`（不包含），因此最后一个字节地址为 `0x81FFFF`。这些修改位于 `__XC16_VERSION__ >= 3020` 的分支；脚本中的单分区及旧工具链分支仍保留原有布局，不能把它们当作当前 APP 的地址定义。
+
+#### 3.5.3 IDE 向量表地址与构建检查
+
+MPLAB X IDE 的链接属性增加了以下参数，将 APP 向量表基址设置为 `0x80C000`：
+
+```text
+--ivt=0x80C000
+```
+
+该参数已记录在 [nbproject/configurations.xml](../nbproject/configurations.xml) 的 `C30-LD` 节点中：
+
+```xml
+<appendMe value="--ivt=0x80C000"/>
+```
+
+APP 起始的 4 KiB（`0x80C000–0x80CFFF`）用于向量表布局，代码从下一段 `0x80D000` 开始。`--ivt` 指定的是向量表基址；4 KiB 是本工程为其划定的区域大小，并不是该参数本身设置了向量表长度。
+
+构建或升级 DFP 时检查以下项目：
+
+1. 工程启用双分区模式，并实际使用工程根目录下修改过的 `p33AK256MPS206.gld`，而不是 DFP 默认脚本。
+2. 实际链接命令包含 `--ivt=0x80C000`，生成的 `.map` 中 APP 向量表位于预留区内，APP 程序段落在 `0x80D000–0x81FFFF`。
+3. MPLAB X 与 VS Code 两套构建保持相同的链接脚本、双分区选项和 IVT 地址。当前 [.vscode/Microsoft_PSU_3kW_PFC.mplab.json](../.vscode/Microsoft_PSU_3kW_PFC.mplab.json) 未显式记录 `0x80C000`，使用 VS Code 构建时需核对实际链接命令，不能仅凭 MPLAB X 的属性推定两边一致。
+4. 升级 DFP 后，重新核对并保留上述自定义布局，避免用新版本默认脚本覆盖工程脚本。
+
+> **范围说明**：本节记录 Flash 分配及 APP 链接约定，不表示在线升级已经实现。Flash 擦写、镜像校验和分区切换仍是待实现功能，见第 16 章及通信协议文档。
 
 ---
 
@@ -2034,7 +2115,7 @@ volatile float g_xxx;
 | 12a | 低压下过零迟滞变窄 | `pfcZcEnterPU` / `pfcZcExitPU` | 90 Vac 时迟滞约 3.1 V，vac 采样噪声大时可能反复进出 BLANK | 上板测量 vac 噪声；必要时给阈值加一个电压下限 |
 | 12b | 过零软启动拍数未调试 | `PFC_ZC_SS_CYCLES` | 16 拍为初值：太小则过零电流尖峰大，太大则 THD 变差 | 按第 9.2 节的方法，在低压和高压下用示波器调试 |
 | 16 | 固件升级只实现了会话框架 | `fw_update.c` 的 `FwUpdateNvm*()` | `BOOT_ERASE` 返回 `NOT_IMPLEMENTED`，无法在线升级 | 实现 NVM 驱动（擦除、quad-word 写入、回读 CRC32、切换启动分区），然后把 `FW_UPDATE_NVM_IMPLEMENTED` 置 1；协议文档第 6.8 节 |
-| 17 | 分区切换配置位未打开 | `config_bits.c`：`FICD_NOBTSWP = BTSWP_DISABLED` | 无法切换到新分区 | 实现升级时在 MCC 中打开；器件为 dsPIC33AK256MPS206（nbproject 和 MCC 已是该型号；`.vscode/*.mplab.json` 的 device 由用户修正），单分区 124 KB |
+| 17 | 分区切换配置位未打开 | `config_bits.c`：`FICD_NOBTSWP = BTSWP_DISABLED` | 无法切换到新分区 | 实现升级时在 MCC 中打开；器件为 dsPIC33AK256MPS206（nbproject 和 MCC 已是该型号；`.vscode/*.mplab.json` 的 device 由用户修正），双分区模式下 Active/Inactive Panel 各 128 KiB，总计 256 KiB；Active Panel 的 Boot/APP 布局见第 3.5 节 |
 | 18 | 前馈效率增益未标定 | PFC_LOAD_FF_GAIN | 虽可被负 PI 抵消，错误增益仍影响动态 | 校准效率并验证负载阶跃 |
 | 19 | RD6 / RC4 的极性、电平和隔离器延迟未验证 | `llc_signal.c` | 读数偏差，或前馈带入错误的负载 | 用信号源注入 10 kHz 方波验证 RD6；用示波器量 RC4；LLC 就绪后用 `GET_LOAD_ECHO` 做闭环比对 |
 | 20 | 链路丢失时 PFC 不停机，`LLC_STATUS` 的需求字段不执行 | `llc_link.c` | 符合协议 1.0 的设计；如果系统要求链路丢失即停机，需要另外定义 | 系统层确定策略后升协议 1.1 |
