@@ -9,22 +9,7 @@
             <sourceEncoding>ISO-8859-1</sourceEncoding>
             <make-dep-projects/>
             <sourceRootList>
-                <sourceRootElem>sources/drivers/mcc_extended</sourceRootElem>
-                <sourceRootElem>sources/isr</sourceRootElem>
-                <sourceRootElem>sources/scheduler</sourceRootElem>
-                <sourceRootElem>sources/apps/control</sourceRootElem>
-                <sourceRootElem>sources/apps/fault</sourceRootElem>
-                <sourceRootElem>sources/apps/pll</sourceRootElem>
-                <sourceRootElem>sources/config</sourceRootElem>
-                <sourceRootElem>sources/drivers/pfc_pwm</sourceRootElem>
-                <sourceRootElem>sources/third_party/X2Cscope</sourceRootElem>
-                <sourceRootElem>sources/apps/meas</sourceRootElem>
-                <sourceRootElem>sources/apps/comm</sourceRootElem>
-                <sourceRootElem>sources/drivers/llc_signal</sourceRootElem>
-                <sourceRootElem>sources/common</sourceRootElem>
-                <sourceRootElem>sources/drivers/pfc_io</sourceRootElem>
-                <sourceRootElem>sources/drivers/uart_link</sourceRootElem>
-                <sourceRootElem>../../../Microsoft_PSU_3kW_PFC.X</sourceRootElem>
+                <sourceRootElem>.</sourceRootElem>
             </sourceRootList>
             <confList>
                 <confElem>

@@ -21,18 +21,18 @@
 
 /*******************************************************************************
 * File Name       : pfc_pwm.c
-* Description     : Totem-pole PFC PWM access layer (fast legs PG1/PG2, slow leg PG3)
+* Description     : Totem-pole PFC PWM access layer (fast legs PG3/PG4, slow leg PG5)
 *
-*   PG1 = phase-A fast leg, PG2 = phase-B fast leg (180 deg, triggered by PG1),
-*   PG3 = line-frequency slow leg, always driven through output override.
+*   PG3 = phase-A fast leg, PG4 = phase-B fast leg (180 deg, triggered by PG3),
+*   PG5 = line-frequency slow leg, always driven through output override.
 *   Fast legs use SWAP so PGxDC always represents the boost-switch duty.
-*   Override changes on PG1/PG2/PG3 are synchronized to the local PWM time
+*   Override changes on PG3/PG4/PG5 are synchronized to the local PWM time
 *   base (OSYNC = 0b00, set in PwmInitExt), so no UPDREQ is needed.
 *
 * Original Author : Chao Wang <chao.wang@microchip.com>
 * Created on      : 2026/10/28
 * Modified by     : Chao Wang
-* Modified on     : 2026/11/01
+* Modified on     : 2026/11/10
 *******************************************************************************/
 #define PFC_PWM_C
 
@@ -61,7 +61,7 @@ float g_pfcPwmPeriodCnt;
 /*******************************************************************************
 * Public Function : PFC_PWM_Init
 * Description     : Put all PFC legs into a safe state and cache the period
-* Purpose         : Ensure PG1/PG2/PG3 outputs are overridden low before the
+* Purpose         : Ensure PG3/PG4/PG5 outputs are overridden low before the
 *                   control loop is allowed to run
 * Input           : None
 * Return          : None
@@ -71,10 +71,17 @@ float g_pfcPwmPeriodCnt;
 *******************************************************************************/
 void PFC_PWM_Init(void)
 {
-    g_pfcPwmPeriodCnt = (float)PG1PER;
+    g_pfcPwmPeriodCnt = (float)PG3PER;
 
-    PG1DC = 0UL;
-    PG2DC = 0UL;
+    // Duty point first, then duty (same order as DutyASet/BSet)
+    PG3TRIGB = 1UL << 31;
+    PG3DC    = 0UL;
+    PG4TRIGB = 1UL << 31;
+    PG4DC    = 0UL;
+    PG1DC    = 0UL;                 // Sync window closed
+    PG2DC    = 0UL;
+    PFC_PWM_PhaseASyncGateOpen();   // Window open: LOGCON passes the switch pins
+    PFC_PWM_PhaseBSyncGateOpen();
     PFC_PWM_AllOutputsOff();
 }
 
@@ -91,9 +98,9 @@ void PFC_PWM_Init(void)
 *******************************************************************************/
 void PFC_PWM_AllOutputsOff(void)
 {
-    PG1IOCON2 = (PG1IOCON2 & ~PFC_PWM_OVRDAT_MASK) | PFC_PWM_OVREN_MASK;
-    PG2IOCON2 = (PG2IOCON2 & ~PFC_PWM_OVRDAT_MASK) | PFC_PWM_OVREN_MASK;
     PG3IOCON2 = (PG3IOCON2 & ~PFC_PWM_OVRDAT_MASK) | PFC_PWM_OVREN_MASK;
+    PG4IOCON2 = (PG4IOCON2 & ~PFC_PWM_OVRDAT_MASK) | PFC_PWM_OVREN_MASK;
+    PG5IOCON2 = (PG5IOCON2 & ~PFC_PWM_OVRDAT_MASK) | PFC_PWM_OVREN_MASK;
 }
 
 /*******************************************************************************
@@ -126,7 +133,7 @@ void PFC_PWM_SlowLegSet(PFC_PWM_POLARITY_e polarity)
             break;
     }
 
-    PG3IOCON2 = (PG3IOCON2 & ~PFC_PWM_OVRDAT_MASK)
+    PG5IOCON2 = (PG5IOCON2 & ~PFC_PWM_OVRDAT_MASK)
               | (ovrdat << PFC_PWM_OVRDAT_POSITION)
               | PFC_PWM_OVREN_MASK;
 }

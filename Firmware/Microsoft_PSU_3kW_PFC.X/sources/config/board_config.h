@@ -48,7 +48,7 @@ extern "C" {
 
 //------------------------------------------------------------------------------
 // Public Constants and Macro Definitions
-// Execution rates (must match MCC: PG1PER 65 kHz, TMR1 PR1 100 us)
+// Execution rates (must match MCC: PG3PER 65 kHz, TMR1 PR1 100 us)
 #define BOARD_FAST_LOOP_HZ      65000U      // Phase A / B ADC ISR rate
 #define BOARD_VLOOP_DIVIDER     8U          // Voltage loop every N phase-B ISRs (8.125 kHz)
 #define BOARD_SLOW_TICK_US      100U        // T1 period

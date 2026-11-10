@@ -132,10 +132,10 @@ void ADC5_Initialize(void)
     AD5CMPSTAT = 0x0UL;
     //CH0TRG disabled; CH1TRG disabled; CH2TRG disabled; CH3TRG disabled; CH4TRG disabled; CH5TRG disabled; CH6TRG disabled; CH7TRG disabled; CH8TRG disabled; CH9TRG disabled; CH10TRG disabled; CH11TRG disabled; CH12TRG disabled; CH13TRG disabled; CH14TRG disabled; CH15TRG disabled; 
     AD5SWTRG = 0x0UL;
-    //TRG1SRC PWM1 Trigger1; MODE Single sample initiated by TRG1SRC[4:0] trigger; TRG2SRC Triggers are disabled; ACCNUM 4 samples, 13 bits result; SAMC 6.5 TAD; IRQSEL enabled; EIEN disabled; TRG1POL disabled; PINSEL AD5AN1; NINSEL AD5ANN0; FRAC Integer; DIFF disabled; 
-    AD5CH0CON1 = 0x1230004UL;
-    //TRG1SRC PWM1 Trigger1; MODE Single sample initiated by TRG1SRC[4:0] trigger; TRG2SRC Triggers are disabled; ACCNUM 4 samples, 13 bits result; SAMC 6.5 TAD; IRQSEL enabled; EIEN disabled; TRG1POL disabled; PINSEL AD5AN2; NINSEL AD5ANN0; FRAC Integer; DIFF disabled; 
-    AD5CH1CON1 = 0x2230004UL;
+    //TRG1SRC PWM3 Trigger1; MODE Single sample initiated by TRG1SRC[4:0] trigger; TRG2SRC Triggers are disabled; ACCNUM 4 samples, 13 bits result; SAMC 6.5 TAD; IRQSEL enabled; EIEN disabled; TRG1POL disabled; PINSEL AD5AN1; NINSEL AD5ANN0; FRAC Integer; DIFF disabled; 
+    AD5CH0CON1 = 0x1230008UL;
+    //TRG1SRC PWM3 Trigger1; MODE Single sample initiated by TRG1SRC[4:0] trigger; TRG2SRC Triggers are disabled; ACCNUM 4 samples, 13 bits result; SAMC 6.5 TAD; IRQSEL enabled; EIEN disabled; TRG1POL disabled; PINSEL AD5AN2; NINSEL AD5ANN0; FRAC Integer; DIFF disabled; 
+    AD5CH1CON1 = 0x2230008UL;
     //ADCMPCNT disabled; CMPMOD NONE; CMPCNTMOD disabled; CMPVAL enabled; ACCBRST disabled; ACCRO disabled; 
     AD5CH0CON2 = 0x20000000UL;
     //ADCMPCNT disabled; CMPMOD NONE; CMPCNTMOD disabled; CMPVAL enabled; ACCBRST disabled; ACCRO disabled; 

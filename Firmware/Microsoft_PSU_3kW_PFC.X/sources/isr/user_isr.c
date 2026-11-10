@@ -41,7 +41,7 @@
 * Original Author : Chao Wang <chao.wang@microchip.com>
 * Created on      : 2026/04/09
 * Modified by     : Chao Wang
-* Modified on     : 2026/11/01
+* Modified on     : 2026/11/10
 *******************************************************************************/
 #define USER_ISR_C
 
@@ -133,7 +133,7 @@ void USER_ISR_AdcScaleInit(void)
 
 /*******************************************************************************
 * Public Function : _AD5CH1Interrupt
-* Description     : Phase-A sampling ISR (PWM1 trigger, 65 kHz)
+* Description     : Phase-A sampling ISR (PWM3 trigger, 65 kHz)
 * Purpose         : Convert phase-A currents and grid voltage to PU,
 *                   then run the phase-A task (PLL, polarity, current loop A)
 * Input           : None (hardware interrupt)
@@ -178,7 +178,7 @@ void __attribute__ ( ( __interrupt__ ) ) _AD5CH1Interrupt ( void )
 
 /*******************************************************************************
 * Public Function : _AD1CH1Interrupt
-* Description     : Phase-B sampling ISR (PWM2 trigger, 65 kHz, 180 deg after A)
+* Description     : Phase-B sampling ISR (PWM4 trigger, 65 kHz, 180 deg after A)
 * Purpose         : Convert phase-B currents and bulk voltage to PU, read the
 *                   LLC load (RD6), then run the phase-B task (current loop B,
 *                   decimated voltage loop) and scope sampling
@@ -188,7 +188,7 @@ void __attribute__ ( ( __interrupt__ ) ) _AD5CH1Interrupt ( void )
 *                   X2Cscope_Update
 * Called by       : Hardware
 * Note            : Priority 5, same as phase-A ISR (no mutual preemption).
-*                   AD3CH0 (vout) is triggered by PG2TRIGA together with AD1.
+*                   AD3CH0 (vout) is triggered by PG4TRIGA together with AD1.
 *                   RD6 is read in this ISR, every state, so the load
 *                   feed-forward is updated in the voltage-loop context.
 *                   Measured execution time ~4.6 us (of the 15.38 us period).

@@ -7,7 +7,7 @@
 | 原作者 | Chao Wang <chao.wang@microchip.com> |
 | 创建日期 | 2026/10/27 |
 | 修改人 | Chao Wang |
-| 修改日期 | 2026/11/05 |
+| 修改日期 | 2026/11/10 |
 | 语言 | 中文 · [English](PFC_Software_Architecture_EN.md) |
 | 适用工程 | `Microsoft_PSU_3kW_PFC.X` |
 | MCU | dsPIC33AK256MPS206（32 位 dsPIC33A，硬件单精度 FPU） |
@@ -23,7 +23,7 @@
 
 > **术语约定**：
 > - 本文的"**拍**"按上下文分两种：65 kHz 控制中断里指一个 PWM 周期（15.38 µs），状态机、故障和调度里指一个 T1 节拍（100 µs）。容易混淆的地方会写明单位。
-> - "**快管**"指 65 kHz 开关的 GaN 桥臂（PG1/PG2），"**慢管**"指工频桥臂（PG3）。
+> - "**快管**"指 65 kHz 开关的 GaN 桥臂（PG3/PG4），"**慢管**"指工频桥臂（PG5）。
 > - "**PU**"即标幺值，见第 7 章。
 
 ---
@@ -70,7 +70,7 @@ PFC 与副边 LLC 之间有两种通信：UART1（LLC 主机，PFC 从机）和�
  ┌──────────────────────── 65 kHz，优先级 5（两相互不抢占）────────────────────────┐
  │ _AD5CH1Interrupt（A 相）              _AD1CH1Interrupt（B 相，+180°）              │
  │  ADC→PU → 快速过流 → PLL → 极性       ADC→PU → 快速过流/过压 → RD6 负载            │
- │  → 电流环 A → PG1DC / 慢管 PG3        → 电压环（每 8 次）→ 电流环 B → PG2DC        │
+ │  → 电流环 A → PG3DC / 慢管 PG5        → 电压环（每 8 次）→ 电流环 B → PG4DC        │
  └─────────────────────────────────────────────────────────────────────────────────────┘
  ┌──────────── 10 kHz T1，优先级 1 ────────────┐   ┌──────────── 主循环 ────────────┐
  │ UART1 字节搬运 → 温度 → ISR 心跳            │   │ 喂狗（需心跳）→ X2Cscope       │
@@ -141,20 +141,20 @@ PFC 与副边 LLC 之间有两种通信：UART1（LLC 主机，PFC 从机）和�
 ### 1.1 功率拓扑
 
 ```
-            L_A        快管桥臂 A (PG1, GaN, 65 kHz)
+            L_A        快管桥臂 A (PG3, GaN, 65 kHz)
    L ──┬──/\/\/──┬────┤ Q_AH ├──┬──────────┐
        │         └────┤ Q_AL ├──┤          │
-       │   L_B        快管桥臂 B (PG2, 与 A 相差 180°)   ═╪═ C_bulk  → Vout ≈ 400 V
+       │   L_B        快管桥臂 B (PG4, 与 A 相差 180°)   ═╪═ C_bulk  → Vout ≈ 400 V
        └──/\/\/──┬────┤ Q_BH ├──┤          │             (送后级 LLC)
                  └────┤ Q_BL ├──┤          │
                                 │          │
    N ─────────────────┤ S_H  ├──┘          │
                       ┤ S_L  ├─────────────┘
-                      慢管桥臂 (PG3, 工频切换, 由 override 直接驱动)
+                      慢管桥臂 (PG5, 工频切换, 由 override 直接驱动)
 ```
 
-- **两相交错 Boost 快管**：PG1（A 相）和 PG2（B 相）以 65 kHz、相位差 180° 工作，输入电流纹波相互抵消。
-- **慢管桥臂**：PG3 不产生 PWM 波形，而是通过 output override 按电网极性**静态**导通上管或下管，相当于一个同步整流的工频桥臂。
+- **两相交错 Boost 快管**：PG3（A 相）和 PG4（B 相）以 65 kHz、相位差 180° 工作，输入电流纹波相互抵消。
+- **慢管桥臂**：PG5 不产生 PWM 波形，而是通过 output override 按电网极性**静态**导通上管或下管，相当于一个同步整流的工频桥臂。
 - **正负半周**的区别在于：哪一个快管充当 Boost 主开关，哪一个充当同步整流管。代码通过 PWM 的 `SWAP` 位来切换，使得 `PGxDC` 寄存器**始终**表示 Boost 主开关的占空比，控制算法不必区分半周。
 
 ### 1.1a 正负半周的电流路径
@@ -164,11 +164,11 @@ PFC 与副边 LLC 之间有两种通信：UART1（LLC 主机，PFC 从机）和�
 ```
                     Bus+ ●────────────┬───────────────┐
                          │            │               │
-                    Q_AH (PWM1H)  S_H (PWM3H)        ═╪═ C_bulk
+                    Q_AH (PWM3H)  S_H (PWM5H)        ═╪═ C_bulk
                          │            │               │
    L ●───L_A──/\/\/──────● SW_A       ● ──────────● N │
                          │            │               │
-                    Q_AL (PWM1L)  S_L (PWM3L)         │
+                    Q_AL (PWM3L)  S_L (PWM5L)         │
                          │            │               │
                     Bus− ●────────────┴───────────────┘
 ```
@@ -198,18 +198,18 @@ PFC 与副边 LLC 之间有两种通信：UART1（LLC 主机，PFC 从机）和�
 ```
  极性         BLANK │        POS         │BLANK│        NEG         │BLANK
  vac            0  ↗    L > N（正半周）  ↘  0  ↘   N > L（负半周）  ↗  0
- PWM3H (S_H)   ____│____________________│_____│▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔│_____
- PWM3L (S_L)   ____│▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔│_____│____________________│_____
- Q_AL (PWM1L)   关 │  Boost（PG1DC）    │  关 │  同步整流          │  关
- Q_AH (PWM1H)   关 │  同步整流          │  关 │  Boost（PG1DC）    │  关
- PG1 SWAP       —  │        1           │  —  │        0           │  —
+ PWM5H (S_H)   ____│____________________│_____│▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔│_____
+ PWM5L (S_L)   ____│▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔│_____│____________________│_____
+ Q_AL (PWM3L)   关 │  Boost（PG3DC）    │  关 │  同步整流          │  关
+ Q_AH (PWM3H)   关 │  同步整流          │  关 │  Boost（PG3DC）    │  关
+ PG3 SWAP       —  │        1           │  —  │        0           │  —
  电流反馈       0  │  iDn（下管电流）   │  0  │  iUp（上管电流）   │  0
 ```
 
 | 半周 | 工频管 | Boost 管（PGxDC） | 同步整流管 | 回路母线 | SWAP | 慢管 OVRDAT | 电流反馈 |
 |---|---|---|---|---|---|---|---|
-| POS | S_L（PWM3L） | 下管 Q_xL（PWMxL） | 上管 Q_xH | Bus− | 1 | `0x1` | `iDn` |
-| NEG | S_H（PWM3H） | 上管 Q_xH（PWMxH） | 下管 Q_xL | Bus+ | 0 | `0x2` | `iUp` |
+| POS | S_L（PWM5L） | 下管 Q_xL（PWMxL） | 上管 Q_xH | Bus− | 1 | `0x1` | `iDn` |
+| NEG | S_H（PWM5H） | 上管 Q_xH（PWMxH） | 下管 Q_xL | Bus+ | 0 | `0x2` | `iUp` |
 
 记忆规则：
 - **Boost 管和导通的工频管总在同一侧**：POS 时都是下管，NEG 时都是上管。电感充电回路要经过同一根母线（Bus− 或 Bus+）闭合。如果两者不在同一侧，充电回路闭合不了，电感两端会直接承受母线电压与电网电压之差，电流失控。
@@ -237,7 +237,7 @@ A/B 两相电流环各设计 65 kHz、穿越约 4 kHz，共用幅值与正弦参
 | 输出功率 | 3 kW | 项目要求 |
 | 输入 | 90–264 Vac，45–65 Hz | 设计范围；保护阈值见 `fault.h`（VAC_UVP 128 Vpk ≈ 90 Vrms，VAC_OVP 380 Vpk ≈ 269 Vrms） |
 | 输出 | 400 V（可设 350–410 V） | `smps_sm.h` |
-| 开关频率 | 65 kHz/相，交错后输入纹波频率 130 kHz | `board_config.h`（`BOARD_FAST_LOOP_HZ`），须与 MCC `PG1PER` 一致 |
+| 开关频率 | 65 kHz/相，交错后输入纹波频率 130 kHz | `board_config.h`（`BOARD_FAST_LOOP_HZ`），须与 MCC `PG3PER` 一致 |
 | 电流环频率 | 65 kHz（每相） | 同上 |
 | 电压环频率 | 8.125 kHz | `PFC_VLOOP_DIVIDER = 8` |
 | 慢任务 | 10 kHz（100 µs） | Timer1 |
@@ -256,8 +256,8 @@ Microsoft_PSU_3kW_PFC.X/
 ├── main.c                          入口：初始化顺序 + 主循环
 ├── mcc_generated_files/            MCC Melody 自动生成（勿手改，重新生成会被覆盖）
 │   ├── adc/        adc1..adc5      ADC 通道、触发源、采样时间
-│   ├── cmp/        cmp1,4,5,6,7,8  比较器/DAC（CMP1/4/5/6 → PG1/PG2 逐周期限流；DAC7 → RA9 调试，DAC8 → RA8 外部 VREF）
-│   ├── pwm_hs/     pwm.c           PG1/PG2/PG3 周期、模式、触发、override
+│   ├── cmp/        cmp1,4,5,6,7,8  比较器/DAC（CMP1/4/5/6 → PG3/PG4 逐周期限流；DAC7 → RA9 调试，DAC8 → RA8 外部 VREF）
+│   ├── pwm_hs/     pwm.c           PG3/PG4/PG5 周期、模式、触发、override
 │   ├── input_capture/ sccp1,2      RD6 捕获（LLC 负载占空比，LLC_SIGNAL_Init 重新配置）
 │   ├── pwm/        sccp3           RC4 占空比输出（母线电压 → LLC）
 │   ├── timer/      tmr1            100 µs 时基
@@ -324,7 +324,7 @@ app_tasks       │    │   ▼         ▼          ▼           ▼         
  │    │         │    └► smps_control ◄── board_config   (PU 基值 + 测量变量 + 控制器)
  │    │         │          │
  │    │         │          ▼
- │    │         │       pfc_pwm ──► 寄存器 (PG1/PG2/PG3)
+ │    │         │       pfc_pwm ──► 寄存器 (PG3/PG4/PG5)
  │    │         ▼
  │    │      il_cal（校准期间喂原始值）、llc_signal（RD6）、llc_link（字节搬运）
  │    ▼
@@ -367,7 +367,7 @@ llc_signal、llc_protocol ──► common/llc_duty_def.h
 
 | 类别 | 宏 | 必须与之一致的对象 |
 |---|---|---|
-| 执行频率 | `BOARD_FAST_LOOP_HZ`（65 kHz）、`BOARD_VLOOP_DIVIDER`、`BOARD_SLOW_TICK_US`（100 µs） | MCC 的 `PG1PER`、`PR1` |
+| 执行频率 | `BOARD_FAST_LOOP_HZ`（65 kHz）、`BOARD_VLOOP_DIVIDER`、`BOARD_SLOW_TICK_US`（100 µs） | MCC 的 `PG3PER`、`PR1` |
 | 采样标定 | `BOARD_FB_VAC/VOUT/TEMP_*`、`BOARD_FB_IL_RANGE_A`（±50 A，`BOARD_FB_IL_SCALE` 由它派生） | 分压比、CT 变比、运放增益 |
 | 功率级 | `BOARD_PFC_L_H`、`BOARD_PFC_COUT_F` | 电感、电容实测值 |
 
@@ -594,15 +594,15 @@ ADC 增益超时或零结果设置 `g_adcCalibrationFailedMask`；CT 校准必�
 
 | 上下文 | 触发源 | 频率 | 优先级 | 入口 | 主要工作 |
 |---|---|---|---|---|---|
-| A 相 ISR | AD5CH1 转换完成（PWM1 Trigger1） | 65 kHz | 5 | `_AD5CH1Interrupt` | （校准期间 `IL_CAL_Update` 累加 iA 原始值）采 iA_up/dn、vac → `SMPS_SM_TaskPhaseA` |
-| B 相 ISR | AD1CH1 转换完成（PWM2 Trigger1） | 65 kHz | 5 | `_AD1CH1Interrupt` | （校准期间 `IL_CAL_Update` 累加 iB 原始值）采 iB_up/dn、vout → RD6 负载 `LLC_SIGNAL_LoadUpdate` → `SMPS_SM_TaskPhaseB` → `X2Cscope_Update` |
+| A 相 ISR | AD5CH1 转换完成（PWM3 Trigger1） | 65 kHz | 5 | `_AD5CH1Interrupt` | （校准期间 `IL_CAL_Update` 累加 iA 原始值）采 iA_up/dn、vac → `SMPS_SM_TaskPhaseA` |
+| B 相 ISR | AD1CH1 转换完成（PWM4 Trigger1） | 65 kHz | 5 | `_AD1CH1Interrupt` | （校准期间 `IL_CAL_Update` 累加 iB 原始值）采 iB_up/dn、vout → RD6 负载 `LLC_SIGNAL_LoadUpdate` → `SMPS_SM_TaskPhaseB` → `X2Cscope_Update` |
 | 慢任务 ISR | Timer1（PR1 = 9999） | 10 kHz | 1 | `_T1Interrupt` | 采温度 → `SMPS_SM_TaskSlow` → UART1 字节搬运 `LLC_LINK_ByteService` → 调度节拍 +1 |
 | 主循环 | — | 尽可能快 | 0 | `SCHEDULER_Run` | 喂狗（需 ISR 心跳）、X2Cscope 通信、LLC 帧解析和应答 `LLC_LINK_Task`、1 ms 任务（链路计时、RC4 更新） |
 
 ### 5.2 时序图（一个 PWM 周期 ≈ 15.38 µs）
 
 ```
- PWM1 周期  |<─────────────────── 15.38 µs ───────────────────>|
+ PWM3 周期  |<─────────────────── 15.38 µs ───────────────────>|
             ▲ Trigger1(A)                  ▲ Trigger1(B, +180°)
  ADC        [AD5/AD2/AD4 转换]              [AD1/AD3CH0 转换]
  ISR(prio5)   ├─ A 相 ISR ─────┤              ├─ B 相 ISR ──┤
@@ -675,26 +675,30 @@ T1 是 `g_fault` 的唯一运行期写入者：合并快速故障，检查校准
 
 | 发生器 | 用途 | 模式 | 周期 | 更新方式 | 说明 |
 |---|---|---|---|---|---|
-| PG1 | A 相快管 | 双更新中心对齐、互补（MODSEL=5） | `PG1PER = 0x1808E`（设计 65 kHz） | UPDMOD = SOC | 主时基；Trigger B 比较事件触发 PG2；TRIGA 用于触发 ADC |
-| PG2 | B 相快管 | 双更新中心对齐、互补（MODSEL=5） | 同 PG1 | UPDMOD = SOC | 由 PG1 触发，设计相位差 180° |
-| PG3 | 慢桥 | 双更新中心对齐 MODSEL=5 | 同 PG1 | Immediate | 通过覆盖驱动 |
-| PG4 | 未用于功率级 | 独立边沿，只开 PWM4H（RC3） | `PG4PER = 0xC7F0` | UPDMOD = Immediate | MCC 配置，`PWM_Enable()` 会一起启动，`DC = 0` 所以 RC3 保持低；不受 `PFC_PWM_*` 管理，软件不使用 |
+| PG3 | A 相快管（PWM3H/L：RD2/RD3） | 双更新中心对齐、互补（MODSEL=5） | `PG3PER = 0x1808E`（设计 65 kHz） | UPDMOD = SOC | 主时基；PGTRGSEL = Trigger D 比较事件（`PG3TRIGD`）作为 PG4、PG5 的 SOC 源；TRIGA 用于触发 ADC |
+| PG4 | B 相快管（PWM4H/L：RD0/RD1） | 双更新中心对齐、互补（MODSEL=5） | 同 PG3 | UPDMOD = SOC | SOCS = PG3，设计相位差 180° |
+| PG5 | 慢桥（PWM5H/L：RC10/RC11） | 双更新中心对齐 MODSEL=5 | 同 PG3 | Immediate | SOCS = PG3；通过覆盖驱动 |
+| PG6 | 未用于功率级 | 独立边沿，只开 PWM6H（RC3） | `PG6PER = 0xC7F0` | UPDMOD = Immediate | MCC 配置，`PWM_Enable()` 会一起启动；PWM6L 无引脚映射，`PwmInitExt()` 将 `PG6IOCON1.PENL` 清 0；`DC = 0` 所以 RC3 保持低；不受 `PFC_PWM_*` 管理，软件不使用 |
+| PG1 | A 相同步窗口（仅片内，无引脚） | 独立边沿、独立输出（PMOD=01），重触发（`TRGMOD=01`） | `PG1PER = 0xFFFFF`（`PwmInitExt` 覆盖 MCC 的 `0x400`） | UPDMOD = SOC，`UPDTRG` = DC 写入 | 由 PG3 的 PWM 事件 A 重触发；`PG1DC` = 窗口宽度；PWM1H/L 与 LOGCON A/B 的源相连，详见 §6.1a |
+| PG2 | B 相同步窗口（仅片内，无引脚） | 同 PG1 | `PG2PER = 0xFFFFF` | 同 PG1 | 由 PG4 的 PWM 事件 B 重触发；`PG2DC` = 窗口宽度；PWM2H/L 与 LOGCON C/D 的源相连 |
 
-> **当前 MCC 配置（#40）**：PG1/2/3 CON=0x8D / 0x1008D / 0x101008D，均双更新中心对齐。每周期两次缓冲更新机会；ADC TRIGA 1:1、CAHALF=1、比较值 0 不等于自动双倍采样。设计各相 65 kHz、180°交错须实测。
+> **PWM 发生器编号变更（2026/11/10）**：MCC 的 PWM 配置已重建，发生器整体后移：原 PG1/PG2/PG3（A 相 / B 相 / 慢桥）现为 **PG3/PG4/PG5**，原 PG4（RC3 上的 PWM4H）现为 **PG6**（RC3 上的 PWM6H）。物理引脚不变（PWM3~PWM6 由 `pins.c` 的 PPS 映射）。**PG1/PG2 随后作为同步窗口发生器重新启用**（内部用，无引脚，见 §6.1a）。ADC Trigger 1 源现为 PWM3（A 相）和 PWM4（B 相）。
+
+> **当前 MCC 配置（#40）**：PG3/4/5 为 PFC 发生器，CON=0x8D / 0x3008D / 0x103008D，均双更新中心对齐，PG4/PG5 的 SOCS = PG3；PG1/PG2 的 MCC `CON=0xF0088`（独立边沿，SOCS=TRIG 位或 PCI 同步），`PwmInitExt()` 将 `TRGMOD` 置为重触发后为 `0x4F0088`。每周期两次缓冲更新机会；ADC TRIGA 1:1、CAHALF=1、比较值 0 不等于自动双倍采样。设计各相 65 kHz、180°交错须实测。
 
 **Override 机制**（`PGxIOCON2`）：
 
 - `OVRENH/OVRENL = 1`：输出由 `OVRDAT` 决定，不受 PWM 发生器控制。
 - `OVRDAT<1>` 对应 PWMxH，`OVRDAT<0>` 对应 PWMxL。
 - MCC 复位值 `PGxIOCON2 = 0x300800`，即 OVREN 置位、OVRDAT = 0，**上电默认所有输出为低**。
-- 覆盖同步由 `PwmInitExt()` 对 PG1/2/3 设置 `OSYNC=01`（尽快生效）；不需 UPDREQ，DC/SWAP 的 UPDMOD 保持原配置。仍需验证硬件与驱动延迟。
+- 覆盖同步由 `PwmInitExt()` 对 PG3/4/5 设置 `OSYNC=01`（尽快生效）；不需 UPDREQ，DC/SWAP 的 UPDMOD 保持原配置。仍需验证硬件与驱动延迟。
 
 **SWAP 机制**（`PGxIOCON1.SWAP`）：交换 PWMxH 和 PWMxL 的输出。代码保证 `PGxDC` 始终代表 Boost 主开关的占空比：
 
 | 极性 | 快管 SWAP | 慢管 OVRDAT | 含义（**需对照原理图确认**） |
 |---|---|---|---|
-| POS（vac > 0） | `PFC_PWM_FAST_LEG_SWAP_POS = 1` | `0x1`（PWM3L 导通） | 下管为 Boost 主开关 |
-| NEG（vac < 0） | `PFC_PWM_FAST_LEG_SWAP_NEG = 0` | `0x2`（PWM3H 导通） | 上管为 Boost 主开关 |
+| POS（vac > 0） | `PFC_PWM_FAST_LEG_SWAP_POS = 1` | `0x1`（PWM5L 导通） | 下管为 Boost 主开关 |
+| NEG（vac < 0） | `PFC_PWM_FAST_LEG_SWAP_NEG = 0` | `0x2`（PWM5H 导通） | 上管为 Boost 主开关 |
 | BLANK | — | `0x0`（全关） | 过零禁止开关 |
 
 **同步整流管所在的引脚**（`pfc_pwm.h` 中的 `PFC_PWM_SYNC_OVREN_POS/NEG`）：override 作用在**引脚**上、在 SWAP 之后（数据手册 16.x：SWAP 最先应用，会被其他控制覆盖），所以同步整流管所在的引脚随半周变化：
@@ -704,13 +708,13 @@ T1 是 `g_fault` 的唯一运行期写入者：合并快速故障，检查校准
 | POS | 1 | PWMxL（下管） | PWMxH（上管） | `OVRENH` |
 | NEG | 0 | PWMxH（上管） | PWMxL（下管） | `OVRENL` |
 
-> ⚠️ 以上按"PWMxH 引脚 = 上管、PWMxL 引脚 = 下管"推出，**需对照原理图确认**（与 SWAP 表的 TODO 同一项）。台架上已确认 PWM1H 是上管，NEG 半周时 PWM3H 为高、PWM1H 为 Boost，与上表一致。各半周的电流路径见第 1.1a 节。
+> ⚠️ 以上按"PWMxH 引脚 = 上管、PWMxL 引脚 = 下管"推出，**需对照原理图确认**（与 SWAP 表的 TODO 同一项）。台架上已确认 PWM3H 是上管，NEG 半周时 PWM5H 为高、PWM3H 为 Boost，与上表一致（该结论是在旧编号 PWM1H/PWM3H 下确认的，引脚未变）。各半周的电流路径见第 1.1a 节。
 
-> **死区**：PG1/2/3 双边 200 ns，MCC 已更新，`PwmInitExt()` 启动前再次写 `PGxDT=0x0A000A00`；1.25 ns 粗时钟、低 4 位细分编码。须测实际门极，不能仅凭寄存器值确认安全。
+> **死区**：PG3/4/5 双边 200 ns，MCC 已更新，`PwmInitExt()` 启动前再次写 `PGxDT=0x0A000A00`；1.25 ns 粗时钟、低 4 位细分编码。须测实际门极，不能仅凭寄存器值确认安全。
 
 **逐周期限流（CBC，[mcc_ext.c](../sources/drivers/mcc_extended/mcc_ext.c) `PinsInitExt` + `PwmInitExt`）**：
 
-| 项 | PG1（A 相） | PG2（B 相） |
+| 项 | PG3（A 相） | PG4（B 相） |
 |---|---|---|
 | PCI 来源（`PGxF1PCI2`） | CMP4、CMP6、RD4（外部 OCP A），经 PCI8/9/10 | CMP5、CMP1、RD7（外部 OCP B），经 PCI11/12/13 |
 | 输出动作 | `FLT1DAT = 00`：PCI 有效期间 PWMxH、PWMxL 都拉低 | 同左 |
@@ -722,27 +726,97 @@ T1 是 `g_fault` 的唯一运行期写入者：合并快速故障，检查校准
   - 换算：PWM 时钟 800 MHz，1 个计数 = 1.25 ns；消隐时间 = (LEB + 1) × 1.25 ns，所以 `PERIOD_LEB` = 200 / 1.25 − 1 = 159，寄存器读回 `PGxLEB = 0x080009F0`（PHR 为 bit 27，LEB = 159 在 bit 19:4）。
 - **硬件阈值**：比较器门限由 CMP1/4/5/6 各自的 DAC 设定（MCC），**待上板标定**（第 16 章风险 #4）。
 
+### 6.1a 同步窗口门控（PG1/PG2 + 组合逻辑 LOGCON）
+
+> **目的**：限制 A/B 相同步整流管的最大导通宽度，并在过零后同步管开始发波时做软起。窗口由 PG1（A 相）、PG2（B 相）产生，经 LOGCON 与 PG3/PG4 的引脚信号相与。本节时序按数据手册（DS70005591C §16）推算，**待台架确认**，见第 16 章。
+
+**(1) 事件到窗口的链路**（A 相；B 相同理：PG4 → 事件 B → PG2）
+
+| 步 | 动作 | 寄存器 / 代码 |
+|---|---|---|
+| 1 | 写占空比：先写 `PG3TRIGB = dc \| (1<<31)`，再写 `PG3DC = dc` | `PFC_PWM_DutyASet()`。`DC` 写入即发出更新请求（`UPDTRG=01`），下一个 SOC 把 TRIGB 与 DC 一起锁存，所以必须先写 TRIGB |
+| 2 | PG3 在第二个半周期计数到 `TRIGB`（bit31 = CAHALF = 1）：此刻是 H 脚下降沿，即不含死区的 L 上升沿 = 同步管起点 | `PG3EVT2.ADTR2EN2 = 1`，TRIGB 比较事件进入 ADC Trigger 2 |
+| 3 | PWM 事件 A = ADC Trigger 2 信号 | `PWMEVTA.EVTAPGS = 0b010`（PG3），`EVTASEL = 0b01010`，`EVTAOEN = 0` |
+| 4 | 事件 A 作为 PCI 源重触发 PG1 | `PG1SPCI2 = 1<<23`；`PG1CON.TRGMOD = 01`；`PG1SPCI1`：`ACP = Latched`、`TERM = Auto`、`TSYNCDIS = 1`、`LATMOD = 1` |
+| 5 | PG1 为独立边沿：从被触发起，H（= L）为高 `PG1DC` 个计数，即窗口宽度 | 独立输出模式下 H、L 是同一个信号，无死区、不互补 |
+
+B 相：`PWMEVTB.EVTBPGS = 0b011`（PG4）→ `PG2SPCI2 = 1<<24` → PG2。
+
+**(2) LOGCON 组合逻辑**（`PwmInitExt()`，在 `PWM_Enable()` 之前静态配置）
+
+| 单元 | 源 1 | 源 2 | 功能 | 目标 |
+|---|---|---|---|---|
+| LOGCONA | PWM1H（`0b0000`） | PWM3H（`0b0100`） | AND（`0b01`） | PWM3H（`PWMLFAD = 0b010`） |
+| LOGCONB | PWM1L（`0b0001`） | PWM3L（`0b0101`） | AND | PWM3L（`PWMLFBD = 0b010`） |
+| LOGCONC | PWM2H（`0b0010`） | PWM4H（`0b0110`） | AND | PWM4H（`PWMLFCD = 0b011`） |
+| LOGCOND | PWM2L（`0b0011`） | PWM4L（`0b0111`） | AND | PWM4L（`PWMLFDD = 0b011`） |
+
+- 输入取自 SWAP、死区、override 之**后**、POL 之**前**；输出**替换**目标引脚信号。
+- 奇数单元（A/C/E）只能出 PWMxH，偶数单元（B/D/F）只能出 PWMxL；PWM1 不能作目标（只能作源）。
+- 运行中**不修改** LOGCON（手册提示 `PGxCON.ON = 1` 时修改结果可能不可预期）。
+
+**(3) 门控状态**：因为 SWAP 之后 H/L 引脚在正负半周交替承载 Boost 与同步管，四个 LOGCON 单元不能一直用窗口去与。改用 PG1/PG2 的 `IOCON2` 的 `OVREN/OVRDAT` 对窗口信号的 H、L **分别强制**（LOGCON 取的是 override 之后的信号）：
+
+| 状态 | 同步管一侧窗口 | Boost 一侧窗口 | 何时进入 |
+|---|---|---|---|
+| OPEN | 强制 1（透传，不限幅） | 强制 1（透传） | `PwmInitExt()` 启动前、`PFC_PWM_Init`、`PFC_LOOP_Reset`、进入 BLANK、同步斜坡结束 |
+| PENDING | 强制 0（同步管关断） | 强制 1（透传） | 离开 BLANK，在 `SwapSet` / `BoostEnable` 之后，同时写入初始窗口 |
+| WINDOW | 释放 override，跟随 PG1/PG2 窗口脉冲 | 强制 1（透传，Boost 不被截） | Boost 斜坡移交，与释放 PG3/PG4 同步管 override 在同一次调用里 |
+
+- **OPEN 的含义**：PG1/PG2 的 H、L 两路窗口都被强制为 1，LOGCON 的 AND 对 PWMxH、PWMxL 两个目标脚都是直通，窗口不再限制任何一路——即"放开 / 透传"。OPEN **不会**让同步管导通；同步管是否导通仍由 PG3/PG4/PG5 的 override 决定（BLANK 时 `PFC_PWM_AllOutputsOff()` 已全部拉低）。
+- 同步管一侧的选择与 `PFC_PWM_SyncOvrenMask(polarity)` 一致：POS 为 H，NEG 为 L。
+- 状态函数在 `pfc_pwm.h`：`PFC_PWM_PhaseA/BSyncGateOpen / Pending / Window`；窗口宽度写 `PFC_PWM_PhaseA/BSyncWindowSet()`。
+- 窗口 `DC` 随下一个 SOC（下一次事件）生效，所以待命期间就写入初始窗口，移交时窗口已就位。
+
+**(4) 正负半周发波**
+
+| 极性 | SWAP | Boost 引脚（`PGxDC` 驱动） | 同步管引脚 | 慢桥（PG5）导通 | 窗口作用的一侧 |
+|---|---|---|---|---|---|
+| POS（vac > 0） | 1 | PWM3L（RD3）、PWM4L（RD1） | PWM3H（RD2）、PWM4H（RD0） | PWM5L（RC11） | H 侧窗口 |
+| NEG（vac < 0） | 0 | PWM3H、PWM4H | PWM3L、PWM4L | PWM5H（RC10） | L 侧窗口 |
+| BLANK | — | 全关（override） | 全关 | 全关 | OPEN |
+
+> ⚠️ 以 "PWMxH 引脚 = 上管、PWMxL 引脚 = 下管" 推出，**需对照原理图确认**，见 §6.1 SWAP 表。
+
+**(5) 窗口宽度与软起**
+
+- 窗口起点是不含死区的边沿，而同步管引脚上的边沿晚一个死区（200 ns），所以：窗口宽度 = 期望导通宽度 + 死区。
+- 换算以 PG3 周期为参考：窗口计数 = (导通宽度 + 死区) × `g_pfcPwmPeriodCnt` ÷ Tsw（`PfcSyncWindowCount()`，`PG1PER` 只需不小于窗口，不参与换算）。
+- 软起从 Boost 软起移交的那一刻开始，每个 65 kHz 周期推进一步：导通宽度 = `X0 + (PFC_SYNC_DUTY_MAX·Tsw − X0) · n/N`，其中 `X0 = PFC_SYNC_SS_START_NS = 100 ns`，`N = PFC_SYNC_SS_CYCLES = 16`；达到 N 后门控回到 OPEN（完全放开）。
+
+**(6) 与 ADC 触发的关系**：PG3 的 `TRIGA = 1<<31` 触发 PWM3 Trigger1（A 相 ISR，`_AD5CH1Interrupt`），PG4 的 `TRIGA = 1<<31` 触发 PWM4 Trigger1（B 相 ISR，`_AD1CH1Interrupt`）；TRIGB 另用于事件 A/B，二者互不干扰。
+
+**(7) PG1/PG2 的 MCC 默认值与 `PwmInitExt()` 的覆盖**
+
+| 项 | MCC 生成值 | `PwmInitExt()` 之后 | 原因 |
+|---|---|---|---|
+| `PGxPER` | `0x400`（高分辨率最小周期，约 80 ns） | `0xFFFFF` | 窗口脉冲宽度不能超过周期；重触发每次重新计数，取最大值不受限制 |
+| `PGxIOCON1.PENH/PENL` | PG1 = 0、PG2 的 PENH = 1 | 均为 0 | PWM1H/L、PWM2H/L 的固定引脚是 RD2/RD3、RD0/RD1，已被 PPS 分给 PWM3/PWM4，窗口只在片内给 LOGCON 用 |
+| `PGxIOCON2` | `0x300800`（OVREN 置位、OVRDAT = 0） | OVRDAT = 11，OVREN 置位 | 上电窗口为低会把 Boost 一并封死，先置 OPEN |
+| `PGxIOCON2.OSYNC` | 10 | 01 | override 尽快生效 |
+| `PGxEVT1.UPDTRG` | 01（`EVT1 = 0x80000`，写 `DC` 自带更新请求） | 01（重申，无变化） | 窗口 `DC` 写入后无需软件 UPDREQ |
+
 ### 6.2 ADC（单次采样，12 位结果 0–4095）
 
 > 所有运行通道的 `ADxCHyCON1.MODE = 0`（Single sample），**没有过采样**，满量程是 4095。MCC 在生成代码的注释里写的 "ACCNUM 4 samples, 13 bits result" 只是 `ACCNUM = 0`（复位值）的文字翻译，在 `MODE ≠ 3` 时不生效，请不要据此认为是 13 位。只有启动时的增益校准通道（`mcc_ext.c`）显式使用 `MODE = 3`、`ACCNUM = 3`（256 次、16 位）。
 
 | ADC 通道 | 引脚 | 信号 | 触发 | 读取位置 | PU 变量 |
 |---|---|---|---|---|---|
-| AD5CH0 | AD5AN1 | A 相上管电流 | PWM1 Trig1 | A 相 ISR | `g_pfcIaUpPU` |
-| AD5CH1 | AD5AN2 | A 相下管电流（**产生 A 相中断**） | PWM1 Trig1 | A 相 ISR | `g_pfcIaDnPU` |
-| AD2CH0 | AD2AN4 | 电网 L 线 | PWM1 Trig1 | A 相 ISR | `g_pfcVacPU`（L − N） |
-| AD2CH1 | AD2AN3 | 电网 N 线 | PWM1 Trig1 | A 相 ISR | ↑ |
-| AD3CH0 | AD3AN0 | 母线电压 Vout | PWM2 Trig1（PG2TRIGA，与 B 相同拍） | B 相 ISR | `g_pfcVoutPU` |
-| AD1CH0 | AD1AN4 | B 相上管电流 | PWM2 Trig1 | B 相 ISR | `g_pfcIbUpPU` |
-| AD1CH1 | AD1AN0 | B 相下管电流（**产生 B 相中断**） | PWM2 Trig1 | B 相 ISR | `g_pfcIbDnPU` |
-| AD3CH1 | AD3AN2 | GaN 散热器温度 | PWM1 Trig1 | T1 | `g_pfcTempGanPU` |
-| AD4CH0 | AD4AN5 | 进风口温度 | PWM1 Trig1 | T1 | `g_pfcTempInletPU` |
-| AD4CH1 | AD4AN3 | LLC-A 温度 | PWM1 Trig1 | T1 | `g_pfcTempLlcAPU` |
-| AD4CH2 | AD4AN0 | LLC-B 温度 | PWM1 Trig1 | T1 | `g_pfcTempLlcBPU` |
+| AD5CH0 | AD5AN1 | A 相上管电流 | PWM3 Trig1 | A 相 ISR | `g_pfcIaUpPU` |
+| AD5CH1 | AD5AN2 | A 相下管电流（**产生 A 相中断**） | PWM3 Trig1 | A 相 ISR | `g_pfcIaDnPU` |
+| AD2CH0 | AD2AN4 | 电网 L 线 | PWM3 Trig1 | A 相 ISR | `g_pfcVacPU`（L − N） |
+| AD2CH1 | AD2AN3 | 电网 N 线 | PWM3 Trig1 | A 相 ISR | ↑ |
+| AD3CH0 | AD3AN0 | 母线电压 Vout | PWM4 Trig1（PG4TRIGA，与 B 相同拍） | B 相 ISR | `g_pfcVoutPU` |
+| AD1CH0 | AD1AN4 | B 相上管电流 | PWM4 Trig1 | B 相 ISR | `g_pfcIbUpPU` |
+| AD1CH1 | AD1AN0 | B 相下管电流（**产生 B 相中断**） | PWM4 Trig1 | B 相 ISR | `g_pfcIbDnPU` |
+| AD3CH1 | AD3AN2 | GaN 散热器温度 | PWM3 Trig1 | T1 | `g_pfcTempGanPU` |
+| AD4CH0 | AD4AN5 | 进风口温度 | PWM3 Trig1 | T1 | `g_pfcTempInletPU` |
+| AD4CH1 | AD4AN3 | LLC-A 温度 | PWM3 Trig1 | T1 | `g_pfcTempLlcAPU` |
+| AD4CH2 | AD4AN0 | LLC-B 温度 | PWM3 Trig1 | T1 | `g_pfcTempLlcBPU` |
 
 说明：
 
-- **电流采样点**：`PG1TRIGA = PG2TRIGA = 0x80000000` 表示在中心对齐周期的第二半周、比较值为 0 时触发，设计上落在半周期边界。理想对称 CCM 波形下可近似平均电感电流；双更新带来的边沿不对称、DCM、采样延迟与开关噪声会破坏这一近似，不能据此保证精确平均值或免除滤波/校准。见 #7、#40。
+- **电流采样点**：`PG3TRIGA = PG4TRIGA = 0x80000000` 表示在中心对齐周期的第二半周、比较值为 0 时触发，设计上落在半周期边界。理想对称 CCM 波形下可近似平均电感电流；双更新带来的边沿不对称、DCM、采样延迟与开关噪声会破坏这一近似，不能据此保证精确平均值或免除滤波/校准。见 #7、#40。
 - **电感电流重构**：硬件只测量开关管电流。`PfcInductorCurrentSelect()` 按极性选择当前正处于导通中点的那个开关管（POS 选下管，NEG 选上管），取绝对值作为 |iL|。**这个假设需要对照原理图确认**。
 - **温度通道**虽然也由 PWM 触发，但只在 T1 中读取最新值，采样时刻与 T1 异步，对慢变的温度没有影响。
 - ADC1–5 增益校准使用内部 AN6；超时/零结果虽然保留单位增益用于诊断，但设置 `g_adcCalibrationFailedMask` 并禁止启动。
@@ -770,8 +844,8 @@ T1 是 `g_fault` 的唯一运行期写入者：合并快速故障，检查校准
 | UART1 | **LLC 链路**，115200 8N1，RC8 = RX、RC9 = TX，PFC 为从机，T1 轮询（第 18 章） |
 | SCCP3 | **RC4 输出**：10 kHz 双沿 PWM，占空比 10%~90% 对应母线 0~500 V（`LLC_SIGNAL_VbusUpdate`）。MCC 已写 `CCP3CON2 = 0x1000000`（OCAEN = 1）；`LLC_SIGNAL_Init` 再显式置 1 一次，防止 MCC 重新生成后丢失 |
 | SCCP1 + SCCP2 | RD6：SCCP2 自由运行捕获上升沿周期，同时复位 SCCP1；SCCP1 捕获下降沿高时间。B 相轮询 FIFO、检测频率与溢出/积压，duty=high/实测周期 |
-| CMP1/4/5/6 | PG1/PG2 逐周期限流的 PCI 源：CMP4/CMP6 → PG1，CMP5/CMP1 → PG2（第 6.1 节）。门限由各自 DAC 设定（MCC） |
-| RD4 / RD7 | 外部 OCP 信号，分别作为 PG1 / PG2 逐周期限流的第三个 PCI 源 |
+| CMP1/4/5/6 | PG3/PG4 逐周期限流的 PCI 源：CMP4/CMP6 → PG3，CMP5/CMP1 → PG4（第 6.1 节）。门限由各自 DAC 设定（MCC） |
+| RD4 / RD7 | 外部 OCP 信号，分别作为 PG3 / PG4 逐周期限流的第三个 PCI 源 |
 | CMP7 / DAC7 + UREF | **RA9 调试输出**：DAC7 经 UREF（`UREFCON = 0x8C01`：INSEL = DAC7，UREFOUTEN = 1）输出到 RA9。电压由 `APP_DAC_DEBUG_RA9_V` 设置，默认 3.135 V（DACDAT = 3890） |
 | CMP8 / DAC8 | **RA8 外部 VREF**：DAC8 经 DACOUT2（`DAC8CON.DACOEN = 1`）输出到 RA8。电压由 `APP_DAC_VREF_RA8_V` 设置，默认 3.135 V（DACDAT = 3890） |
 | 未使用引脚 | RA0、RB6、RB7、RB10、RB11：`PFC_IO_Init()`（[pfc_io.c](../sources/drivers/pfc_io/pfc_io.c)）先写 LAT = 0 再设为输出，不依赖 MCC 的 TRIS |
@@ -1032,7 +1106,7 @@ G_i = Vout / (L · IL_BASE) = 400 / (300e-6 × 18.45) = 72 282  (1/s)
 
 **(6) 为什么写成 G_i/s**：对 `d(iL_pu)/dt = G_i·ΔD` 积分得 `iL_pu = G_i·∫ΔD dt`。拉氏变换里积分记作"除以 s"，所以对象是**积分器** `G_i/s`：恒定的 ΔD 会让电流线性爬升。
 
-**(7) 延时**：下述设计核算采用原单更新中心对齐模式的 **1.5 Ts ≈ 23 µs** 等效延时假设。当前 PG1/PG2 为双更新模式，每完整周期有两个更新机会，采样、ISR 运算与写入时刻会影响实际延时；不能仅凭 `UPDMOD=SOC` 继续认定只有完整周期起点装载。应按 #40 实测并重算裕度；下列数值是该模型下的设计结果。
+**(7) 延时**：下述设计核算采用原单更新中心对齐模式的 **1.5 Ts ≈ 23 µs** 等效延时假设。当前 PG3/PG4 为双更新模式，每完整周期有两个更新机会，采样、ISR 运算与写入时刻会影响实际延时；不能仅凭 `UPDMOD=SOC` 继续认定只有完整周期起点装载。应按 #40 实测并重算裕度；下列数值是该模型下的设计结果。
 
 #### 8.1a.3 电流环控制器：Kp、Ki
 
@@ -1526,11 +1600,11 @@ BLANK 状态下（PfcZcLeaveBlank），按顺序过三道关
 
 ### 9.3 切换时序（A 相 `PFC_LOOP_PhaseAUpdate`）
 
-A 相负责极性变化。进入 BLANK 时先调用 `PFC_PWM_AllOutputsOff()`，再将 PG1/PG2 占空比和两相诊断值置 0，然后发布 BLANK。B 相后续 ISR 已面对关闭的两相输出请求，不再依赖其下一次调用才请求关断 B 相。
+A 相负责极性变化。进入 BLANK 时先调用 `PFC_PWM_AllOutputsOff()`，再将 PG3/PG4 占空比和两相诊断值置 0，然后发布 BLANK。B 相后续 ISR 已面对关闭的两相输出请求，不再依赖其下一次调用才请求关断 B 相。进入 BLANK 时同步窗口门控回到 OPEN（`PFC_PWM_PhaseA/BSyncGateOpen()`，窗口两侧都强制为 1，即透传）并清掉同步斜坡状态（`syncActive = false`）。放开窗口并不会让同步管导通——同步管此时已被 `PFC_PWM_AllOutputsOff()` 关断；这样做是让门控在每次过零时都复位到确定状态，避免窗口停在上一次的 WINDOW / PENDING，使下次离开 BLANK 时 Boost 一侧被截断。
 
-离开 BLANK 时在覆盖保持期间设置快桥 SWAP，按新极性设置慢桥，启动两相独立的 16 次调用软启动，SR 保持覆盖关闭。`OSYNC=01` 让覆盖尽快生效，DC/SWAP 缓冲更新仍遵循各 PG 的 UPDMOD；寄存器写入不等于实际门极已经完成转换。
+离开 BLANK 时在覆盖保持期间设置快桥 SWAP，按新极性设置慢桥，启动两相独立的 16 次调用软启动，SR 保持覆盖关闭。`OSYNC=01` 让覆盖尽快生效，DC/SWAP 缓冲更新仍遵循各 PG 的 UPDMOD；寄存器写入不等于实际门极已经完成转换。此时同步窗口门控进入 PENDING（同步管一侧窗口强制 0，Boost 一侧强制 1），并写入初始窗口，见 §6.1a。
 
-慢桥在离开 BLANK 时选择新半周的续流路径。此策略依赖原理图、电流方向和驱动器时序，必须以两相快桥与慢桥的同时波形验证；PG3 的 200 ns 死区配置不能单独证明直接覆盖换向安全。
+慢桥在离开 BLANK 时选择新半周的续流路径。此策略依赖原理图、电流方向和驱动器时序，必须以两相快桥与慢桥的同时波形验证；PG5 的 200 ns 死区配置不能单独证明直接覆盖换向安全。
 
 ### 9.4 内环冻结 + 软起与闭环交接（`PfcDutyCompute`）
 
@@ -1542,6 +1616,12 @@ A 相负责极性变化。进入 BLANK 时先调用 `PFC_PWM_AllOutputsOff()`，
 4. 后续闭环每次计算最终占空比后，同样将施加的 PI 部分回写历史，覆盖最终占空比限幅的抗积分饱和。
 
 这消除了旧的交接额外 PI 步进。运行点、前馈、采样或缓冲更新变化仍可能改变实际脉冲，不能宣称所有条件下严格连续；16 次调用及 SR 时序仍需轻载/满载波形验证。
+
+**交接边沿检测**：`PFC_LOOP_PhaseAUpdate()` 在调用 `PfcDutyCompute()` 之前保存 `rampWasActive = pfcSsA.active`，调用之后用 `if (rampWasActive && !pfcSsA.active)` 判断"这一拍刚好交接"。这个下降沿只出现一次，用来触发交接动作（释放同步管 override、启动同步窗口斜坡）。没有这张快照，就分不清"一直在闭环"和"刚刚交接"。B 相相同。
+
+**闭环回写**（`PfcDutyCompute()` 闭环分支）：`duty` 限幅后，用 `SMPS_FloatController2P2ZTrackOutput(ctrl, duty - dutyFf)` 把真正施加的 PI 部分写回控制器输出历史，只回写 PI 部分（`dutyFf` 不参与积分），使限幅期间积分不继续累积，限幅解除后不过冲。
+
+**同步管软起（交接点之后）**：交接时除了释放 PG3/PG4 的同步管 override，还会启动同步窗口斜坡（`pfcSsA/B.syncActive`）：先写初始窗口，再把门控切到 WINDOW（同步管一侧跟随 PG1/PG2 窗口脉冲，Boost 一侧强制透传）；之后每次调用把窗口宽度往上推一步，导通宽度从 `PFC_SYNC_SS_START_NS` 线性增到 `PFC_SYNC_DUTY_MAX`·Tsw，共 `PFC_SYNC_SS_CYCLES = 16` 次，结束后门控回到 OPEN（完全放开）。窗口宽度的计算见 §6.1a(5)。
 
 ### 9.5 过零调试观测点
 
@@ -1623,9 +1703,9 @@ stateDiagram-v2
                g_fault（只在 T1 中写）──► FAULT_IsActive() ──► 状态机 → FAULT
 ```
 
-- 覆盖同步由 `PwmInitExt()` 对 PG1/2/3 设置 `OSYNC=01`（尽快生效）；不需 UPDREQ，DC/SWAP 的 UPDMOD 保持原配置。仍需验证硬件与驱动延迟。
+- 覆盖同步由 `PwmInitExt()` 对 PG3/4/5 设置 `OSYNC=01`（尽快生效）；不需 UPDREQ，DC/SWAP 的 UPDMOD 保持原配置。仍需验证硬件与驱动延迟。
 - **慢速路径**：每 100 µs 评估一次，带去抖（默认 5 拍置位、10 拍清除，即 0.5 ms / 1 ms）。
-- **硬件路径（逐周期限流）**：CMP1/4/5/6 和外部 RD4/RD7 → PWM Fault PCI，越限当拍关断 PG1/PG2，下一个周期自动恢复；开通后有 200 ns 前沿消隐（第 6.1 节）。它只限流，不锁存故障，也不通知状态机；持续过流仍由上面的软件快速 OCP 停机。
+- **硬件路径（逐周期限流）**：CMP1/4/5/6 和外部 RD4/RD7 → PWM Fault PCI，越限当拍关断 PG3/PG4，下一个周期自动恢复；开通后有 200 ns 前沿消隐（第 6.1 节）。它只限流，不锁存故障，也不通知状态机；持续过流仍由上面的软件快速 OCP 停机。
 
 ### 11.2 故障列表与阈值（[fault.h](../sources/apps/fault/fault.h)）
 
@@ -1704,7 +1784,7 @@ UART `CLEAR_FAULT` 仅允许 FAULT/STANDBY 且 enable=0；T1 只在这些停止�
 
 ### 12.0 上电前检查清单（**必须全部完成**）
 
-- [x] PG1/2/3 已配置双边 200 ns 死区，mcc_ext 启动前再次设置
+- [x] PG3/4/5 已配置双边 200 ns 死区，mcc_ext 启动前再次设置
 - [ ] 用示波器确认实际门极死区、驱动延迟与换向顺序符合硬件
 - [ ] 对照原理图确认 `PFC_PWM_SLOW_LEG_POS/NEG_OVRDAT` 和 `PFC_PWM_FAST_LEG_SWAP_POS/NEG`（[pfc_pwm.h](../sources/drivers/pfc_pwm/pfc_pwm.h)）
 - [ ] 对照原理图确认 `PfcInductorCurrentSelect()` 中的上/下管选择
@@ -1712,7 +1792,7 @@ UART `CLEAR_FAULT` 仅允许 FAULT/STANDBY 且 enable=0；T1 只在这些停止�
 - [x] 基值已按 230 Vac / 3 kW / 400 V 确定（7.2 节），阈值写成"物理量 / 基值"，随基值自动换算
 - [ ] 确认 CT 和运放的实际满量程为 ±50 A（`BOARD_FB_IL_RANGE_A`），与软件一致
 - [ ] `APP_PFC_ENABLE_AT_STARTUP = 0`，`APP_PLL_PWM_TEST_ENABLE = 0`
-- [ ] 确认 `PG1TRIGA` 的采样点落在开关管导通的中点
+- [ ] 确认 `PG3TRIGA` 的采样点落在开关管导通的中点
 
 ### 12.1 第 1 步：MCU 单板（不接功率级）
 
@@ -1721,7 +1801,7 @@ UART `CLEAR_FAULT` 仅允许 FAULT/STANDBY 且 enable=0；T1 只在这些停止�
 | 程序运行 | 调试器单步 / 断点在 `while(1)` | 能进入主循环 |
 | 中断频率 | 在 A/B 相 ISR 中翻转 GPIO，示波器测量 | 都是 65 kHz，A 与 B 相差半个周期 |
 | T1 频率 | 同上 | 10 kHz |
-| PWM 输出 | 示波器看 PWM1H/L、2H/L、3H/L | **全部为低**（override） |
+| PWM 输出 | 示波器看 PWM3H/L、4H/L、5H/L | **全部为低**（override） |
 | X2Cscope | 连接 UART3，115200 | 能读取 `g_sm.state = 1`（STANDBY） |
 | ISR 耗时 | GPIO 脉宽 | 实测 A 相约 4.4 µs，B 相约 4.6 µs（5.8 节）；两相合计须明显小于 15.38 µs |
 | 模拟输出 | 万用表测 RA8（DACOUT2，外部 VREF）、RA9（UREF，调试） | 都约为 3.13 V。偏低或接近 0 V 时见第 16 章风险 #21 |
@@ -1757,14 +1837,14 @@ UART `CLEAR_FAULT` 仅允许 FAULT/STANDBY 且 enable=0；T1 只在这些停止�
 | 观测 | 期望 |
 |---|---|
 | `g_pfcPolarity` | 正半周 = 1，负半周 = 2，过零附近 = 0 |
-| 示波器：PWM3H/L 与 vac | 慢管在正确的半周导通，过零时两者都关断，**没有重叠** |
+| 示波器：PWM5H/L 与 vac | 慢管在正确的半周导通，过零时两者都关断，**没有重叠** |
 | `g_pfcZcRejectCnt / g_pfcZcMismatchCnt` | 0 |
 | BLANK 宽度 | PLL 锁定后阈值按 vPk 缩放，BLANK 约 7° 加去抖，与输入电压基本无关（第 9.2 节表格）；PLL 未锁定时用固定的 16 V / 24 V，低压下会更宽 |
 
 ### 12.4 第 4 步：开环占空比（低压，电阻负载）
 
 - ⚠️ 互补模式下的同步 Boost 是**双向**的：固定占空比 D 时，变换器会把 Vout 拉向 |vac|/(1−D)。只要母线电压高于这个值，电流就会**反向**流回电网。因此开环测试时：
-  - 建议在 MCC 中临时把 PG1/PG2 改成**独立模式**，只驱动 Boost 主开关，同步整流管保持关断，依靠 GaN 的反向导通（或体二极管）续流，这样功率级等效于普通的二极管 Boost；
+  - 建议在 MCC 中临时把 PG3/PG4 改成**独立模式**，只驱动 Boost 主开关，同步整流管保持关断，依靠 GaN 的反向导通（或体二极管）续流，这样功率级等效于普通的二极管 Boost；
   - 母线接电阻负载，并从低输入电压开始；
 - 在 `PfcDutyCompute` 中临时 `return` 一个固定的小占空比（例如 0.1），绕开电流环，只验证功率级和驱动；
 - 逐步增大，观察电感电流波形、开关节点电压和死区；验证完成后改回互补模式，并复查死区；
@@ -1907,6 +1987,9 @@ UART `CLEAR_FAULT` 仅允许 FAULT/STANDBY 且 enable=0；T1 只在这些停止�
 | `PFC_ZC_PLL_WIN` | 0.035 | PLL 过零窗口 \|cos θ\| | 设为 0 关闭 PLL 预测进入 BLANK |
 | `PFC_ZC_SS_CYCLES` | 16（**初值，待上板调试**） | 过零后软起的拍数，在 BLANK 之后另算 | 过零尖峰大时增大；THD 差时减小；设为 0 关闭软起（见第 9.2 节） |
 | `PFC_DUTY_MAX / MIN` | 0.95 / 0.0 | 占空比限幅 | — |
+| `PFC_SYNC_SS_START_NS` | 100 | 同步管软起的起始导通宽度 [ns]（不含死区；窗口 = 它 + 200 ns 死区） | 增大：同步管更早带电流；减小：更保守 |
+| `PFC_SYNC_SS_CYCLES` | = `PFC_ZC_SS_CYCLES`（16） | 同步窗口斜坡拍数，从 Boost 软起交接点起算 | 过零后同步管电流冲击大时增大 |
+| `PFC_SYNC_DUTY_MAX` | 0.95 | 斜坡终点：最大可控同步占空比（占开关周期的比例）；斜坡结束后门控回到 OPEN，完全放开 | 减小：同步管斜坡终点更低 |
 | `PFC_VPK_MIN_PU` | 80 V / VAC_BASE（0.246） | 1/vPk 的下限 | 防止低压时电流参考过大 |
 | `PFC_VOUT_MIN_PU` | 90 V / VOUT_BASE（0.225） | 1/vout 的下限 | — |
 | `PFC_IL_FILT_ALPHA` | 0.0921 | \|iL\| 低通系数（约 1 kHz） | 影响慢速 OCP 的响应速度 |
@@ -1957,7 +2040,7 @@ UART `CLEAR_FAULT` 仅允许 FAULT/STANDBY 且 enable=0；T1 只在这些停止�
 | `APP_X2CSCOPE_ENABLE` | 1 | X2Cscope 调试接口总开关。设为 0 时 `X2Cscope_Init/Communicate/Update` 都编译为空，移除 5000 字节缓冲区和 X2Cscope 通信实现；MCC 的 UART3 驱动及 `SYSTEM_Initialize()` 内的 UART3 初始化仍保留。用于量产裁剪时需区分这两个层次 |
 | `APP_PFC_LOAD_FF_ENABLE` | 1 | LLC 负载前馈（8.2b）。设为 0 时只用电压环 PI |
 | `APP_FW_VERSION_MAJOR/MINOR/BUILD` | 0 / 1 / 1 | 固件版本，经 `GET_INFO` 上报给 LLC |
-| `APP_PFC_PWM_DEADTIME_NS` | 200 | PG1/2/3 双边死区 ns |
+| `APP_PFC_PWM_DEADTIME_NS` | 200 | PG3/4/5 双边死区 ns |
 | `APP_PFC_PG_WINDOW_V` | 10 | RUN 判稳与 PG 电压误差窗口 V |
 | `APP_PFC_STARTUP_TIMEOUT_MS` | 10000 | PREPARE / SOFTSTART 各自截止时间 ms |
 | `APP_PFC_RELAY_SETTLE_MS` | 10 | 继电器闭合后控制准入等待 ms |
@@ -2014,7 +2097,7 @@ UART `CLEAR_FAULT` 仅允许 FAULT/STANDBY 且 enable=0；T1 只在这些停止�
 
 | 宏 | 默认值 | 用途 |
 |---|---|---|
-| `BOARD_FAST_LOOP_HZ` | 65000 | A/B 相 ISR 频率，须与 MCC 的 `PG1PER` 一致。`PFC_FAST_LOOP_HZ`、`LLC_SIG_CALL_HZ` 由它派生；`pfc_loop.c` 在它 ≠ 65000 时 `#error`（`SOGI_PLL_TS_SEC` 写死为 1/65 kHz） |
+| `BOARD_FAST_LOOP_HZ` | 65000 | A/B 相 ISR 频率，须与 MCC 的 `PG3PER` 一致。`PFC_FAST_LOOP_HZ`、`LLC_SIG_CALL_HZ` 由它派生；`pfc_loop.c` 在它 ≠ 65000 时 `#error`（`SOGI_PLL_TS_SEC` 写死为 1/65 kHz） |
 | `BOARD_VLOOP_DIVIDER` | 8 | 电压环分频（8.125 kHz），派生 `PFC_VLOOP_DIVIDER`、`PFC_VLOOP_HZ` |
 | `BOARD_SLOW_TICK_US` | 100 | T1 周期，须与 MCC 的 `PR1` 一致；软起步长按它计算 |
 | `BOARD_SLOW_TICKS_PER_MS` | 10 | 由上一项派生，X 电容放电计时等使用 |
@@ -2124,7 +2207,12 @@ volatile float g_xxx;
 | 23 | 断开交流后 vac 采样是否仍然有效 | `user_isr.c`（L、N 两路分别采样后相减） | 如果采样电路在断开后失去参考（L、N 都悬空），`g_pfcVacPU` 可能不反映 X 电容电压，导致不放电或误放电 | 对照原理图确认采样电路的参考点；上板验证 |
 | 27 | 当前固件最坏执行时间未测 | user_isr / T1 / main | 历史 A≈4.4 µs、B≈4.6 µs 不包含本轮修复；主循环饿死会停止喂狗 | 测最坏电压环周期、T1/UART 服务间隙和快照临界区，校验 4 ms 喂狗预算 |
 | 38 | RD6 有效不证明 CPU 新鲜度 | LLC_SIGNAL_LoadUpdate | 周期、溢出、积压已防护，但 CPU 停顿后硬件 PWM 可持续 | 定义独立软件心跳/新鲜度与失联策略 |
-| 40 | 三个 PG 双更新模式时序待验证 | 用户更新 PG1/2/3 MODSEL=5 | 两次更新可形成不对称脉冲，不能沿用单更新平均电流/延迟假设 | 实测 65 kHz、180°交错、TRIGA、RDY、DC/SWAP/覆盖与门极 |
+| 40 | 三个 PG 双更新模式时序待验证 | 用户更新 PG3/4/5 MODSEL=5 | 两次更新可形成不对称脉冲，不能沿用单更新平均电流/延迟假设 | 实测 65 kHz、180°交错、TRIGA、RDY、DC/SWAP/覆盖与门极 |
+| 41 | 同步窗口信号在 `PENH/PENL = 0` 时能否到达 LOGCON | `PwmInitExt()`（PG1/PG2、LOGCON A–D） | 窗口恒为低，同步管被封死 | 示波器看 PWM3H/L、PWM4H/L：同步管宽度随 `PG1DC/PG2DC` 变化 |
+| 42 | Boost 在窗口期间是否不被截断 | 门控状态 PENDING / WINDOW，§6.1a | 窗口从 Boost 关断（事件）时刻才开始，与 Boost 导通区几乎不重叠；若 Boost 一侧的透传失效，Boost 会被截断 | 正负半周分别观察 Boost 脉冲宽度 |
+| 43 | 事件到窗口的延迟与死区补偿未标定 | `PfcSyncWindowCount()`、PWM 事件 A/B | 事件展宽与同步引入的延迟使实际导通宽度偏离期望 | 示波器标定后在窗口上加微调常量 |
+| 44 | PG1/PG2 停止后的空闲电平未知 | 门控 PENDING / WINDOW | 窗口低电平若未定义，可能意外封死或放开同步管 | 台架观察 BLANK 前后的同步管波形 |
+| 45 | RD3（PWM3L）目前无信号，疑似板子硬件问题 | 硬件 | A 相 L 侧无法验证 | 先测 MCU 引脚上的信号；必要时把 PWM3L 的 PPS 换到别的脚验证 |
 
 ### 16.2 已关闭（保留记录）
 
@@ -2165,7 +2253,7 @@ volatile float g_xxx;
 | 一直停在 PREPARE | PLL 未锁定，或预充电条件不满足 | 看 `g_pll.locked`、`g_pfcVacPeakPU`、`g_pfcVoutPU`；检查 `BOARD_FB_VAC_SCALE` / `BOARD_FB_VOUT_SCALE` 是否正确 |
 | PLL 不锁定 | vac 符号/幅值不对、频率超出 44–67 Hz、幅值低于 0.1 PU | 看 `g_pll.v_est`、`g_pll.freq_filt`、`g_pll.eps_mag_lpf`、`g_pll.freq_limited` |
 | 一使能就进入 FAULT | 某个阈值在占位标定下误触发 | 读 `g_fault.latchedFlags` 并按 ID 解码；最常见的是 VAC_UVP（标定错误）和 OTP（温度系数错误） |
-| FAST_IA_OCP 偶发 | 电流采样偏置错误、采样点落在开关沿上、噪声 | 停机状态下看 `g_pfcIaUpPU` 是否为 0；检查 `g_ilCalA.ok`（为 0 说明零点校准被拒绝，仍在用 2048）；检查 `PG1TRIGA` 的采样点 |
+| FAST_IA_OCP 偶发 | 电流采样偏置错误、采样点落在开关沿上、噪声 | 停机状态下看 `g_pfcIaUpPU` 是否为 0；检查 `g_ilCalA.ok`（为 0 说明零点校准被拒绝，仍在用 2048）；检查 `PG3TRIGA` 的采样点 |
 | 上电后长时间停在 INIT | 零点校准没有完成：ADC 中断没有运行（PWM 未使能、全局中断未开） | 看 `g_ilCalA.count / g_ilCalB.count` 是否在增长，到 4096 后 `done` 应为 1 |
 | 停机时电流 PU 不为 0 | 零点校准被拒绝回退为 2048，或校准时电感电流不为 0 | 看 `g_ilCalA.ok / g_ilCalB.ok` 和 `offsetUp / offsetDn`；确认上电时 PWM 关断、没有残余电流 |
 | 过零附近电流尖峰 | 软起太短、BLANK 太窄、慢管切换时序 | 增大 `PFC_ZC_SS_CYCLES`；适当增大 ENTER/EXIT 阈值；示波器看慢管与快管的时序 |

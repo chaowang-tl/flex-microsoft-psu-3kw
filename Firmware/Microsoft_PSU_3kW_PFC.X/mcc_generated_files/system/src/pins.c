@@ -99,10 +99,14 @@ void PINS_Initialize(void)
         RPINR2bits.ICM1R = 0x0037UL; //RD6->SCCP1:ICM1;
         RPOR9bits.RP40R = 0x0017UL;  //RC7->UART3:U3TX;
         RPOR10bits.RP42R = 0x0013UL;  //RC9->UART1:U1TX;
-        RPOR10bits.RP43R = 0x0005UL;  //RC10->PWM:PWM3H;
-        RPOR10bits.RP44R = 0x0006UL;  //RC11->PWM:PWM3L;
-        RPOR8bits.RP36R = 0x0007UL;  //RC3->PWM:PWM4H;
         RPOR9bits.RP37R = 0x0029UL;  //RC4->SCCP3:OCM3;
+        RPOR12bits.RP51R = 0x0005UL;  //RD2->PWM:PWM3H;
+        RPOR12bits.RP52R = 0x0006UL;  //RD3->PWM:PWM3L;
+        RPOR12bits.RP49R = 0x0007UL;  //RD0->PWM:PWM4H;
+        RPOR12bits.RP50R = 0x0008UL;  //RD1->PWM:PWM4L;
+        RPOR10bits.RP43R = 0x0009UL;  //RC10->PWM:PWM5H;
+        RPOR10bits.RP44R = 0x000AUL;  //RC11->PWM:PWM5L;
+        RPOR8bits.RP36R = 0x000BUL;  //RC3->PWM:PWM6H;
 
       PINS_PPSLock(); // lock PPS
 

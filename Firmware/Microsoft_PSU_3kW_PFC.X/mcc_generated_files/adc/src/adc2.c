@@ -13,7 +13,7 @@
 */
 
 /*
-© [2026] Microchip Technology Inc. and its subsidiaries.
+? [2026] Microchip Technology Inc. and its subsidiaries.
 
     Subject to your compliance with these terms, you may use Microchip 
     software and any derivatives exclusively with Microchip products. 
@@ -132,10 +132,10 @@ void ADC2_Initialize(void)
     AD2CMPSTAT = 0x0UL;
     //CH0TRG disabled; CH1TRG disabled; CH2TRG disabled; CH3TRG disabled; CH4TRG disabled; CH5TRG disabled; CH6TRG disabled; CH7TRG disabled; 
     AD2SWTRG = 0x0UL;
-    //TRG1SRC PWM1 Trigger1; MODE Single sample initiated by TRG1SRC[4:0] trigger; TRG2SRC Triggers are disabled; ACCNUM 4 samples, 13 bits result; SAMC 6.5 TAD; IRQSEL enabled; EIEN disabled; TRG1POL disabled; PINSEL AD2AN4; NINSEL AD2ANN0; FRAC Integer; DIFF disabled; 
-    AD2CH0CON1 = 0x4230004UL;
-    //TRG1SRC PWM1 Trigger1; MODE Single sample initiated by TRG1SRC[4:0] trigger; TRG2SRC Triggers are disabled; ACCNUM 4 samples, 13 bits result; SAMC 6.5 TAD; IRQSEL enabled; EIEN disabled; TRG1POL disabled; PINSEL AD2AN3; NINSEL AD2ANN0; FRAC Integer; DIFF disabled; 
-    AD2CH1CON1 = 0x3230004UL;
+    //TRG1SRC PWM3 Trigger1; MODE Single sample initiated by TRG1SRC[4:0] trigger; TRG2SRC Triggers are disabled; ACCNUM 4 samples, 13 bits result; SAMC 6.5 TAD; IRQSEL enabled; EIEN disabled; TRG1POL disabled; PINSEL AD2AN4; NINSEL AD2ANN0; FRAC Integer; DIFF disabled; 
+    AD2CH0CON1 = 0x4230008UL;
+    //TRG1SRC PWM3 Trigger1; MODE Single sample initiated by TRG1SRC[4:0] trigger; TRG2SRC Triggers are disabled; ACCNUM 4 samples, 13 bits result; SAMC 6.5 TAD; IRQSEL enabled; EIEN disabled; TRG1POL disabled; PINSEL AD2AN3; NINSEL AD2ANN0; FRAC Integer; DIFF disabled; 
+    AD2CH1CON1 = 0x3230008UL;
     //ADCMPCNT disabled; CMPMOD NONE; CMPCNTMOD disabled; CMPVAL enabled; ACCBRST disabled; ACCRO disabled; 
     AD2CH0CON2 = 0x20000000UL;
     //ADCMPCNT disabled; CMPMOD NONE; CMPCNTMOD disabled; CMPVAL enabled; ACCBRST disabled; ACCRO disabled; 

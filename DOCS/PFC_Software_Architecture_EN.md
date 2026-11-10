@@ -7,7 +7,7 @@
 | Original Author | Chao Wang <chao.wang@microchip.com> |
 | Created on | 2026/10/27 |
 | Modified by | Chao Wang |
-| Modified on | 2026/11/05 |
+| Modified on | 2026/11/10 |
 | Language | [中文](PFC_Software_Architecture_CN.md) · English |
 | Project | `Microsoft_PSU_3kW_PFC.X` |
 | MCU | dsPIC33AK256MPS206 (32-bit dsPIC33A, hardware single-precision FPU) |
@@ -23,7 +23,7 @@ This document is for firmware engineers taking over this project for the first t
 
 > **Terminology**:
 > - In this document a "**cycle**" or "**tick**" depends on context: in the 65 kHz control ISR a cycle is one PWM period (15.38 µs); in the state machine, fault handling and scheduling a tick is one T1 period (100 µs). Where confusion is likely, the unit is stated explicitly.
-> - "**Fast leg**" refers to the GaN bridge legs switching at 65 kHz (PG1/PG2); "**slow leg**" refers to the line-frequency leg (PG3).
+> - "**Fast leg**" refers to the GaN bridge legs switching at 65 kHz (PG3/PG4); "**slow leg**" refers to the line-frequency leg (PG5).
 > - "**PU**" means per-unit; see Chapter 7.
 
 ---
@@ -70,7 +70,7 @@ There are two communication channels between the PFC and the secondary-side LLC:
  ┌──────────────── 65 kHz, priority 5 (the two phases do not preempt each other) ──────┐
  │ _AD5CH1Interrupt (phase A)            _AD1CH1Interrupt (phase B, +180°)             │
  │  ADC→PU → fast OC → PLL → polarity    ADC→PU → fast OC/OV → RD6 load                │
- │  → current loop A → PG1DC / slow PG3  → voltage loop (every 8th) → cur. loop B → PG2DC│
+ │  → current loop A → PG3DC / slow PG5  → voltage loop (every 8th) → cur. loop B → PG4DC│
  └─────────────────────────────────────────────────────────────────────────────────────┘
  ┌──────────── 10 kHz T1, priority 1 ──────────┐   ┌────────────── main loop ───────────┐
  │ UART1 byte transfer → temp → ISR heartbeat  │   │ clear WDT (needs heartbeat)        │
@@ -142,20 +142,20 @@ See the [review record](PFC_Code_Review_EN.md) and Chapter 16 for the complete f
 ### 1.1 Power Topology
 
 ```
-            L_A        fast leg A (PG1, GaN, 65 kHz)
+            L_A        fast leg A (PG3, GaN, 65 kHz)
    L ──┬──/\/\/──┬────┤ Q_AH ├──┬──────────┐
        │         └────┤ Q_AL ├──┤          │
-       │   L_B        fast leg B (PG2, 180° from A)   ═╪═ C_bulk  → Vout ≈ 400 V
+       │   L_B        fast leg B (PG4, 180° from A)   ═╪═ C_bulk  → Vout ≈ 400 V
        └──/\/\/──┬────┤ Q_BH ├──┤          │             (to downstream LLC)
                  └────┤ Q_BL ├──┤          │
                                 │          │
    N ─────────────────┤ S_H  ├──┘          │
                       ┤ S_L  ├─────────────┘
-                      slow leg (PG3, line-frequency switching, driven directly by override)
+                      slow leg (PG5, line-frequency switching, driven directly by override)
 ```
 
-- **Two-phase interleaved boost fast legs**: PG1 (phase A) and PG2 (phase B) operate at 65 kHz with a 180° phase shift, so their input current ripple cancels.
-- **Slow leg**: PG3 does not generate a PWM waveform; instead, output override **statically** turns on the high-side or low-side switch according to grid polarity, so it acts as a synchronously rectifying line-frequency leg.
+- **Two-phase interleaved boost fast legs**: PG3 (phase A) and PG4 (phase B) operate at 65 kHz with a 180° phase shift, so their input current ripple cancels.
+- **Slow leg**: PG5 does not generate a PWM waveform; instead, output override **statically** turns on the high-side or low-side switch according to grid polarity, so it acts as a synchronously rectifying line-frequency leg.
 - The difference between the **positive and negative half cycles** is which fast-leg switch acts as the boost switch and which acts as the synchronous rectifier (SR) switch. The code switches this with the PWM `SWAP` bit, so that the `PGxDC` register **always** represents the duty cycle of the boost switch and the control algorithm does not need to distinguish half cycles.
 
 ### 1.1a Current Paths in the Positive and Negative Half Cycles
@@ -165,11 +165,11 @@ Convention: the inductors connect to the L line, vac = L − N (i.e. `g_pfcVacPU
 ```
                     Bus+ ●────────────┬───────────────┐
                          │            │               │
-                    Q_AH (PWM1H)  S_H (PWM3H)        ═╪═ C_bulk
+                    Q_AH (PWM3H)  S_H (PWM5H)        ═╪═ C_bulk
                          │            │               │
    L ●───L_A──/\/\/──────● SW_A       ● ──────────● N │
                          │            │               │
-                    Q_AL (PWM1L)  S_L (PWM3L)         │
+                    Q_AL (PWM3L)  S_L (PWM5L)         │
                          │            │               │
                     Bus− ●────────────┴───────────────┘
 ```
@@ -199,18 +199,18 @@ Convention: the inductors connect to the L line, vac = L − N (i.e. `g_pfcVacPU
 ```
  Polarity      BLANK │        POS         │BLANK│        NEG         │BLANK
  vac             0  ↗  L > N (pos. half)  ↘  0  ↘  N > L (neg. half)  ↗  0
- PWM3H (S_H)   ____│____________________│_____│▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔│_____
- PWM3L (S_L)   ____│▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔│_____│____________________│_____
- Q_AL (PWM1L)   off│  Boost (PG1DC)     │ off │  SR                │ off
- Q_AH (PWM1H)   off│  SR                │ off │  Boost (PG1DC)     │ off
- PG1 SWAP       —  │        1           │  —  │        0           │  —
+ PWM5H (S_H)   ____│____________________│_____│▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔│_____
+ PWM5L (S_L)   ____│▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔│_____│____________________│_____
+ Q_AL (PWM3L)   off│  Boost (PG3DC)     │ off │  SR                │ off
+ Q_AH (PWM3H)   off│  SR                │ off │  Boost (PG3DC)     │ off
+ PG3 SWAP       —  │        1           │  —  │        0           │  —
  I feedback     0  │  iDn (low-side I)  │  0  │  iUp (high-side I) │  0
 ```
 
 | Half cycle | Line-frequency switch | Boost switch (PGxDC) | SR switch | Return bus | SWAP | Slow-leg OVRDAT | Current feedback |
 |---|---|---|---|---|---|---|---|
-| POS | S_L (PWM3L) | low-side Q_xL (PWMxL) | high-side Q_xH | Bus− | 1 | `0x1` | `iDn` |
-| NEG | S_H (PWM3H) | high-side Q_xH (PWMxH) | low-side Q_xL | Bus+ | 0 | `0x2` | `iUp` |
+| POS | S_L (PWM5L) | low-side Q_xL (PWMxL) | high-side Q_xH | Bus− | 1 | `0x1` | `iDn` |
+| NEG | S_H (PWM5H) | high-side Q_xH (PWMxH) | low-side Q_xL | Bus+ | 0 | `0x2` | `iUp` |
 
 Rules to remember:
 - **The boost switch and the conducting line-frequency switch are always on the same side**: both low-side in POS, both high-side in NEG. The inductor charging loop must close through the same bus rail (Bus− or Bus+). If they were not on the same side, the charging loop could not close; the inductor would see the difference between bus voltage and grid voltage directly and the current would run away.
@@ -238,7 +238,7 @@ Both current loops target 65 kHz and approximately 4 kHz crossover, sharing ampl
 | Output power | 3 kW | Project requirement |
 | Input | 90–264 Vac, 45–65 Hz | Design range; protection thresholds in `fault.h` (VAC_UVP 128 Vpk ≈ 90 Vrms, VAC_OVP 380 Vpk ≈ 269 Vrms) |
 | Output | 400 V (settable 350–410 V) | `smps_sm.h` |
-| Switching frequency | 65 kHz per phase, input ripple frequency 130 kHz after interleaving | `board_config.h` (`BOARD_FAST_LOOP_HZ`), must match MCC `PG1PER` |
+| Switching frequency | 65 kHz per phase, input ripple frequency 130 kHz after interleaving | `board_config.h` (`BOARD_FAST_LOOP_HZ`), must match MCC `PG3PER` |
 | Current loop rate | 65 kHz (per phase) | Same as above |
 | Voltage loop rate | 8.125 kHz | `PFC_VLOOP_DIVIDER = 8` |
 | Slow task | 10 kHz (100 µs) | Timer1 |
@@ -257,8 +257,8 @@ Microsoft_PSU_3kW_PFC.X/
 ├── main.c                          Entry: initialisation order + main loop
 ├── mcc_generated_files/            Generated by MCC Melody (do not edit by hand; regeneration overwrites it)
 │   ├── adc/        adc1..adc5      ADC channels, trigger sources, sampling time
-│   ├── cmp/        cmp1,4,5,6,7,8  Comparators/DACs (CMP1/4/5/6 → PG1/PG2 cycle-by-cycle current limit; DAC7 → RA9 debug, DAC8 → RA8 external VREF)
-│   ├── pwm_hs/     pwm.c           PG1/PG2/PG3 period, mode, triggers, override
+│   ├── cmp/        cmp1,4,5,6,7,8  Comparators/DACs (CMP1/4/5/6 → PG3/PG4 cycle-by-cycle current limit; DAC7 → RA9 debug, DAC8 → RA8 external VREF)
+│   ├── pwm_hs/     pwm.c           PG3/PG4/PG5 period, mode, triggers, override
 │   ├── input_capture/ sccp1,2      RD6 capture (LLC load duty cycle; reconfigured by LLC_SIGNAL_Init)
 │   ├── pwm/        sccp3           RC4 duty-cycle output (bulk bus voltage → LLC)
 │   ├── timer/      tmr1            100 µs time base
@@ -325,7 +325,7 @@ app_tasks       │    │   ▼         ▼          ▼           ▼         
  │    │         │    └► smps_control ◄── board_config   (PU bases + measurements + controllers)
  │    │         │          │
  │    │         │          ▼
- │    │         │       pfc_pwm ──► registers (PG1/PG2/PG3)
+ │    │         │       pfc_pwm ──► registers (PG3/PG4/PG5)
  │    │         ▼
  │    │      il_cal (fed raw values during calibration), llc_signal (RD6), llc_link (byte transfer)
  │    ▼
@@ -368,7 +368,7 @@ Differences between debug, production and bench-test builds should appear only i
 
 | Category | Macros | Must match |
 |---|---|---|
-| Execution rates | `BOARD_FAST_LOOP_HZ` (65 kHz), `BOARD_VLOOP_DIVIDER`, `BOARD_SLOW_TICK_US` (100 µs) | MCC `PG1PER`, `PR1` |
+| Execution rates | `BOARD_FAST_LOOP_HZ` (65 kHz), `BOARD_VLOOP_DIVIDER`, `BOARD_SLOW_TICK_US` (100 µs) | MCC `PG3PER`, `PR1` |
 | ADC scaling | `BOARD_FB_VAC/VOUT/TEMP_*`, `BOARD_FB_IL_RANGE_A` (±50 A; `BOARD_FB_IL_SCALE` is derived from it) | Divider ratios, CT turns ratio, op-amp gain |
 | Power stage | `BOARD_PFC_L_H`, `BOARD_PFC_COUT_F` | Measured inductance and capacitance |
 
@@ -595,15 +595,15 @@ ADC gain timeout or a zero result sets `g_adcCalibrationFailedMask`. CT calibrat
 
 | Context | Trigger source | Rate | Priority | Entry | Main work |
 |---|---|---|---|---|---|
-| Phase A ISR | AD5CH1 conversion complete (PWM1 Trigger1) | 65 kHz | 5 | `_AD5CH1Interrupt` | (during calibration `IL_CAL_Update` accumulates raw iA) sample iA_up/dn, vac → `SMPS_SM_TaskPhaseA` |
-| Phase B ISR | AD1CH1 conversion complete (PWM2 Trigger1) | 65 kHz | 5 | `_AD1CH1Interrupt` | (during calibration `IL_CAL_Update` accumulates raw iB) sample iB_up/dn, vout → RD6 load `LLC_SIGNAL_LoadUpdate` → `SMPS_SM_TaskPhaseB` → `X2Cscope_Update` |
+| Phase A ISR | AD5CH1 conversion complete (PWM3 Trigger1) | 65 kHz | 5 | `_AD5CH1Interrupt` | (during calibration `IL_CAL_Update` accumulates raw iA) sample iA_up/dn, vac → `SMPS_SM_TaskPhaseA` |
+| Phase B ISR | AD1CH1 conversion complete (PWM4 Trigger1) | 65 kHz | 5 | `_AD1CH1Interrupt` | (during calibration `IL_CAL_Update` accumulates raw iB) sample iB_up/dn, vout → RD6 load `LLC_SIGNAL_LoadUpdate` → `SMPS_SM_TaskPhaseB` → `X2Cscope_Update` |
 | Slow-task ISR | Timer1 (PR1 = 9999) | 10 kHz | 1 | `_T1Interrupt` | sample temperature → `SMPS_SM_TaskSlow` → UART1 byte transfer `LLC_LINK_ByteService` → scheduler tick +1 |
 | Main loop | — | as fast as possible | 0 | `SCHEDULER_Run` | Clear watchdog (requires ISR heartbeat), X2Cscope communication, LLC frame parsing and replies `LLC_LINK_Task`, 1 ms task (link timing, RC4 update) |
 
 ### 5.2 Timing Diagram (One PWM Period ≈ 15.38 µs)
 
 ```
- PWM1 period |<─────────────────── 15.38 µs ───────────────────>|
+ PWM3 period |<─────────────────── 15.38 µs ───────────────────>|
             ▲ Trigger1(A)                  ▲ Trigger1(B, +180°)
  ADC        [AD5/AD2/AD4 conversion]        [AD1/AD3CH0 conversion]
  ISR(prio5)   ├─ phase A ISR ──┤              ├─ phase B ISR ┤
@@ -676,26 +676,30 @@ A≈4.4 µs and B≈4.6 µs are historical measurements. This pass adds filterin
 
 | Generator | Purpose | Mode | Period | Update mode | Notes |
 |---|---|---|---|---|---|
-| PG1 | Phase A fast leg | Double-update center-aligned, complementary (MODSEL=5) | `PG1PER = 0x1808E` (design 65 kHz) | UPDMOD = SOC | Master time base; Trigger B compare event triggers PG2; TRIGA is used to trigger the ADC |
-| PG2 | Phase B fast leg | Double-update center-aligned, complementary (MODSEL=5) | Same as PG1 | UPDMOD = SOC | Triggered by PG1, design 180° phase shift |
-| PG3 | Slow leg | Double-update center-aligned MODSEL=5 | Same as PG1 | Immediate | Driven through override |
-| PG4 | Not used by the power stage | Independent edge, only PWM4H (RC3) enabled | `PG4PER = 0xC7F0` | UPDMOD = Immediate | Configured by MCC, started together by `PWM_Enable()`; `DC = 0` so RC3 stays low; not managed by `PFC_PWM_*`, not used by software |
+| PG3 | Phase A fast leg (PWM3H/L: RD2/RD3) | Double-update center-aligned, complementary (MODSEL=5) | `PG3PER = 0x1808E` (design 65 kHz) | UPDMOD = SOC | Master time base; PGTRGSEL = Trigger D compare event (`PG3TRIGD`) is the SOC source of PG4 and PG5; TRIGA is used to trigger the ADC |
+| PG4 | Phase B fast leg (PWM4H/L: RD0/RD1) | Double-update center-aligned, complementary (MODSEL=5) | Same as PG3 | UPDMOD = SOC | SOCS = PG3, design 180° phase shift |
+| PG5 | Slow leg (PWM5H/L: RC10/RC11) | Double-update center-aligned MODSEL=5 | Same as PG3 | Immediate | SOCS = PG3; driven through override |
+| PG6 | Not used by the power stage | Independent edge, only PWM6H (RC3) enabled | `PG6PER = 0xC7F0` | UPDMOD = Immediate | Configured by MCC, started together by `PWM_Enable()`; `PwmInitExt()` clears `PG6IOCON1.PENL` because PWM6L has no pin mapping; `DC = 0` so RC3 stays low; not managed by `PFC_PWM_*`, not used by software |
+| PG1 | Phase A sync window (on-chip only, no pin) | Independent edge, independent output (PMOD=01), retriggerable (`TRGMOD=01`) | `PG1PER = 0xFFFFF` (`PwmInitExt` overrides the MCC `0x400`) | UPDMOD = SOC, `UPDTRG` = DC write | Retriggered by PG3's PWM event A; `PG1DC` = window width; PWM1H/L feed the LOGCON A/B sources, see §6.1a |
+| PG2 | Phase B sync window (on-chip only, no pin) | Same as PG1 | `PG2PER = 0xFFFFF` | Same as PG1 | Retriggered by PG4's PWM event B; `PG2DC` = window width; PWM2H/L feed the LOGCON C/D sources |
 
-> **Current MCC snapshot (#40)**: the user updated PG1/2/3, with CON 0x8D / 0x1008D / 0x101008D, all MODSEL=5. Double update offers two buffer-update opportunities per full cycle. ADC Trigger 1 still selects only TRIGA, 1:1 postscaling, CAHALF=1 and compare zero. Update count does not establish ADC rate; verify the design targets of 65 kHz per phase and 180° interleaving with simultaneous gate/ADC/update measurements.
+> **PWM generator numbering (2026/11/10)**: the MCC PWM configuration was rebuilt and the generators moved up: former PG1/PG2/PG3 (phase A / phase B / slow leg) are now **PG3/PG4/PG5**, and former PG4 (PWM4H on RC3) is now **PG6** (PWM6H on RC3). Physical pins are unchanged (PWM3–PWM6 are routed by PPS in `pins.c`). **PG1/PG2 were then re-enabled as the sync-window generators** (internal only, no pin, see §6.1a). The ADC Trigger 1 sources are now PWM3 (phase A) and PWM4 (phase B).
+
+> **Current MCC snapshot (#40)**: PG3/4/5 are the PFC generators, with CON 0x8D / 0x3008D / 0x103008D, all MODSEL=5, and PG4/PG5 SOCS = PG3; for PG1/PG2 the MCC `CON=0xF0088` (independent edge, SOCS = TRIG bit or PCI sync), and `PwmInitExt()` sets `TRGMOD` to retriggerable, giving `0x4F0088`. Double update offers two buffer-update opportunities per full cycle. ADC Trigger 1 still selects only TRIGA, 1:1 postscaling, CAHALF=1 and compare zero. Update count does not establish ADC rate; verify the design targets of 65 kHz per phase and 180° interleaving with simultaneous gate/ADC/update measurements.
 
 **Override mechanism** (`PGxIOCON2`):
 
 - `OVRENH/OVRENL = 1`: the output is determined by `OVRDAT`, not by the PWM generator.
 - `OVRDAT<1>` corresponds to PWMxH, `OVRDAT<0>` to PWMxL.
 - MCC reset value `PGxIOCON2 = 0x300800`, i.e. OVREN set, OVRDAT = 0: **all outputs are low by default at power-up**.
-- `PwmInitExt()` sets PG1/2/3 override synchronization to `OSYNC=01` (as soon as possible), without UPDREQ. DC/SWAP UPDMOD remains configured separately; hardware/driver latency still needs validation.
+- `PwmInitExt()` sets PG3/4/5 override synchronization to `OSYNC=01` (as soon as possible), without UPDREQ. DC/SWAP UPDMOD remains configured separately; hardware/driver latency still needs validation.
 
 **SWAP mechanism** (`PGxIOCON1.SWAP`): swaps the PWMxH and PWMxL outputs. The code ensures that `PGxDC` always represents the duty cycle of the boost switch:
 
 | Polarity | Fast-leg SWAP | Slow-leg OVRDAT | Meaning (**must be confirmed against the schematic**) |
 |---|---|---|---|
-| POS (vac > 0) | `PFC_PWM_FAST_LEG_SWAP_POS = 1` | `0x1` (PWM3L on) | Low-side switch is the boost switch |
-| NEG (vac < 0) | `PFC_PWM_FAST_LEG_SWAP_NEG = 0` | `0x2` (PWM3H on) | High-side switch is the boost switch |
+| POS (vac > 0) | `PFC_PWM_FAST_LEG_SWAP_POS = 1` | `0x1` (PWM5L on) | Low-side switch is the boost switch |
+| NEG (vac < 0) | `PFC_PWM_FAST_LEG_SWAP_NEG = 0` | `0x2` (PWM5H on) | High-side switch is the boost switch |
 | BLANK | — | `0x0` (all off) | Switching inhibited around zero crossing |
 
 **Pin carrying the SR switch** (`PFC_PWM_SYNC_OVREN_POS/NEG` in `pfc_pwm.h`): override acts on the **pin**, after SWAP (datasheet 16.x: SWAP is applied first and is overridden by other controls), so the pin carrying the SR switch changes with the half cycle:
@@ -705,13 +709,13 @@ A≈4.4 µs and B≈4.6 µs are historical measurements. This pass adds filterin
 | POS | 1 | PWMxL (low-side) | PWMxH (high-side) | `OVRENH` |
 | NEG | 0 | PWMxH (high-side) | PWMxL (low-side) | `OVRENL` |
 
-> ⚠️ The above is derived assuming "PWMxH pin = high-side switch, PWMxL pin = low-side switch" and **must be confirmed against the schematic** (same item as the TODO for the SWAP table). On the bench it has been confirmed that PWM1H is the high-side switch, and in the NEG half cycle PWM3H is high and PWM1H is the boost switch, consistent with the table above. See Section 1.1a for the current paths in each half cycle.
+> ⚠️ The above is derived assuming "PWMxH pin = high-side switch, PWMxL pin = low-side switch" and **must be confirmed against the schematic** (same item as the TODO for the SWAP table). On the bench it has been confirmed that PWM3H is the high-side switch, and in the NEG half cycle PWM5H is high and PWM3H is the boost switch, consistent with the table above (confirmed under the former numbering PWM1H/PWM3H; the pins are unchanged). See Section 1.1a for the current paths in each half cycle.
 
-> **Dead time**: 200 ns on both edges of PG1/2/3, updated by the user in MCC and reapplied by `PwmInitExt()` before start as `PGxDT=0x0A000A00` (1.25 ns coarse clock, four fine-count bits). Verify actual gates; the register value alone does not establish safety.
+> **Dead time**: 200 ns on both edges of PG3/4/5, updated by the user in MCC and reapplied by `PwmInitExt()` before start as `PGxDT=0x0A000A00` (1.25 ns coarse clock, four fine-count bits). Verify actual gates; the register value alone does not establish safety.
 
 **Cycle-by-cycle current limit (CBC, [mcc_ext.c](../sources/drivers/mcc_extended/mcc_ext.c) `PinsInitExt` + `PwmInitExt`)**:
 
-| Item | PG1 (phase A) | PG2 (phase B) |
+| Item | PG3 (phase A) | PG4 (phase B) |
 |---|---|---|
 | PCI sources (`PGxF1PCI2`) | CMP4, CMP6, RD4 (external OCP A), via PCI8/9/10 | CMP5, CMP1, RD7 (external OCP B), via PCI11/12/13 |
 | Output action | `FLT1DAT = 00`: both PWMxH and PWMxL driven low while PCI is active | Same as left |
@@ -723,27 +727,97 @@ The Fault PCI configuration is the same for both phases:
   - Conversion: PWM clock 800 MHz, 1 count = 1.25 ns; blanking time = (LEB + 1) × 1.25 ns, so `PERIOD_LEB` = 200 / 1.25 − 1 = 159, and the register reads back `PGxLEB = 0x080009F0` (PHR is bit 27, LEB = 159 in bits 19:4).
 - **Hardware thresholds**: the comparator thresholds are set by the DACs of CMP1/4/5/6 respectively (MCC) and **still need calibration on the board** (Chapter 16 risk #4).
 
+### 6.1a Sync-Window Gate (PG1/PG2 + Combinatorial Logic LOGCON)
+
+> **Purpose**: limit the maximum on-time of the phase A/B synchronous rectifier (sync) switch, and soft-start the sync switch after a zero crossing. The window is generated by PG1 (phase A) and PG2 (phase B) and ANDed with the PG3/PG4 pin signals through LOGCON. The timing in this section is derived from the data sheet (DS70005591C §16) and **still needs board confirmation**, see Chapter 16.
+
+**(1) From event to window** (phase A; phase B is the same with PG4 → event B → PG2)
+
+| Step | Action | Register / code |
+|---|---|---|
+| 1 | Write the duty: first `PG3TRIGB = dc \| (1<<31)`, then `PG3DC = dc` | `PFC_PWM_DutyASet()`. A `DC` write issues an update request (`UPDTRG=01`) and the next SOC latches TRIGB and DC together, so TRIGB must be written first |
+| 2 | In the second half-cycle PG3 reaches `TRIGB` (bit31 = CAHALF = 1): this is the falling edge of the H pin, i.e. the rising edge of L without dead time = start of the sync switch | `PG3EVT2.ADTR2EN2 = 1` routes the TRIGB compare event into ADC Trigger 2 |
+| 3 | PWM event A = the ADC Trigger 2 signal | `PWMEVTA.EVTAPGS = 0b010` (PG3), `EVTASEL = 0b01010`, `EVTAOEN = 0` |
+| 4 | Event A is a PCI source that retriggers PG1 | `PG1SPCI2 = 1<<23`; `PG1CON.TRGMOD = 01`; `PG1SPCI1`: `ACP = Latched`, `TERM = Auto`, `TSYNCDIS = 1`, `LATMOD = 1` |
+| 5 | PG1 is independent edge: from the trigger, H (= L) stays high for `PG1DC` counts, which is the window width | In Independent Output mode H and L are the same signal, with no dead time and no complement |
+
+Phase B: `PWMEVTB.EVTBPGS = 0b011` (PG4) → `PG2SPCI2 = 1<<24` → PG2.
+
+**(2) LOGCON combinatorial logic** (`PwmInitExt()`, configured statically before `PWM_Enable()`)
+
+| Instance | Source 1 | Source 2 | Function | Destination |
+|---|---|---|---|---|
+| LOGCONA | PWM1H (`0b0000`) | PWM3H (`0b0100`) | AND (`0b01`) | PWM3H (`PWMLFAD = 0b010`) |
+| LOGCONB | PWM1L (`0b0001`) | PWM3L (`0b0101`) | AND | PWM3L (`PWMLFBD = 0b010`) |
+| LOGCONC | PWM2H (`0b0010`) | PWM4H (`0b0110`) | AND | PWM4H (`PWMLFCD = 0b011`) |
+| LOGCOND | PWM2L (`0b0011`) | PWM4L (`0b0111`) | AND | PWM4L (`PWMLFDD = 0b011`) |
+
+- Inputs are taken **after** dead time, SWAP and override and **before** POL; the output **replaces** the destination pin signal.
+- Odd instances (A/C/E) can only drive PWMxH; even instances (B/D/F) can only drive PWMxL; PWM1 cannot be a destination (it can only be a source).
+- LOGCON is **not** modified at run time (the data sheet warns that changing it while `PGxCON.ON = 1` may give unexpected results).
+
+**(3) Gate states**: after SWAP the H and L pins alternately carry the boost switch and the sync switch in the two half-cycles, so the four LOGCON instances cannot simply be ANDed with the window all the time. Instead the H and L sides of the window signal are **forced separately** through `OVREN/OVRDAT` in the PG1/PG2 `IOCON2` (LOGCON reads the signal after override):
+
+| State | Window on the sync side | Window on the boost side | Entered when |
+|---|---|---|---|
+| OPEN | Forced 1 (pass-through, no limit) | Forced 1 (pass-through) | Before start in `PwmInitExt()`, `PFC_PWM_Init`, `PFC_LOOP_Reset`, BLANK entry, end of the sync ramp |
+| PENDING | Forced 0 (sync switch off) | Forced 1 (pass-through) | BLANK exit, after `SwapSet` / `BoostEnable`, together with writing the initial window |
+| WINDOW | Override released, follows the PG1/PG2 window pulse | Forced 1 (pass-through, boost not truncated) | Boost ramp hand-over, in the same call that releases the PG3/PG4 sync override |
+
+- **Meaning of OPEN**: both the H and L sides of the PG1/PG2 window are forced to 1, so the LOGCON AND is a straight pass-through for both the PWMxH and PWMxL destination pins and the window limits neither side — i.e. "released / pass-through". OPEN does **not** turn the sync switch on; whether it conducts is still decided by the PG3/PG4/PG5 overrides (during BLANK `PFC_PWM_AllOutputsOff()` has already forced them all low).
+- The sync side matches `PFC_PWM_SyncOvrenMask(polarity)`: H for POS, L for NEG.
+- State functions are in `pfc_pwm.h`: `PFC_PWM_PhaseA/BSyncGateOpen / Pending / Window`; the window width is written with `PFC_PWM_PhaseA/BSyncWindowSet()`.
+- The window `DC` takes effect at the next SOC (the next event), so the initial window is written while PENDING and is already in place at hand-over.
+
+**(4) Waveforms in the two half-cycles**
+
+| Polarity | SWAP | Boost pin (driven by `PGxDC`) | Sync pin | Slow leg (PG5) on | Window acts on |
+|---|---|---|---|---|---|
+| POS (vac > 0) | 1 | PWM3L (RD3), PWM4L (RD1) | PWM3H (RD2), PWM4H (RD0) | PWM5L (RC11) | H-side window |
+| NEG (vac < 0) | 0 | PWM3H, PWM4H | PWM3L, PWM4L | PWM5H (RC10) | L-side window |
+| BLANK | — | All off (override) | All off | All off | OPEN |
+
+> ⚠️ Derived from "PWMxH pin = high-side switch, PWMxL pin = low-side switch"; **must be confirmed against the schematic**, see the SWAP table in §6.1.
+
+**(5) Window width and soft start**
+
+- The window starts on the edge without dead time, while the edge on the sync pin comes one dead time (200 ns) later, so: window width = desired on-time + dead time.
+- The conversion references the PG3 period: window count = (on-time + dead time) × `g_pfcPwmPeriodCnt` ÷ Tsw (`PfcSyncWindowCount()`); `PG1PER` only has to be at least as long as the window and does not take part in the conversion.
+- The soft start begins when the boost soft start hands over and advances one step per 65 kHz call: on-time = `X0 + (PFC_SYNC_DUTY_MAX·Tsw − X0) · n/N` with `X0 = PFC_SYNC_SS_START_NS = 100 ns` and `N = PFC_SYNC_SS_CYCLES = 16`; after N steps the gate returns to OPEN (fully released).
+
+**(6) Relation to the ADC triggers**: PG3 `TRIGA = 1<<31` triggers PWM3 Trigger1 (phase A ISR, `_AD5CH1Interrupt`) and PG4 `TRIGA = 1<<31` triggers PWM4 Trigger1 (phase B ISR, `_AD1CH1Interrupt`); TRIGB is used separately for events A/B and does not interfere.
+
+**(7) PG1/PG2 MCC defaults and what `PwmInitExt()` overrides**
+
+| Item | MCC value | After `PwmInitExt()` | Reason |
+|---|---|---|---|
+| `PGxPER` | `0x400` (minimum high-resolution period, about 80 ns) | `0xFFFFF` | The window pulse cannot be longer than the period; a retriggered generator restarts its count each time, so the maximum value does not limit it |
+| `PGxIOCON1.PENH/PENL` | PG1 = 0, PG2 PENH = 1 | both 0 | The fixed pins of PWM1H/L and PWM2H/L are RD2/RD3 and RD0/RD1, which PPS now gives to PWM3/PWM4; the window only feeds LOGCON on-chip |
+| `PGxIOCON2` | `0x300800` (OVREN set, OVRDAT = 0) | OVRDAT = 11, OVREN set | A low window at power-up would block the boost switch as well, so start in OPEN |
+| `PGxIOCON2.OSYNC` | 10 | 01 | Overrides take effect as soon as possible |
+| `PGxEVT1.UPDTRG` | 01 (`EVT1 = 0x80000`, a `DC` write issues its own update request) | 01 (restated, no change) | No software UPDREQ needed after writing the window `DC` |
+
 ### 6.2 ADC (Single Sample, 12-Bit Result 0–4095)
 
 > All running channels have `ADxCHyCON1.MODE = 0` (Single sample), **no oversampling**, and full scale is 4095. The comment "ACCNUM 4 samples, 13 bits result" in the MCC-generated code is only a textual rendering of `ACCNUM = 0` (the reset value); it has no effect when `MODE ≠ 3`, so do not take it to mean 13 bits. Only the gain calibration channel at startup (`mcc_ext.c`) explicitly uses `MODE = 3`, `ACCNUM = 3` (256 samples, 16 bits).
 
 | ADC channel | Pin | Signal | Trigger | Read in | PU variable |
 |---|---|---|---|---|---|
-| AD5CH0 | AD5AN1 | Phase A high-side current | PWM1 Trig1 | Phase A ISR | `g_pfcIaUpPU` |
-| AD5CH1 | AD5AN2 | Phase A low-side current (**generates the phase A interrupt**) | PWM1 Trig1 | Phase A ISR | `g_pfcIaDnPU` |
-| AD2CH0 | AD2AN4 | Grid L line | PWM1 Trig1 | Phase A ISR | `g_pfcVacPU` (L − N) |
-| AD2CH1 | AD2AN3 | Grid N line | PWM1 Trig1 | Phase A ISR | ↑ |
-| AD3CH0 | AD3AN0 | Bulk bus voltage Vout | PWM2 Trig1 (PG2TRIGA, same cycle as phase B) | Phase B ISR | `g_pfcVoutPU` |
-| AD1CH0 | AD1AN4 | Phase B high-side current | PWM2 Trig1 | Phase B ISR | `g_pfcIbUpPU` |
-| AD1CH1 | AD1AN0 | Phase B low-side current (**generates the phase B interrupt**) | PWM2 Trig1 | Phase B ISR | `g_pfcIbDnPU` |
-| AD3CH1 | AD3AN2 | GaN heatsink temperature | PWM1 Trig1 | T1 | `g_pfcTempGanPU` |
-| AD4CH0 | AD4AN5 | Air inlet temperature | PWM1 Trig1 | T1 | `g_pfcTempInletPU` |
-| AD4CH1 | AD4AN3 | LLC-A temperature | PWM1 Trig1 | T1 | `g_pfcTempLlcAPU` |
-| AD4CH2 | AD4AN0 | LLC-B temperature | PWM1 Trig1 | T1 | `g_pfcTempLlcBPU` |
+| AD5CH0 | AD5AN1 | Phase A high-side current | PWM3 Trig1 | Phase A ISR | `g_pfcIaUpPU` |
+| AD5CH1 | AD5AN2 | Phase A low-side current (**generates the phase A interrupt**) | PWM3 Trig1 | Phase A ISR | `g_pfcIaDnPU` |
+| AD2CH0 | AD2AN4 | Grid L line | PWM3 Trig1 | Phase A ISR | `g_pfcVacPU` (L − N) |
+| AD2CH1 | AD2AN3 | Grid N line | PWM3 Trig1 | Phase A ISR | ↑ |
+| AD3CH0 | AD3AN0 | Bulk bus voltage Vout | PWM4 Trig1 (PG4TRIGA, same cycle as phase B) | Phase B ISR | `g_pfcVoutPU` |
+| AD1CH0 | AD1AN4 | Phase B high-side current | PWM4 Trig1 | Phase B ISR | `g_pfcIbUpPU` |
+| AD1CH1 | AD1AN0 | Phase B low-side current (**generates the phase B interrupt**) | PWM4 Trig1 | Phase B ISR | `g_pfcIbDnPU` |
+| AD3CH1 | AD3AN2 | GaN heatsink temperature | PWM3 Trig1 | T1 | `g_pfcTempGanPU` |
+| AD4CH0 | AD4AN5 | Air inlet temperature | PWM3 Trig1 | T1 | `g_pfcTempInletPU` |
+| AD4CH1 | AD4AN3 | LLC-A temperature | PWM3 Trig1 | T1 | `g_pfcTempLlcAPU` |
+| AD4CH2 | AD4AN0 | LLC-B temperature | PWM3 Trig1 | T1 | `g_pfcTempLlcBPU` |
 
 Notes:
 
-- **Current sampling point**: `PG1TRIGA = PG2TRIGA = 0x80000000` selects the second half of the center-aligned cycle with compare value 0, targeting the half-cycle boundary. This can approximate average inductor current for an ideal symmetric CCM waveform. Double-update edge asymmetry, DCM, acquisition delay and switching noise can invalidate the approximation; neither exact average current nor freedom from filtering/calibration is guaranteed. See #7 and #40.
+- **Current sampling point**: `PG3TRIGA = PG4TRIGA = 0x80000000` selects the second half of the center-aligned cycle with compare value 0, targeting the half-cycle boundary. This can approximate average inductor current for an ideal symmetric CCM waveform. Double-update edge asymmetry, DCM, acquisition delay and switching noise can invalidate the approximation; neither exact average current nor freedom from filtering/calibration is guaranteed. See #7 and #40.
 - **Inductor current reconstruction**: the hardware measures only switch currents. `PfcInductorCurrentSelect()` selects, by polarity, the switch that is at the midpoint of its on-time (low-side for POS, high-side for NEG), and takes its absolute value as |iL|. **This assumption must be confirmed against the schematic**.
 - The **temperature channels** are also PWM-triggered, but the latest value is read only in T1; the sampling instant is asynchronous to T1, which does not matter for slowly varying temperatures.
 - ADC1–5 gain calibration uses internal AN6. Timeout/zero results retain unity for diagnostics but set `g_adcCalibrationFailedMask` and block startup.
@@ -771,8 +845,8 @@ Notes:
 | UART1 | **LLC link**, 115200 8N1, RC8 = RX, RC9 = TX, PFC is slave, polled by T1 (Chapter 18) |
 | SCCP3 | **RC4 output**: 10 kHz dual-edge PWM, duty cycle 10%~90% corresponds to bus 0~500 V (`LLC_SIGNAL_VbusUpdate`). MCC already writes `CCP3CON2 = 0x1000000` (OCAEN = 1); `LLC_SIGNAL_Init` sets it explicitly once more so it is not lost after MCC regeneration |
 | SCCP1 + SCCP2 | RD6: free-running SCCP2 captures rising-edge period while resetting SCCP1; SCCP1 captures falling-edge high time. Phase B polls FIFOs, checks frequency/overflow/backlog and divides high time by actual period |
-| CMP1/4/5/6 | PCI sources for PG1/PG2 cycle-by-cycle current limit: CMP4/CMP6 → PG1, CMP5/CMP1 → PG2 (Section 6.1). Thresholds set by the respective DACs (MCC) |
-| RD4 / RD7 | External OCP signals, the third PCI source for PG1 / PG2 cycle-by-cycle current limit respectively |
+| CMP1/4/5/6 | PCI sources for PG3/PG4 cycle-by-cycle current limit: CMP4/CMP6 → PG3, CMP5/CMP1 → PG4 (Section 6.1). Thresholds set by the respective DACs (MCC) |
+| RD4 / RD7 | External OCP signals, the third PCI source for PG3 / PG4 cycle-by-cycle current limit respectively |
 | CMP7 / DAC7 + UREF | **RA9 debug output**: DAC7 is output to RA9 through UREF (`UREFCON = 0x8C01`: INSEL = DAC7, UREFOUTEN = 1). Voltage set by `APP_DAC_DEBUG_RA9_V`, default 3.135 V (DACDAT = 3890) |
 | CMP8 / DAC8 | **RA8 external VREF**: DAC8 is output to RA8 through DACOUT2 (`DAC8CON.DACOEN = 1`). Voltage set by `APP_DAC_VREF_RA8_V`, default 3.135 V (DACDAT = 3890) |
 | Unused pins | RA0, RB6, RB7, RB10, RB11: `PFC_IO_Init()` ([pfc_io.c](../sources/drivers/pfc_io/pfc_io.c)) writes LAT = 0 first and then sets them as outputs, without relying on MCC's TRIS |
@@ -1032,7 +1106,7 @@ G_i = Vout / (L · IL_BASE) = 400 / (300e-6 × 18.45) = 72 282  (1/s)
 
 **(6) Why it is written G_i/s**: integrating `d(iL_pu)/dt = G_i·ΔD` gives `iL_pu = G_i·∫ΔD dt`. In the Laplace transform integration is written as "divide by s", so the plant is an **integrator** `G_i/s`: a constant ΔD makes the current ramp linearly.
 
-**(7) Delay**: the following design calculation assumes an equivalent **1.5 Ts ≈ 23 µs** delay for the former single-update center-aligned mode. PG1/PG2 now provide two update opportunities per full cycle. Sampling, ISR execution and register-write timing determine the actual delay; `UPDMOD=SOC` alone no longer establishes loading only at the full-cycle start. Measure timing and recalculate margins per #40; the numbers below are design results under the stated model.
+**(7) Delay**: the following design calculation assumes an equivalent **1.5 Ts ≈ 23 µs** delay for the former single-update center-aligned mode. PG3/PG4 now provide two update opportunities per full cycle. Sampling, ISR execution and register-write timing determine the actual delay; `UPDMOD=SOC` alone no longer establishes loading only at the full-cycle start. Measure timing and recalculate margins per #40; the numbers below are design results under the stated model.
 
 #### 8.1a.3 Current Loop Controller: Kp, Ki
 
@@ -1530,11 +1604,11 @@ None of the above functions write `g_pfcPolarity`; it is written in one place by
 
 ### 9.3 Switching Sequence (Phase A `PFC_LOOP_PhaseAUpdate`)
 
-Phase A owns polarity changes. BLANK entry calls `PFC_PWM_AllOutputsOff()`, zeros PG1/PG2 duty and both duty diagnostics, then publishes BLANK. Phase B's later ISR sees both off requests already issued; phase B shutdown no longer waits for that call.
+Phase A owns polarity changes. BLANK entry calls `PFC_PWM_AllOutputsOff()`, zeros PG3/PG4 duty and both duty diagnostics, then publishes BLANK. Phase B's later ISR sees both off requests already issued; phase B shutdown no longer waits for that call. BLANK entry also returns the sync-window gate to OPEN (`PFC_PWM_PhaseA/BSyncGateOpen()`, both window sides forced to 1, i.e. pass-through) and clears the sync ramp state (`syncActive = false`). Releasing the window does not turn the sync switch on — it is already off through `PFC_PWM_AllOutputsOff()`; the point is to reset the gate to a known state at every zero crossing, so that a window left in the previous WINDOW / PENDING state cannot truncate the boost side on the next BLANK exit.
 
-On BLANK exit, fast-leg SWAP is set while overrides remain held, the slow leg selects the new polarity, and each phase starts its 16-call soft start with SR held off. `OSYNC=01` applies overrides as soon as possible; DC/SWAP buffering still follows each PG's UPDMOD. A register write does not establish completion at the physical gate.
+On BLANK exit, fast-leg SWAP is set while overrides remain held, the slow leg selects the new polarity, and each phase starts its 16-call soft start with SR held off. `OSYNC=01` applies overrides as soon as possible; DC/SWAP buffering still follows each PG's UPDMOD. A register write does not establish completion at the physical gate. The sync-window gate then enters PENDING (window on the sync side forced 0, boost side forced 1) with the initial window written, see §6.1a.
 
-The slow leg selects the new half-cycle freewheeling path on BLANK exit. This depends on schematic mapping, current direction and driver timing and requires simultaneous fast/slow gate waveforms. PG3's configured 200 ns dead time alone does not prove safe direct-override commutation.
+The slow leg selects the new half-cycle freewheeling path on BLANK exit. This depends on schematic mapping, current direction and driver timing and requires simultaneous fast/slow gate waveforms. PG5's configured 200 ns dead time alone does not prove safe direct-override commutation.
 
 ### 9.4 Inner-Loop Freeze + Soft-Start to Closed-Loop Handover (`PfcDutyCompute`)
 
@@ -1546,6 +1620,12 @@ After BLANK, each phase's `PfcDutyCompute()` freezes its controller while increa
 4. Subsequent closed-loop calls track the applied PI contribution after final duty saturation, extending anti-windup to that limit.
 
 This removes the former extra PI step at handover. Operating point, feed-forward, sampling and buffer updates can still change physical pulses, so universal exact continuity is not claimed. The 16-call holdoff and SR timing require light/full-load waveforms.
+
+**Hand-over edge detection**: `PFC_LOOP_PhaseAUpdate()` saves `rampWasActive = pfcSsA.active` before calling `PfcDutyCompute()` and tests `if (rampWasActive && !pfcSsA.active)` after the call. This falling edge occurs only once and triggers the hand-over actions (release of the sync override, start of the sync-window ramp). Without the saved snapshot, "still in closed loop" cannot be told apart from "just handed over". Phase B is the same.
+
+**Closed-loop write-back** (closed-loop branch of `PfcDutyCompute()`): after `duty` is clamped, `SMPS_FloatController2P2ZTrackOutput(ctrl, duty - dutyFf)` writes the PI part actually applied back into the controller output history. Only the PI part is written back (`dutyFf` is not integrated), so the integrator does not keep growing during clamping and does not overshoot once the clamp releases.
+
+**Sync-switch soft start (after the hand-over point)**: at hand-over, besides releasing the PG3/PG4 sync override, the sync-window ramp starts (`pfcSsA/B.syncActive`): the initial window is written first, then the gate is switched to WINDOW (the sync side follows the PG1/PG2 window pulse, the boost side is forced to pass-through). On every following call the window is advanced one step, taking the on-time linearly from `PFC_SYNC_SS_START_NS` to `PFC_SYNC_DUTY_MAX`·Tsw in `PFC_SYNC_SS_CYCLES = 16` steps, after which the gate returns to OPEN (fully released). The window width is computed as in §6.1a(5).
 
 ### 9.5 Zero-Crossing Debug Observation Points
 
@@ -1626,9 +1706,9 @@ Fast OCP, fast OVP or missing ADC data call `SmpsFastTrip()` to publish a sticky
                g_fault (written only in T1) ──► FAULT_IsActive() ──► state machine → FAULT
 ```
 
-- `PwmInitExt()` sets PG1/2/3 override synchronization to `OSYNC=01` (as soon as possible), without UPDREQ. DC/SWAP UPDMOD remains configured separately; hardware/driver latency still needs validation.
+- `PwmInitExt()` sets PG3/4/5 override synchronization to `OSYNC=01` (as soon as possible), without UPDREQ. DC/SWAP UPDMOD remains configured separately; hardware/driver latency still needs validation.
 - **Slow path**: evaluated once every 100 µs, with debounce (by default 5 ticks to set and 10 ticks to clear, i.e. 0.5 ms / 1 ms).
-- **Hardware path (cycle-by-cycle current limit)**: CMP1/4/5/6 and external RD4/RD7 → PWM Fault PCI. When the limit is exceeded, PG1/PG2 are turned off in that cycle and recover automatically in the next cycle; after turn-on there is a 200 ns leading-edge blanking (Section 6.1). It only limits current: it does not latch a fault and does not notify the state machine. A sustained overcurrent is still shut down by the software fast OCP described above.
+- **Hardware path (cycle-by-cycle current limit)**: CMP1/4/5/6 and external RD4/RD7 → PWM Fault PCI. When the limit is exceeded, PG3/PG4 are turned off in that cycle and recover automatically in the next cycle; after turn-on there is a 200 ns leading-edge blanking (Section 6.1). It only limits current: it does not latch a fault and does not notify the state machine. A sustained overcurrent is still shut down by the software fast OCP described above.
 
 ### 11.2 Fault List and Thresholds ([fault.h](../sources/apps/fault/fault.h))
 
@@ -1707,7 +1787,7 @@ Slow detectors currently use contiguous IDs0–11, FLT_DETECT_COUNT=12 and a bou
 
 ### 12.0 Pre-Power-Up Checklist (**all items must be completed**)
 
-- [x] PG1/2/3 both-edge 200 ns dead time configured and reapplied before start in mcc_ext
+- [x] PG3/4/5 both-edge 200 ns dead time configured and reapplied before start in mcc_ext
 - [ ] Confirm actual gate dead time, driver delay and commutation order on hardware
 - [ ] `PFC_PWM_SLOW_LEG_POS/NEG_OVRDAT` and `PFC_PWM_FAST_LEG_SWAP_POS/NEG` ([pfc_pwm.h](../sources/drivers/pfc_pwm/pfc_pwm.h)) checked against the schematic
 - [ ] High-side/low-side switch selection in `PfcInductorCurrentSelect()` checked against the schematic
@@ -1715,7 +1795,7 @@ Slow detectors currently use contiguous IDs0–11, FLT_DETECT_COUNT=12 and a bou
 - [x] Base values fixed at 230 Vac / 3 kW / 400 V (Section 7.2); thresholds are written as "physical value / base value" and scale automatically with the base values
 - [ ] Actual full scale of CT and op-amp confirmed as ±50 A (`BOARD_FB_IL_RANGE_A`), matching the software
 - [ ] `APP_PFC_ENABLE_AT_STARTUP = 0`, `APP_PLL_PWM_TEST_ENABLE = 0`
-- [ ] Sampling point of `PG1TRIGA` confirmed to be at the middle of the switch on-time
+- [ ] Sampling point of `PG3TRIGA` confirmed to be at the middle of the switch on-time
 
 ### 12.1 Step 1: MCU Board Only (No Power Stage)
 
@@ -1724,7 +1804,7 @@ Slow detectors currently use contiguous IDs0–11, FLT_DETECT_COUNT=12 and a bou
 | Program runs | Debugger single-step / breakpoint at `while(1)` | Reaches the main loop |
 | Interrupt frequency | Toggle a GPIO in the phase A/B ISRs, measure with oscilloscope | Both 65 kHz, A and B offset by half a period |
 | T1 frequency | Same as above | 10 kHz |
-| PWM outputs | Oscilloscope on PWM1H/L, 2H/L, 3H/L | **All low** (override) |
+| PWM outputs | Oscilloscope on PWM3H/L, 4H/L, 5H/L | **All low** (override) |
 | X2Cscope | Connect UART3, 115200 | Can read `g_sm.state = 1` (STANDBY) |
 | ISR execution time | GPIO pulse width | Measured: phase A about 4.4 µs, phase B about 4.6 µs (Section 5.8); the sum of both phases must be clearly less than 15.38 µs |
 | Analog outputs | Multimeter on RA8 (DACOUT2, external VREF), RA9 (UREF, debug) | Both about 3.13 V. If low or near 0 V, see Chapter 16 risk #21 |
@@ -1760,14 +1840,14 @@ Checks:
 | Observation | Expected |
 |---|---|
 | `g_pfcPolarity` | Positive half cycle = 1, negative half cycle = 2, near zero crossing = 0 |
-| Oscilloscope: PWM3H/L vs. vac | Slow leg conducts in the correct half cycle, both off at zero crossing, **no overlap** |
+| Oscilloscope: PWM5H/L vs. vac | Slow leg conducts in the correct half cycle, both off at zero crossing, **no overlap** |
 | `g_pfcZcRejectCnt / g_pfcZcMismatchCnt` | 0 |
 | BLANK width | After PLL lock the thresholds scale with vPk, so BLANK is about 7° plus debounce, largely independent of input voltage (table in Section 9.2); without PLL lock the fixed 16 V / 24 V are used, giving a wider BLANK at low voltage |
 
 ### 12.4 Step 4: Open-Loop Duty Cycle (Low Voltage, Resistive Load)
 
 - ⚠️ A synchronous boost in complementary mode is **bidirectional**: with a fixed duty D, the converter pulls Vout towards |vac|/(1−D). Whenever the bulk bus voltage is above this value, current flows **backwards** into the grid. Therefore, for open-loop testing:
-  - It is recommended to temporarily change PG1/PG2 to **independent mode** in MCC, driving only the boost switch and keeping the SR switch off, freewheeling through the GaN reverse conduction (or body diode); the power stage then behaves like an ordinary diode boost;
+  - It is recommended to temporarily change PG3/PG4 to **independent mode** in MCC, driving only the boost switch and keeping the SR switch off, freewheeling through the GaN reverse conduction (or body diode); the power stage then behaves like an ordinary diode boost;
   - Connect a resistive load to the bulk bus and start from a low input voltage;
 - In `PfcDutyCompute`, temporarily `return` a small fixed duty (e.g. 0.1) to bypass the current loop and verify only the power stage and the drive;
 - Increase it gradually while observing the inductor current waveform, switch node voltage and dead time; after verification switch back to complementary mode and recheck the dead time;
@@ -1910,6 +1990,9 @@ The following describes real sensing (test=0); see 0.6 for bench-mode exceptions
 | `PFC_ZC_PLL_WIN` | 0.035 | PLL zero-crossing window \|cos θ\| | Set to 0 to disable PLL-predicted entry into BLANK |
 | `PFC_ZC_SS_CYCLES` | 16 (**initial value, to be tuned on hardware**) | Number of soft-start cycles after a zero crossing, counted separately after BLANK | Increase if the zero-crossing spike is large; decrease if THD is poor; set to 0 to disable the soft start (see Section 9.2) |
 | `PFC_DUTY_MAX / MIN` | 0.95 / 0.0 | Duty cycle clamp | — |
+| `PFC_SYNC_SS_START_NS` | 100 | Initial on-time of the sync-switch soft start [ns] (without dead time; window = it + 200 ns dead time) | Increase: sync switch carries current earlier; decrease: more conservative |
+| `PFC_SYNC_SS_CYCLES` | = `PFC_ZC_SS_CYCLES` (16) | Number of steps of the sync-window ramp, counted from the boost soft-start hand-over | Increase if the sync switch current surge after a zero crossing is large |
+| `PFC_SYNC_DUTY_MAX` | 0.95 | Ramp end point: maximum controllable sync duty (fraction of the switching period); after the ramp the gate returns to OPEN, fully released | Decrease: lower ramp end point for the sync switch |
 | `PFC_VPK_MIN_PU` | 80 V / VAC_BASE (0.246) | Lower limit for 1/vPk | Prevents an excessive current reference at low voltage |
 | `PFC_VOUT_MIN_PU` | 90 V / VOUT_BASE (0.225) | Lower limit for 1/vout | — |
 | `PFC_IL_FILT_ALPHA` | 0.0921 | \|iL\| low-pass coefficient (about 1 kHz) | Affects the response speed of the slow OCP |
@@ -1960,7 +2043,7 @@ Outer-loop notch filter ([pfc_loop.c](../sources/apps/control/pfc_loop.c), see 8
 | `APP_X2CSCOPE_ENABLE` | 1 | Master switch for the X2Cscope debug interface. At 0, `X2Cscope_Init/Communicate/Update` compile to empty, removing the 5000-byte buffer and X2Cscope communication implementation. The MCC UART3 driver and UART3 initialization inside `SYSTEM_Initialize()` remain; distinguish these layers when trimming a production build |
 | `APP_PFC_LOAD_FF_ENABLE` | 1 | LLC load feed-forward (8.2b). When set to 0 only the voltage loop PI is used |
 | `APP_FW_VERSION_MAJOR/MINOR/BUILD` | 0 / 1 / 1 | Firmware version, reported to the LLC via `GET_INFO` |
-| `APP_PFC_PWM_DEADTIME_NS` | 200 | Both-edge PG1/2/3 dead time, ns |
+| `APP_PFC_PWM_DEADTIME_NS` | 200 | Both-edge PG3/4/5 dead time, ns |
 | `APP_PFC_PG_WINDOW_V` | 10 | RUN settling and PG voltage-error window, V |
 | `APP_PFC_STARTUP_TIMEOUT_MS` | 10000 | Separate PREPARE / SOFTSTART deadline, ms |
 | `APP_PFC_RELAY_SETTLE_MS` | 10 | Control admission delay after relay close, ms |
@@ -2017,7 +2100,7 @@ Constants determined by hardware, which are not tuning parameters, are collected
 
 | Macro | Default | Purpose |
 |---|---|---|
-| `BOARD_FAST_LOOP_HZ` | 65000 | Phase A/B ISR frequency; must match `PG1PER` in MCC. `PFC_FAST_LOOP_HZ` and `LLC_SIG_CALL_HZ` are derived from it; `pfc_loop.c` raises `#error` if it is ≠ 65000 (`SOGI_PLL_TS_SEC` is hard-coded to 1/65 kHz) |
+| `BOARD_FAST_LOOP_HZ` | 65000 | Phase A/B ISR frequency; must match `PG3PER` in MCC. `PFC_FAST_LOOP_HZ` and `LLC_SIG_CALL_HZ` are derived from it; `pfc_loop.c` raises `#error` if it is ≠ 65000 (`SOGI_PLL_TS_SEC` is hard-coded to 1/65 kHz) |
 | `BOARD_VLOOP_DIVIDER` | 8 | Voltage loop divider (8.125 kHz); `PFC_VLOOP_DIVIDER` and `PFC_VLOOP_HZ` are derived from it |
 | `BOARD_SLOW_TICK_US` | 100 | T1 period; must match `PR1` in MCC; the soft-start step is calculated from it |
 | `BOARD_SLOW_TICKS_PER_MS` | 10 | Derived from the previous item; used by X-capacitor discharge timing and others |
@@ -2127,7 +2210,12 @@ The numbering stays fixed (Chapter 0 and code comments refer to these numbers). 
 | 23 | Whether vac sensing remains valid after AC disconnection | `user_isr.c` (L and N sampled separately and subtracted) | If the sensing circuit loses its reference after disconnection (both L and N floating), `g_pfcVacPU` may not reflect the X-capacitor voltage, causing no discharge or false discharge | Confirm the reference point of the sensing circuit against the schematic; verify on hardware |
 | 27 | Current firmware WCET unmeasured | user_isr / T1 / main | Historical A≈4.4 µs/B≈4.6 µs excludes these fixes; main starvation stops WDT servicing | Measure worst voltage-loop cycle, T1/UART gaps and snapshot critical section against the 4 ms budget |
 | 38 | RD6 validity does not prove CPU freshness | LLC_SIGNAL_LoadUpdate | Period/overflow/backlog are guarded, but hardware PWM can outlive CPU progress | Define independent software heartbeat/freshness and loss policy |
-| 40 | All three PG double-update timing unverified | User PG1/2/3 MODSEL=5 | Two updates may form asymmetric pulses; single-update average-current/delay assumptions do not carry over | Measure 65 kHz, 180° interleaving, TRIGA, RDY, DC/SWAP/overrides and gates |
+| 40 | All three PG double-update timing unverified | User PG3/4/5 MODSEL=5 | Two updates may form asymmetric pulses; single-update average-current/delay assumptions do not carry over | Measure 65 kHz, 180° interleaving, TRIGA, RDY, DC/SWAP/overrides and gates |
+| 41 | Whether the window signal reaches LOGCON with `PENH/PENL = 0` | `PwmInitExt()` (PG1/PG2, LOGCON A–D) | A window stuck low would block the sync switch | Scope PWM3H/L, PWM4H/L: the sync width should follow `PG1DC/PG2DC` |
+| 42 | Whether the boost switch is untouched during the window | Gate states PENDING / WINDOW, §6.1a | The window starts at the boost turn-off (the event) and barely overlaps the boost on-time; if the boost-side pass-through fails the boost would be truncated | Check the boost pulse width in both half-cycles |
+| 43 | Event-to-window delay and dead-time compensation not calibrated | `PfcSyncWindowCount()`, PWM events A/B | Event stretching and synchronization delay make the real on-time differ from the target | Calibrate on a scope and add a trim constant to the window |
+| 44 | Idle level of PG1/PG2 once stopped is unknown | Gate PENDING / WINDOW | An undefined low window level could unexpectedly block or release the sync switch | Observe the sync switch around BLANK on the board |
+| 45 | RD3 (PWM3L) currently has no signal, suspected board hardware fault | Hardware | The phase A L side cannot be verified | Probe the signal at the MCU pin first; if needed move the PWM3L PPS to another pin to verify |
 
 ### 16.2 Closed (Kept for Record)
 
@@ -2168,7 +2256,7 @@ This pass applies authorized application C/H fixes and synchronizes all six bili
 | Stays in PREPARE | PLL not locked, or pre-charge condition not met | Check `g_pll.locked`, `g_pfcVacPeakPU`, `g_pfcVoutPU`; check that `BOARD_FB_VAC_SCALE` / `BOARD_FB_VOUT_SCALE` are correct |
 | PLL does not lock | Wrong vac sign/amplitude, frequency outside 44–67 Hz, amplitude below 0.1 PU | Check `g_pll.v_est`, `g_pll.freq_filt`, `g_pll.eps_mag_lpf`, `g_pll.freq_limited` |
 | Enters FAULT as soon as enabled | A threshold false-triggers with the placeholder calibration | Read `g_fault.latchedFlags` and decode by ID; most common are VAC_UVP (wrong calibration) and OTP (wrong temperature coefficients) |
-| Occasional FAST_IA_OCP | Wrong current sensing offset, sampling point on a switching edge, noise | While stopped, check that `g_pfcIaUpPU` is 0; check `g_ilCalA.ok` (0 means the zero-point calibration was rejected and 2048 is still used); check the sampling point of `PG1TRIGA` |
+| Occasional FAST_IA_OCP | Wrong current sensing offset, sampling point on a switching edge, noise | While stopped, check that `g_pfcIaUpPU` is 0; check `g_ilCalA.ok` (0 means the zero-point calibration was rejected and 2048 is still used); check the sampling point of `PG3TRIGA` |
 | Stays in INIT for a long time after power-up | Zero-point calibration not finished: the ADC interrupt is not running (PWM not enabled, global interrupts not enabled) | Check whether `g_ilCalA.count / g_ilCalB.count` is increasing; at 4096 `done` should be 1 |
 | Current PU not 0 while stopped | Zero-point calibration rejected and fell back to 2048, or inductor current not 0 during calibration | Check `g_ilCalA.ok / g_ilCalB.ok` and `offsetUp / offsetDn`; confirm that PWM is off and there is no residual current at power-up |
 | Current spike near zero crossing | Soft start too short, BLANK too narrow, slow leg switching timing | Increase `PFC_ZC_SS_CYCLES`; increase the ENTER/EXIT thresholds moderately; check slow leg vs. fast leg timing with an oscilloscope |

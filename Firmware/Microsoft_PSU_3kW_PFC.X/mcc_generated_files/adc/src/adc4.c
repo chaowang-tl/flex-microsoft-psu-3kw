@@ -132,12 +132,12 @@ void ADC4_Initialize(void)
     AD4CMPSTAT = 0x0UL;
     //CH0TRG disabled; CH1TRG disabled; CH2TRG disabled; CH3TRG disabled; CH4TRG disabled; CH5TRG disabled; CH6TRG disabled; CH7TRG disabled; 
     AD4SWTRG = 0x0UL;
-    //TRG1SRC PWM1 Trigger1; MODE Single sample initiated by TRG1SRC[4:0] trigger; TRG2SRC Triggers are disabled; ACCNUM 4 samples, 13 bits result; SAMC 12.5 TAD; IRQSEL enabled; EIEN disabled; TRG1POL disabled; PINSEL AD4AN5; NINSEL AD4ANN0; FRAC Integer; DIFF disabled; 
-    AD4CH0CON1 = 0x5260004UL;
-    //TRG1SRC PWM1 Trigger1; MODE Single sample initiated by TRG1SRC[4:0] trigger; TRG2SRC Triggers are disabled; ACCNUM 4 samples, 13 bits result; SAMC 12.5 TAD; IRQSEL enabled; EIEN disabled; TRG1POL disabled; PINSEL AD4AN3; NINSEL AD4ANN0; FRAC Integer; DIFF disabled; 
-    AD4CH1CON1 = 0x3260004UL;
-    //TRG1SRC PWM1 Trigger1; MODE Single sample initiated by TRG1SRC[4:0] trigger; TRG2SRC Triggers are disabled; ACCNUM 4 samples, 13 bits result; SAMC 12.5 TAD; IRQSEL enabled; EIEN disabled; TRG1POL disabled; PINSEL AD4AN0; NINSEL AD4ANN0; FRAC Integer; DIFF disabled; 
-    AD4CH2CON1 = 0x260004UL;
+    //TRG1SRC PWM3 Trigger1; MODE Single sample initiated by TRG1SRC[4:0] trigger; TRG2SRC Triggers are disabled; ACCNUM 4 samples, 13 bits result; SAMC 12.5 TAD; IRQSEL enabled; EIEN disabled; TRG1POL disabled; PINSEL AD4AN5; NINSEL AD4ANN0; FRAC Integer; DIFF disabled; 
+    AD4CH0CON1 = 0x5260008UL;
+    //TRG1SRC PWM3 Trigger1; MODE Single sample initiated by TRG1SRC[4:0] trigger; TRG2SRC Triggers are disabled; ACCNUM 4 samples, 13 bits result; SAMC 12.5 TAD; IRQSEL enabled; EIEN disabled; TRG1POL disabled; PINSEL AD4AN3; NINSEL AD4ANN0; FRAC Integer; DIFF disabled; 
+    AD4CH1CON1 = 0x3260008UL;
+    //TRG1SRC PWM3 Trigger1; MODE Single sample initiated by TRG1SRC[4:0] trigger; TRG2SRC Triggers are disabled; ACCNUM 4 samples, 13 bits result; SAMC 12.5 TAD; IRQSEL enabled; EIEN disabled; TRG1POL disabled; PINSEL AD4AN0; NINSEL AD4ANN0; FRAC Integer; DIFF disabled; 
+    AD4CH2CON1 = 0x260008UL;
     //ADCMPCNT disabled; CMPMOD NONE; CMPCNTMOD disabled; CMPVAL enabled; ACCBRST disabled; ACCRO disabled; 
     AD4CH0CON2 = 0x20000000UL;
     //ADCMPCNT disabled; CMPMOD NONE; CMPCNTMOD disabled; CMPVAL enabled; ACCBRST disabled; ACCRO disabled; 

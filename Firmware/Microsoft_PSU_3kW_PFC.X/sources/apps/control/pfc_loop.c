@@ -23,11 +23,11 @@
 * File Name       : pfc_loop.c
 * Description     : Interleaved totem-pole PFC fast control path
 *
-*   Phase-A ISR (65 kHz, PWM1 trigger):
+*   Phase-A ISR (65 kHz, PWM3 trigger):
 *     SOGI-PLL -> zero-crossing / polarity (slow leg, A SWAP)
-*              -> current reference -> phase-A current loop -> PG1DC
-*   Phase-B ISR (65 kHz, PWM2 trigger, 180 deg later):
-*     follow polarity (B SWAP) -> phase-B current loop -> PG2DC
+*              -> current reference -> phase-A current loop -> PG3DC
+*   Phase-B ISR (65 kHz, PWM4 trigger, 180 deg later):
+*     follow polarity (B SWAP) -> phase-B current loop -> PG4DC
 *     every PFC_VLOOP_DIVIDER calls: voltage loop (8.125 kHz)
 *
 *   Current reference per phase: iref = 0.5 * demand / vPk * |cos(theta)|
@@ -61,7 +61,7 @@
 * Original Author : Chao Wang <chao.wang@microchip.com>
 * Created on      : 2026/10/28
 * Modified by     : Chao Wang
-* Modified on     : 2026/11/01
+* Modified on     : 2026/11/10
 *******************************************************************************/
 #define PFC_LOOP_C
 
@@ -85,6 +85,13 @@
 // Duty soft-start after each zero crossing; 0 disables (closed loop at once)
 #define PFC_ZC_SS_CYCLES        16U         // ~246 us at 65 kHz
 #define PFC_ZC_SS_STEP          (PFC_DUTY_MAX / (float)((PFC_ZC_SS_CYCLES > 0U) ? PFC_ZC_SS_CYCLES : 1U))
+
+// Synchronous-rectifier window soft start: runs from the boost hand-over,
+// PFC_SYNC_SS_CYCLES calls long, on-time from PFC_SYNC_SS_START_NS up to
+// PFC_SYNC_DUTY_MAX of the switching period, then the gate opens fully
+#define PFC_SYNC_SS_START_NS    100.0f
+#define PFC_SYNC_SS_CYCLES      PFC_ZC_SS_CYCLES
+#define PFC_SYNC_DUTY_MAX       0.95f
 
 #define PFC_DUTY_MAX            0.95f
 #define PFC_DUTY_MIN            0.0f
@@ -130,6 +137,8 @@ typedef struct
     float dutyLim;                  // Ramped duty limit
     bool  active;                   // Ramp running, current loop frozen
     uint16_t cycles;                 // Minimum rectifier hold-off
+    bool  syncActive;               // Sync-window ramp running (after hand-over)
+    uint16_t syncCycles;            // Sync-window ramp step
 } PFC_SS_T;
 
 // Second-order notch, zeros on the unit circle at fn, poles at radius r
@@ -161,6 +170,7 @@ static PFC_PWM_POLARITY_e PfcVacSign(float vac);
 static PFC_PWM_POLARITY_e PfcPllSign(void);
 static void  PfcSoftStartBegin(PFC_SS_T *ss);
 static float PfcDutyCompute(float vacAbs, SMPS_FLOAT_NPNZ_T const * const ctrl, PFC_SS_T *ss);
+static uint32_t PfcSyncWindowCount(uint16_t step);
 //------------------------------------------------------------------------------
 // Private Variables
 volatile float pfcIpkPerPhasePU;    // 0.5 * demand / vPk, voltage-loop rate
@@ -214,6 +224,8 @@ void PFC_LOOP_Init(void)
 void PFC_LOOP_Reset(void)
 {
     PFC_PWM_AllOutputsOff();
+    PFC_PWM_PhaseASyncGateOpen();
+    PFC_PWM_PhaseBSyncGateOpen();
 
     SMPS_FloatController2P2ZReset(&g_vLoop2p2z);
     SMPS_FloatController2P2ZReset(&g_iaLoop2p2z);
@@ -236,8 +248,12 @@ void PFC_LOOP_Reset(void)
     pfcZcCnt         = 0U;
     pfcSsA.dutyLim   = 0.0f;
     pfcSsA.active    = false;
+    pfcSsA.syncActive = false;
+    pfcSsA.syncCycles = 0U;
     pfcSsB.dutyLim   = 0.0f;
     pfcSsB.active    = false;
+    pfcSsB.syncActive = false;
+    pfcSsB.syncCycles = 0U;
     pfcVloopCnt      = 0U;
     PfcNotchPreset(&pfcVoutNotch, g_pfcVoutPU);
 }
@@ -261,7 +277,7 @@ void PFC_LOOP_GridUpdate(void)
 /*******************************************************************************
 * Public Function : PFC_LOOP_PhaseAUpdate
 * Description     : Phase-A fast path: polarity, reference and current loop
-* Purpose         : Own the zero-crossing state and drive PG1 and PG3
+* Purpose         : Own the zero-crossing state and drive PG3 and PG5
 * Input           : None
 * Return          : None
 * Calls           : PFC_PWM_*, PfcPolarityUpdate, PfcSoftStartBegin,
@@ -287,6 +303,8 @@ void PFC_LOOP_PhaseAUpdate(void)
         {
             g_pfcPolarity = PFC_PWM_POL_BLANK;
             PFC_PWM_AllOutputsOff();
+            PFC_PWM_PhaseASyncGateOpen();
+            pfcSsA.syncActive = false;
             PFC_PWM_DutyBSet(0.0f);
             g_pfcDutyBPU = 0.0f;
             PFC_PWM_DutyASet(0.0f);
@@ -299,6 +317,10 @@ void PFC_LOOP_PhaseAUpdate(void)
             PfcSoftStartBegin(&pfcSsA);
             PFC_PWM_DutyASet(0.0f);
             PFC_PWM_PhaseABoostEnable(polarity);
+            // Sync pin blocked until the boost ramp hands over; boost side passed
+            pfcSsA.syncActive = false;
+            PFC_PWM_PhaseASyncWindowSet(PfcSyncWindowCount(0U));
+            PFC_PWM_PhaseASyncGatePending(polarity);
             g_pfcPolarity = polarity;
         }
     }
@@ -322,20 +344,37 @@ void PFC_LOOP_PhaseAUpdate(void)
 
     if (rampWasActive && !pfcSsA.active)
     {
-        PFC_PWM_PhaseASyncEnable(polarity);     // Ramp handed over: rectifier on
+        // Hand-over: rectifier pin released and sync window starts at step 0
+        PFC_PWM_PhaseASyncEnable(polarity);
+        pfcSsA.syncCycles = 0U;
+        pfcSsA.syncActive = true;
+        PFC_PWM_PhaseASyncWindowSet(PfcSyncWindowCount(0U));
+        PFC_PWM_PhaseASyncGateWindow(polarity);
+    }
+    else if (pfcSsA.syncActive)
+    {
+        if (++pfcSsA.syncCycles >= PFC_SYNC_SS_CYCLES)
+        {
+            pfcSsA.syncActive = false;          // Ramp done: sync fully released
+            PFC_PWM_PhaseASyncGateOpen();
+        }
+        else
+        {
+            PFC_PWM_PhaseASyncWindowSet(PfcSyncWindowCount(pfcSsA.syncCycles));
+        }
     }
 }
 
 /*******************************************************************************
 * Public Function : PFC_LOOP_PhaseBUpdate
 * Description     : Phase-B fast path and decimated voltage loop
-* Purpose         : Follow phase-A polarity, run phase-B current loop on PG2
+* Purpose         : Follow phase-A polarity, run phase-B current loop on PG4
 * Input           : None
 * Return          : None
 * Calls           : PFC_PWM_*, PfcVoltageLoop, PfcSoftStartBegin,
 *                   PfcDutyCompute, PfcInductorCurrentSelect
 * Called by       : SMPS_SM_TaskPhaseB (65 kHz, loop enabled)
-* Note            : Phase B only touches PG2; polarity is decided by phase A.
+* Note            : Phase B only touches PG4; polarity is decided by phase A.
 *                   Phase-B soft-start runs independently of phase A; its
 *                   synchronous rectifier pin is released at its own hand-over
 *******************************************************************************/
@@ -357,11 +396,19 @@ void PFC_LOOP_PhaseBUpdate(void)
         PFC_PWM_DutyBSet(0.0f);
         g_pfcDutyBPU = 0.0f;
 
-        if (polarity != PFC_PWM_POL_BLANK)
+        if (polarity == PFC_PWM_POL_BLANK)
+        {
+            PFC_PWM_PhaseBSyncGateOpen();
+            pfcSsB.syncActive = false;
+        }
+        else
         {
             PFC_PWM_PhaseBSwapSet(polarity);
             PfcSoftStartBegin(&pfcSsB);
             PFC_PWM_PhaseBBoostEnable(polarity);
+            pfcSsB.syncActive = false;
+            PFC_PWM_PhaseBSyncWindowSet(PfcSyncWindowCount(0U));
+            PFC_PWM_PhaseBSyncGatePending(polarity);
         }
         pfcPolarityB = polarity;
     }
@@ -381,7 +428,24 @@ void PFC_LOOP_PhaseBUpdate(void)
 
     if (rampWasActive && !pfcSsB.active)
     {
-        PFC_PWM_PhaseBSyncEnable(polarity);     // Ramp handed over: rectifier on
+        // Hand-over: rectifier pin released and sync window starts at step 0
+        PFC_PWM_PhaseBSyncEnable(polarity);
+        pfcSsB.syncCycles = 0U;
+        pfcSsB.syncActive = true;
+        PFC_PWM_PhaseBSyncWindowSet(PfcSyncWindowCount(0U));
+        PFC_PWM_PhaseBSyncGateWindow(polarity);
+    }
+    else if (pfcSsB.syncActive)
+    {
+        if (++pfcSsB.syncCycles >= PFC_SYNC_SS_CYCLES)
+        {
+            pfcSsB.syncActive = false;          // Ramp done: sync fully released
+            PFC_PWM_PhaseBSyncGateOpen();
+        }
+        else
+        {
+            PFC_PWM_PhaseBSyncWindowSet(PfcSyncWindowCount(pfcSsB.syncCycles));
+        }
     }
 }
 
@@ -745,6 +809,32 @@ static PFC_PWM_POLARITY_e PfcVacSign(float vac)
 static PFC_PWM_POLARITY_e PfcPllSign(void)
 {
     return (SOGI_PLL_GetCos(&g_pll) > 0.0f) ? PFC_PWM_POL_POS : PFC_PWM_POL_NEG;
+}
+
+/*******************************************************************************
+* Private Function : PfcSyncWindowCount
+* Description     : PG1/PG2 window width (counts) of the sync-rectifier ramp
+* Purpose         : On-time from PFC_SYNC_SS_START_NS to PFC_SYNC_DUTY_MAX of the
+*                   period, linear in step, plus the dead time (the window starts
+*                   on the edge without dead time)
+* Input           : step - ramp step, 0 .. PFC_SYNC_SS_CYCLES
+* Return          : window count, 0 .. g_pfcPwmPeriodCnt (PG3 period reference)
+* Calls           : None
+* Called by       : PFC_LOOP_PhaseAUpdate, PFC_LOOP_PhaseBUpdate
+* Note            : Counts per ns are taken from g_pfcPwmPeriodCnt, the same
+*                   scale as the duty write
+*******************************************************************************/
+static uint32_t PfcSyncWindowCount(uint16_t step)
+{
+    float tswNs = 1.0e9f / (float)BOARD_FAST_LOOP_HZ;
+    float onNs  = PFC_SYNC_SS_START_NS
+                + (PFC_SYNC_DUTY_MAX * tswNs - PFC_SYNC_SS_START_NS)
+                * ((float)step / (float)PFC_SYNC_SS_CYCLES);
+    float cnt   = (onNs + (float)APP_PFC_PWM_DEADTIME_NS) * (g_pfcPwmPeriodCnt / tswNs);
+
+    if (cnt < 0.0f)               { cnt = 0.0f; }
+    if (cnt > g_pfcPwmPeriodCnt)  { cnt = g_pfcPwmPeriodCnt; }
+    return (uint32_t)(cnt + 0.5f);
 }
 
 /*******************************************************************************

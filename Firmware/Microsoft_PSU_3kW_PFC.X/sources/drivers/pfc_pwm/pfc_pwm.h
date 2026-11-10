@@ -21,11 +21,11 @@
 
 /*******************************************************************************
 * File Name       : pfc_pwm.h
-* Description     : Totem-pole PFC PWM access layer (fast legs PG1/PG2, slow leg PG3)
+* Description     : Totem-pole PFC PWM access layer (fast legs PG3/PG4, slow leg PG5)
 * Original Author : Chao Wang <chao.wang@microchip.com>
 * Created on      : 2026/10/28
 * Modified by     : Chao Wang
-* Modified on     : 2026/10/30
+* Modified on     : 2026/11/10
 *******************************************************************************/
 #ifndef PFC_PWM_H
 #define PFC_PWM_H
@@ -45,9 +45,9 @@ extern "C" {
 //------------------------------------------------------------------------------
 // Public Constants and Macro Definitions
 // Override masks in PGxIOCON2
-#define PFC_PWM_OVREN_MASK          (_PG1IOCON2_OVRENH_MASK | _PG1IOCON2_OVRENL_MASK)
-#define PFC_PWM_OVRDAT_MASK         _PG1IOCON2_OVRDAT_MASK
-#define PFC_PWM_OVRDAT_POSITION     _PG1IOCON2_OVRDAT_POSITION
+#define PFC_PWM_OVREN_MASK          (_PG3IOCON2_OVRENH_MASK | _PG3IOCON2_OVRENL_MASK)
+#define PFC_PWM_OVRDAT_MASK         _PG3IOCON2_OVRDAT_MASK
+#define PFC_PWM_OVRDAT_POSITION     _PG3IOCON2_OVRDAT_POSITION
 
 // Slow-leg override data per polarity (OVRDAT<1> = PWMxH, OVRDAT<0> = PWMxL)
 // TODO: verify against schematic which slow-leg switch conducts in each half-cycle
@@ -63,8 +63,8 @@ extern "C" {
 // Override acts on the pins, after SWAP: with SWAP = 1 PGxDC drives the PWMxL pin,
 // so the rectifier is on PWMxH, and the other way round with SWAP = 0.
 // TODO: verify; assumes PWMxH pin = high-side switch, PWMxL pin = low-side switch
-#define PFC_PWM_SYNC_OVREN_POS      _PG1IOCON2_OVRENH_MASK
-#define PFC_PWM_SYNC_OVREN_NEG      _PG1IOCON2_OVRENL_MASK
+#define PFC_PWM_SYNC_OVREN_POS      _PG3IOCON2_OVRENH_MASK
+#define PFC_PWM_SYNC_OVREN_NEG      _PG3IOCON2_OVRENL_MASK
 
 //------------------------------------------------------------------------------
 // Public Enumerated and Structure Definitions
@@ -87,7 +87,7 @@ typedef enum
 
 //------------------------------------------------------------------------------
 // Public Variables
-PFC_PWM_C_PUBLIC float g_pfcPwmPeriodCnt;   // PG1PER as float, set by PFC_PWM_Init
+PFC_PWM_C_PUBLIC float g_pfcPwmPeriodCnt;   // PG3PER as float, set by PFC_PWM_Init
 
 //------------------------------------------------------------------------------
 // Public Function Prototypes
@@ -95,16 +95,97 @@ PFC_PWM_C_PUBLIC void PFC_PWM_Init(void);
 PFC_PWM_C_PUBLIC void PFC_PWM_AllOutputsOff(void);
 PFC_PWM_C_PUBLIC void PFC_PWM_SlowLegSet(PFC_PWM_POLARITY_e polarity);
 
-// Write phase-A boost duty (0..1); the DC write also latches pending overrides
+// Sync-window gate: PG1 (phase A) / PG2 (phase B) window pins PWM1H/L and PWM2H/L
+// feed the LOGCON AND gates. Override on the PG1/PG2 pins forces each window side:
+//   OVREN bit set + OVRDAT 1 = pass (window forced high, boost side untouched)
+//   OVREN bit set + OVRDAT 0 = block (window forced low, sync side off)
+//   OVREN bit clear          = follow the PG1/PG2 window pulse
+#define PFC_PWM_WIN_OVREN_ALL_A     (_PG1IOCON2_OVRENH_MASK | _PG1IOCON2_OVRENL_MASK)
+#define PFC_PWM_WIN_OVREN_ALL_B     (_PG2IOCON2_OVRENH_MASK | _PG2IOCON2_OVRENL_MASK)
+#define PFC_PWM_WIN_DAT_MASK        _PG1IOCON2_OVRDAT_MASK   // Same field position in PG2
+#define PFC_PWM_WIN_DAT_H           (2UL << _PG1IOCON2_OVRDAT_POSITION)  // OVRDAT<1> = PWMxH
+#define PFC_PWM_WIN_DAT_L           (1UL << _PG1IOCON2_OVRDAT_POSITION)  // OVRDAT<0> = PWMxL
+
+// Write phase-A boost duty (0..1). TRIGB (duty point, bit31 = CAHALF) is written
+// before DC so both take effect at the same SOC.
 inline static void PFC_PWM_DutyASet(float duty)
 {
-    PG1DC = (uint32_t)(duty * g_pfcPwmPeriodCnt) & 0x000FFFFFUL;
+    uint32_t dc = (uint32_t)(duty * g_pfcPwmPeriodCnt) & 0x000FFFFFUL;
+    PG3TRIGB = dc | (1UL << 31);
+    PG3DC    = dc;
 }
 
-// Write phase-B boost duty (0..1)
+// Write phase-B boost duty (0..1); TRIGB before DC, as for phase A
 inline static void PFC_PWM_DutyBSet(float duty)
 {
-    PG2DC = (uint32_t)(duty * g_pfcPwmPeriodCnt) & 0x000FFFFFUL;
+    uint32_t dc = (uint32_t)(duty * g_pfcPwmPeriodCnt) & 0x000FFFFFUL;
+    PG4TRIGB = dc | (1UL << 31);
+    PG4DC    = dc;
+}
+
+// Boost-side window bit pattern for a polarity (the side that is not the sync pin).
+// POS: sync on PWMxH, boost on PWMxL. NEG: sync on PWMxL, boost on PWMxH.
+inline static uint32_t PFC_PWM_WinBoostDat(PFC_PWM_POLARITY_e polarity)
+{
+    return (polarity == PFC_PWM_POL_NEG) ? PFC_PWM_WIN_DAT_H : PFC_PWM_WIN_DAT_L;
+}
+
+inline static uint32_t PFC_PWM_WinBoostOvren(PFC_PWM_POLARITY_e polarity, uint32_t ovrenH, uint32_t ovrenL)
+{
+    return (polarity == PFC_PWM_POL_NEG) ? ovrenH : ovrenL;
+}
+
+// Phase-A window gate
+inline static void PFC_PWM_PhaseASyncGateOpen(void)
+{
+    PG1IOCON2 = (PG1IOCON2 & ~(PFC_PWM_WIN_OVREN_ALL_A | PFC_PWM_WIN_DAT_MASK))
+              | PFC_PWM_WIN_OVREN_ALL_A | PFC_PWM_WIN_DAT_H | PFC_PWM_WIN_DAT_L;
+}
+
+// Pending: sync side blocked, boost side passed through
+inline static void PFC_PWM_PhaseASyncGatePending(PFC_PWM_POLARITY_e polarity)
+{
+    PG1IOCON2 = (PG1IOCON2 & ~(PFC_PWM_WIN_OVREN_ALL_A | PFC_PWM_WIN_DAT_MASK))
+              | PFC_PWM_WIN_OVREN_ALL_A | PFC_PWM_WinBoostDat(polarity);
+}
+
+// Window: boost side passed through, sync side follows the PG1 window pulse
+inline static void PFC_PWM_PhaseASyncGateWindow(PFC_PWM_POLARITY_e polarity)
+{
+    PG1IOCON2 = (PG1IOCON2 & ~(PFC_PWM_WIN_OVREN_ALL_A | PFC_PWM_WIN_DAT_MASK))
+              | PFC_PWM_WinBoostOvren(polarity, _PG1IOCON2_OVRENH_MASK, _PG1IOCON2_OVRENL_MASK)
+              | PFC_PWM_WinBoostDat(polarity);
+}
+
+// Window width of the sync pulse (PG1DC), counts; takes effect at the next PG1 SOC
+inline static void PFC_PWM_PhaseASyncWindowSet(uint32_t windowCnt)
+{
+    PG1DC = windowCnt & 0x000FFFFFUL;
+}
+
+// Phase-B window gate
+inline static void PFC_PWM_PhaseBSyncGateOpen(void)
+{
+    PG2IOCON2 = (PG2IOCON2 & ~(PFC_PWM_WIN_OVREN_ALL_B | PFC_PWM_WIN_DAT_MASK))
+              | PFC_PWM_WIN_OVREN_ALL_B | PFC_PWM_WIN_DAT_H | PFC_PWM_WIN_DAT_L;
+}
+
+inline static void PFC_PWM_PhaseBSyncGatePending(PFC_PWM_POLARITY_e polarity)
+{
+    PG2IOCON2 = (PG2IOCON2 & ~(PFC_PWM_WIN_OVREN_ALL_B | PFC_PWM_WIN_DAT_MASK))
+              | PFC_PWM_WIN_OVREN_ALL_B | PFC_PWM_WinBoostDat(polarity);
+}
+
+inline static void PFC_PWM_PhaseBSyncGateWindow(PFC_PWM_POLARITY_e polarity)
+{
+    PG2IOCON2 = (PG2IOCON2 & ~(PFC_PWM_WIN_OVREN_ALL_B | PFC_PWM_WIN_DAT_MASK))
+              | PFC_PWM_WinBoostOvren(polarity, _PG2IOCON2_OVRENH_MASK, _PG2IOCON2_OVRENL_MASK)
+              | PFC_PWM_WinBoostDat(polarity);
+}
+
+inline static void PFC_PWM_PhaseBSyncWindowSet(uint32_t windowCnt)
+{
+    PG2DC = windowCnt & 0x000FFFFFUL;
 }
 
 // Override-enable bit of the synchronous rectifier pin for the given polarity
@@ -117,50 +198,50 @@ inline static uint32_t PFC_PWM_SyncOvrenMask(PFC_PWM_POLARITY_e polarity)
 // Release the phase-A boost-switch pin; the synchronous rectifier pin stays forced low
 inline static void PFC_PWM_PhaseABoostEnable(PFC_PWM_POLARITY_e polarity)
 {
-    PG1IOCON2 &= ~(PFC_PWM_OVREN_MASK & ~PFC_PWM_SyncOvrenMask(polarity));
+    PG3IOCON2 &= ~(PFC_PWM_OVREN_MASK & ~PFC_PWM_SyncOvrenMask(polarity));
 }
 
 // Release the phase-A synchronous rectifier pin (after the boost pin is released)
 inline static void PFC_PWM_PhaseASyncEnable(PFC_PWM_POLARITY_e polarity)
 {
-    PG1IOCON2 &= ~PFC_PWM_SyncOvrenMask(polarity);
+    PG3IOCON2 &= ~PFC_PWM_SyncOvrenMask(polarity);
 }
 
 // Force phase-A outputs low
 inline static void PFC_PWM_PhaseADisable(void)
 {
-    PG1IOCON2 = (PG1IOCON2 & ~PFC_PWM_OVRDAT_MASK) | PFC_PWM_OVREN_MASK;
+    PG3IOCON2 = (PG3IOCON2 & ~PFC_PWM_OVRDAT_MASK) | PFC_PWM_OVREN_MASK;
 }
 
 // Release the phase-B boost-switch pin; the synchronous rectifier pin stays forced low
 inline static void PFC_PWM_PhaseBBoostEnable(PFC_PWM_POLARITY_e polarity)
 {
-    PG2IOCON2 &= ~(PFC_PWM_OVREN_MASK & ~PFC_PWM_SyncOvrenMask(polarity));
+    PG4IOCON2 &= ~(PFC_PWM_OVREN_MASK & ~PFC_PWM_SyncOvrenMask(polarity));
 }
 
 // Release the phase-B synchronous rectifier pin (after the boost pin is released)
 inline static void PFC_PWM_PhaseBSyncEnable(PFC_PWM_POLARITY_e polarity)
 {
-    PG2IOCON2 &= ~PFC_PWM_SyncOvrenMask(polarity);
+    PG4IOCON2 &= ~PFC_PWM_SyncOvrenMask(polarity);
 }
 
 // Force phase-B outputs low
 inline static void PFC_PWM_PhaseBDisable(void)
 {
-    PG2IOCON2 = (PG2IOCON2 & ~PFC_PWM_OVRDAT_MASK) | PFC_PWM_OVREN_MASK;
+    PG4IOCON2 = (PG4IOCON2 & ~PFC_PWM_OVRDAT_MASK) | PFC_PWM_OVREN_MASK;
 }
 
-// Select which fast-leg switch PG1DC drives for the given polarity
+// Select which fast-leg switch PG3DC drives for the given polarity
 inline static void PFC_PWM_PhaseASwapSet(PFC_PWM_POLARITY_e polarity)
 {
-    PG1IOCON1bits.SWAP = (polarity == PFC_PWM_POL_NEG) ? PFC_PWM_FAST_LEG_SWAP_NEG
+    PG3IOCON1bits.SWAP = (polarity == PFC_PWM_POL_NEG) ? PFC_PWM_FAST_LEG_SWAP_NEG
                                                         : PFC_PWM_FAST_LEG_SWAP_POS;
 }
 
-// Select which fast-leg switch PG2DC drives for the given polarity
+// Select which fast-leg switch PG4DC drives for the given polarity
 inline static void PFC_PWM_PhaseBSwapSet(PFC_PWM_POLARITY_e polarity)
 {
-    PG2IOCON1bits.SWAP = (polarity == PFC_PWM_POL_NEG) ? PFC_PWM_FAST_LEG_SWAP_NEG
+    PG4IOCON1bits.SWAP = (polarity == PFC_PWM_POL_NEG) ? PFC_PWM_FAST_LEG_SWAP_NEG
                                                         : PFC_PWM_FAST_LEG_SWAP_POS;
 }
 

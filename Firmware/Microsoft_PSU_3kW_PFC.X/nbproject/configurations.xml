@@ -91,10 +91,10 @@
           <itemPath>mcc_generated_files/pwm/pwm_interface.h</itemPath>
         </logicalFolder>
         <logicalFolder name="pwm_hs" displayName="pwm_hs" projectFiles="true">
+          <itemPath>mcc_generated_files/pwm_hs/pwm_hs_types.h</itemPath>
+          <itemPath>mcc_generated_files/pwm_hs/pwm_features.h</itemPath>
           <itemPath>mcc_generated_files/pwm_hs/pwm.h</itemPath>
           <itemPath>mcc_generated_files/pwm_hs/pwm_hs_interface.h</itemPath>
-          <itemPath>mcc_generated_files/pwm_hs/pwm_features.h</itemPath>
-          <itemPath>mcc_generated_files/pwm_hs/pwm_hs_types.h</itemPath>
         </logicalFolder>
         <logicalFolder name="system" displayName="system" projectFiles="true">
           <itemPath>mcc_generated_files/system/clock.h</itemPath>
@@ -144,7 +144,7 @@
     <logicalFolder name="LinkerScript"
                    displayName="Linker Files"
                    projectFiles="true">
-      <itemPath>../../../Microsoft_PSU_3kW_PFC.X/p33AK256MPS206.gld</itemPath>
+      <itemPath>p33AK256MPS206.gld</itemPath>
     </logicalFolder>
     <logicalFolder name="SourceFiles"
                    displayName="Source Files"
@@ -277,22 +277,7 @@
     </logicalFolder>
   </logicalFolder>
   <sourceRootList>
-    <Elem>sources/drivers/mcc_extended</Elem>
-    <Elem>sources/isr</Elem>
-    <Elem>sources/scheduler</Elem>
-    <Elem>sources/apps/control</Elem>
-    <Elem>sources/apps/fault</Elem>
-    <Elem>sources/apps/pll</Elem>
-    <Elem>sources/config</Elem>
-    <Elem>sources/drivers/pfc_pwm</Elem>
-    <Elem>sources/third_party/X2Cscope</Elem>
-    <Elem>sources/apps/meas</Elem>
-    <Elem>sources/apps/comm</Elem>
-    <Elem>sources/drivers/llc_signal</Elem>
-    <Elem>sources/common</Elem>
-    <Elem>sources/drivers/pfc_io</Elem>
-    <Elem>sources/drivers/uart_link</Elem>
-    <Elem>../../../Microsoft_PSU_3kW_PFC.X</Elem>
+    <Elem>.</Elem>
   </sourceRootList>
   <projectmakefile>Makefile</projectmakefile>
   <confs>
@@ -302,7 +287,7 @@
         <targetDevice>dsPIC33AK256MPS206</targetDevice>
         <targetHeader></targetHeader>
         <targetPluginBoard></targetPluginBoard>
-        <platformTool>noID</platformTool>
+        <platformTool>ICD4Tool</platformTool>
         <languageToolchain>XCDSC</languageToolchain>
         <languageToolchainVersion>4.00.00</languageToolchainVersion>
         <platform>3</platform>
@@ -886,7 +871,7 @@
         <property key="memories.instruction.ram.ranges"
                   value="${memories.instruction.ram.ranges}"/>
         <property key="memories.programmemory" value="true"/>
-        <property key="memories.programmemory.ranges" value="800000-83ffff"/>
+        <property key="memories.programmemory.ranges" value="800000-87ffff"/>
         <property key="poweroptions.powerenable" value="false"/>
         <property key="programmerToGoFilePath"
                   value="D:/work_space_flex/PSU_3kW_Microsoft/Microsoft_PSU_3kW_PFC.X/debug/default/Microsoft_PSU_3kW_PFC_ptg"/>
