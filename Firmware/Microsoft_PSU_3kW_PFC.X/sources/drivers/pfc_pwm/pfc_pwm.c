@@ -25,6 +25,8 @@
 *
 *   PG3 = phase-A fast leg, PG4 = phase-B fast leg (180 deg, triggered by PG3),
 *   PG5 = line-frequency slow leg, always driven through output override.
+*   After each zero crossing the slow leg is turned on only when the boost
+*   soft start hands over (together with the synchronous rectifier release).
 *   Fast legs use SWAP so PGxDC always represents the boost-switch duty.
 *   Override changes on PG3/PG4/PG5 are synchronized to the local PWM time
 *   base (OSYNC = 0b00, set in PwmInitExt), so no UPDREQ is needed.
@@ -112,7 +114,9 @@ void PFC_PWM_AllOutputsOff(void)
 * Calls           : None
 * Called by       : PFC_LOOP_PhaseAUpdate
 * Note            : BLANK forces both switches off; polarity changes always
-*                   pass through BLANK so the slow leg never shoots through
+*                   pass through BLANK so the slow leg never shoots through.
+*                   POS/NEG is applied at the boost soft-start hand-over, not
+*                   on BLANK exit; the slow-leg body diode conducts until then
 *******************************************************************************/
 void PFC_PWM_SlowLegSet(PFC_PWM_POLARITY_e polarity)
 {

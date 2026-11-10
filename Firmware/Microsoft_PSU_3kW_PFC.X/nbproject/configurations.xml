@@ -475,8 +475,6 @@
         <property key="ADC5" value="true"/>
         <property key="AutoSelectMemRanges" value="auto"/>
         <property key="BISS1" value="true"/>
-        <property key="CAN1" value="true"/>
-        <property key="CAN2" value="true"/>
         <property key="CCP 1" value="true"/>
         <property key="CCP 2" value="true"/>
         <property key="CCP 3" value="true"/>

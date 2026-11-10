@@ -155,7 +155,7 @@ See the [review record](PFC_Code_Review_EN.md) and Chapter 16 for the complete f
 ```
 
 - **Two-phase interleaved boost fast legs**: PG3 (phase A) and PG4 (phase B) operate at 65 kHz with a 180° phase shift, so their input current ripple cancels.
-- **Slow leg**: PG5 does not generate a PWM waveform; instead, output override **statically** turns on the high-side or low-side switch according to grid polarity, so it acts as a synchronously rectifying line-frequency leg.
+- **Slow leg**: PG5 does not generate a PWM waveform; instead, output override **statically** turns on the high-side or low-side switch according to grid polarity, so it acts as a synchronously rectifying line-frequency leg. Within each half-cycle the slow leg is **not** turned on at BLANK exit; it turns on at the boost soft-start hand-over, in the same call that releases the synchronous rectifier (see §9.3). During the soft start the current flows through the slow-leg body diode.
 - The difference between the **positive and negative half cycles** is which fast-leg switch acts as the boost switch and which acts as the synchronous rectifier (SR) switch. The code switches this with the PWM `SWAP` bit, so that the `PGxDC` register **always** represents the duty cycle of the boost switch and the control algorithm does not need to distinguish half cycles.
 
 ### 1.1a Current Paths in the Positive and Negative Half Cycles
@@ -206,6 +206,8 @@ Convention: the inductors connect to the L line, vac = L − N (i.e. `g_pfcVacPU
  PG3 SWAP       —  │        1           │  —  │        0           │  —
  I feedback     0  │  iDn (low-side I)  │  0  │  iUp (high-side I) │  0
 ```
+
+> PWM5H / PWM5L are drawn high for the whole half-cycle. In practice each half-cycle starts with a boost soft start of about 16 calls (≈246 µs) during which the slow leg is still off and the body diode conducts; at the soft-start hand-over the slow leg turns on by polarity and, in the same call, the synchronous rectifier is released (§9.3).
 
 | Half cycle | Line-frequency switch | Boost switch (PGxDC) | SR switch | Return bus | SWAP | Slow-leg OVRDAT | Current feedback |
 |---|---|---|---|---|---|---|---|
@@ -776,6 +778,8 @@ Phase B: `PWMEVTB.EVTBPGS = 0b011` (PG4) → `PG2SPCI2 = 1<<24` → PG2.
 | POS (vac > 0) | 1 | PWM3L (RD3), PWM4L (RD1) | PWM3H (RD2), PWM4H (RD0) | PWM5L (RC11) | H-side window |
 | NEG (vac < 0) | 0 | PWM3H, PWM4H | PWM3L, PWM4L | PWM5H (RC10) | L-side window |
 | BLANK | — | All off (override) | All off | All off | OPEN |
+
+> "Slow leg (PG5) on" applies after the boost soft-start hand-over; between BLANK exit and the hand-over the slow leg stays fully off.
 
 > ⚠️ Derived from "PWMxH pin = high-side switch, PWMxL pin = low-side switch"; **must be confirmed against the schematic**, see the SWAP table in §6.1.
 
@@ -1570,7 +1574,7 @@ None of the above functions write `g_pfcPolarity`; it is written in one place by
 | 264 V / 63 Hz | 18.4 / 27.6 V | 8.0 cycles | 12.0 cycles | +2 cycles | ≈22 cycles | 20 cycles |
 
 - With fixed angles, the number of BLANK cycles depends only on frequency (≈ 7.05° + 2 cycles), not on voltage.
-- The table counts BLANK only, excluding subsequent soft start of at least 16 calls (design approximately 246 µs). SR releases after handover. Sampling quantization of ±1 call and actual override/DC/SWAP/driver delays are excluded; OSYNC=01 and double update do not justify a fixed one-cycle application delay. Measure per #37/#40.
+- The table counts BLANK only, excluding subsequent soft start of at least 16 calls (design approximately 246 µs). The slow leg turns on and SR releases after handover. Sampling quantization of ±1 call and actual override/DC/SWAP/driver delays are excluded; OSYNC=01 and double update do not justify a fixed one-cycle application delay. Measure per #37/#40.
 
 **230 V / 50 Hz worked example** (1 cycle = 15.38 µs ≈ 0.277°):
 
@@ -1580,18 +1584,18 @@ None of the above functions write `g_pfcPolarity`; it is written in one place by
 | ② After zero crossing | \|vac\| rises from 0 to 24 V | asin(24/325) = 4.23° | ≈ 15.3 |
 | ③ Debounce | First sample above 24 V counts as 1, 2 more cycles to reach 3 | — | +2 |
 | **BLANK total** | All PWM off | ≈ 7.6° | **≈ 27.5 cycles (≈ 0.42 ms)** |
-| ④ Soft start | Boost switch switching, duty ramping, SR switch still off | — | +16 cycles (**to be tuned**) |
+| ④ Soft start | Boost switch switching, duty ramping, slow leg and SR switch still off (body diode conducts) | — | +16 cycles (**to be tuned**) |
 | Turn-off to full closed-loop recovery | | | ≈ 43.5 cycles (≈ 0.67 ms) |
 
 ```
 |vac|<16V      zero crossing     |vac|>24V  +2cyc    +SS cycles (now 16)
    │◄──── 10.2 ────►│◄──── 15.3 ────►│◄─2─►│◄──── 16 ────►│
    │      BLANK: all PWM off, ≈27.5 cycles │  soft start    │
-                                                              ▲ handover to loop, SR switch released
+                                                              ▲ handover to loop, slow leg on + SR switch released
 ```
 
 > **Soft start needs board tuning**: handover requires the ramp to reach frozen duty and at least 16 calls. Small duty or negative PI no longer releases SR early. Sixteen is the current initial setting; verify light/full-load currents and gates.
-> - N too small: large zero-crossing current spike, with the Coss charge/discharge from slow-leg switching added on top.
+> - N too small: large zero-crossing current spike, with the Coss charge/discharge from the slow-leg turn-on at hand-over added on top (the body diode is already conducting, so the turn-on is near zero-voltage, but a hand-over that comes too early still enlarges the spike).
 > - N too large: current stays low for a long time after the zero crossing and THD gets worse. At 230 V, 16 cycles is roughly an additional 4.4° of current deficit.
 > - Tuning method: observe the inductor current and the SR switch gate on an oscilloscope, adjust up and down starting from 16 cycles, and find a compromise between zero-crossing spike and THD. Confirm at both low and high line.
 - At 90 V the THD caused by BLANK drops from about 4.5% to about 1.1%. The cost is a narrower hysteresis at low voltage (about 3.1 V at 90 V), which requires the noise plus offset of the vac measurement to be less than about ±2 V.
@@ -1606,9 +1610,11 @@ None of the above functions write `g_pfcPolarity`; it is written in one place by
 
 Phase A owns polarity changes. BLANK entry calls `PFC_PWM_AllOutputsOff()`, zeros PG3/PG4 duty and both duty diagnostics, then publishes BLANK. Phase B's later ISR sees both off requests already issued; phase B shutdown no longer waits for that call. BLANK entry also returns the sync-window gate to OPEN (`PFC_PWM_PhaseA/BSyncGateOpen()`, both window sides forced to 1, i.e. pass-through) and clears the sync ramp state (`syncActive = false`). Releasing the window does not turn the sync switch on — it is already off through `PFC_PWM_AllOutputsOff()`; the point is to reset the gate to a known state at every zero crossing, so that a window left in the previous WINDOW / PENDING state cannot truncate the boost side on the next BLANK exit.
 
-On BLANK exit, fast-leg SWAP is set while overrides remain held, the slow leg selects the new polarity, and each phase starts its 16-call soft start with SR held off. `OSYNC=01` applies overrides as soon as possible; DC/SWAP buffering still follows each PG's UPDMOD. A register write does not establish completion at the physical gate. The sync-window gate then enters PENDING (window on the sync side forced 0, boost side forced 1) with the initial window written, see §6.1a.
+On BLANK exit, fast-leg SWAP is set while overrides remain held and each phase starts its 16-call soft start, releasing only the boost-switch pin; the slow leg and SR stay held off (the slow leg has been fully off since BLANK and is not set here). `OSYNC=01` applies overrides as soon as possible; DC/SWAP buffering still follows each PG's UPDMOD. A register write does not establish completion at the physical gate. The sync-window gate then enters PENDING (window on the sync side forced 0, boost side forced 1) with the initial window written, see §6.1a.
 
-The slow leg selects the new half-cycle freewheeling path on BLANK exit. This depends on schematic mapping, current direction and driver timing and requires simultaneous fast/slow gate waveforms. PG5's configured 200 ns dead time alone does not prove safe direct-override commutation.
+The slow leg turns on by the new polarity only at the **phase-A boost soft-start hand-over** (`PFC_PWM_SlowLegSet(polarity)`), and phase A's SR is released right after it in the same call (`PFC_PWM_PhaseASyncEnable`). During the soft start the current (up to roughly 15 % of the peak) flows through the slow-leg body diode; it is already conducting when the slow leg turns on, so the turn-on is near zero-voltage. Only the phase-A ISR touches the slow leg. Phase B hands over on its own, about half a switching period later (occasionally 1 call apart); its SR may be released up to 1 call before the slow leg turns on, and the current simply uses the body diode in that gap. With `PFC_ZC_SS_CYCLES` of 0 or 1 the hand-over happens in the BLANK-exit call itself, so the slow leg turns on immediately, as in the old behaviour. BLANK entry, faults and shutdown still turn the slow leg off at once through `PFC_PWM_AllOutputsOff()`, and POS and NEG are still always separated by BLANK.
+
+This depends on schematic mapping, current direction and driver timing and requires simultaneous fast/slow gate waveforms. PG5's configured 200 ns dead time alone does not prove safe direct-override commutation.
 
 ### 9.4 Inner-Loop Freeze + Soft-Start to Closed-Loop Handover (`PfcDutyCompute`)
 
@@ -1621,7 +1627,7 @@ After BLANK, each phase's `PfcDutyCompute()` freezes its controller while increa
 
 This removes the former extra PI step at handover. Operating point, feed-forward, sampling and buffer updates can still change physical pulses, so universal exact continuity is not claimed. The 16-call holdoff and SR timing require light/full-load waveforms.
 
-**Hand-over edge detection**: `PFC_LOOP_PhaseAUpdate()` saves `rampWasActive = pfcSsA.active` before calling `PfcDutyCompute()` and tests `if (rampWasActive && !pfcSsA.active)` after the call. This falling edge occurs only once and triggers the hand-over actions (release of the sync override, start of the sync-window ramp). Without the saved snapshot, "still in closed loop" cannot be told apart from "just handed over". Phase B is the same.
+**Hand-over edge detection**: `PFC_LOOP_PhaseAUpdate()` saves `rampWasActive = pfcSsA.active` before calling `PfcDutyCompute()` and tests `if (rampWasActive && !pfcSsA.active)` after the call. This falling edge occurs only once and triggers the hand-over actions (phase A: turn the slow leg on first, then release the sync override and start the sync-window ramp; phase B: release the sync override and start the sync-window ramp, it does not touch the slow leg). Without the saved snapshot, "still in closed loop" cannot be told apart from "just handed over". Phase B is the same.
 
 **Closed-loop write-back** (closed-loop branch of `PfcDutyCompute()`): after `duty` is clamped, `SMPS_FloatController2P2ZTrackOutput(ctrl, duty - dutyFf)` writes the PI part actually applied back into the controller output history. Only the PI part is written back (`dutyFf` is not integrated), so the integrator does not keep growing during clamping and does not overshoot once the clamp releases.
 
@@ -1831,7 +1837,7 @@ Slow detectors currently use contiguous IDs0–11, FLT_DETECT_COUNT=12 and a bou
 
 This step verifies the most dangerous part, the polarity logic, **without letting the fast leg switch**:
 
-- Temporarily comment out `PFC_PWM_PhaseABoostEnable()` in `PFC_LOOP_PhaseAUpdate()` and `PFC_PWM_PhaseBBoostEnable()` in `PFC_LOOP_PhaseBUpdate()`, so that the fast leg stays in override-off (also comment out `PFC_PWM_PhaseASyncEnable()` / `PFC_PWM_PhaseBSyncEnable()` at the handover point, otherwise the pin of the synchronous rectifier (SR) switch is released at the soft-start handover). Only the slow leg switches according to polarity;
+- Temporarily comment out `PFC_PWM_PhaseABoostEnable()` in `PFC_LOOP_PhaseAUpdate()` and `PFC_PWM_PhaseBBoostEnable()` in `PFC_LOOP_PhaseBUpdate()`, so that the fast leg stays in override-off (also comment out `PFC_PWM_PhaseASyncEnable()` / `PFC_PWM_PhaseBSyncEnable()` at the handover point, otherwise the pin of the synchronous rectifier (SR) switch is released at the soft-start handover; **keep** `PFC_PWM_SlowLegSet(polarity)` at the handover point). Only the slow leg switches according to polarity. Note that the slow leg now turns on about 16 calls (≈246 µs) after each BLANK exit instead of at BLANK exit;
 - ⚠️ **Do not** substitute this with "set the duty cycle to 0": the fast leg has complementary outputs, and with a boost switch duty of 0 the SR switch conducts 100 %, so the pre-charged bulk bus would feed current back into the grid through the inductor;
 - Set `g_sm.enableCommand = 1` in X2Cscope. (The pre-charge check requires `vout ≥ 0.9 × vPk`; in a low-voltage test the bulk bus is pre-charged through the rectifier to near the peak. If this is not met, `SMPS_PRECHARGE_RATIO` can be relaxed temporarily.)
 
@@ -1840,7 +1846,7 @@ Checks:
 | Observation | Expected |
 |---|---|
 | `g_pfcPolarity` | Positive half cycle = 1, negative half cycle = 2, near zero crossing = 0 |
-| Oscilloscope: PWM5H/L vs. vac | Slow leg conducts in the correct half cycle, both off at zero crossing, **no overlap** |
+| Oscilloscope: PWM5H/L vs. vac | Slow leg conducts in the correct half cycle, both off at zero crossing, **no overlap**; the turn-on edge of each half cycle is about 16 calls after the zero crossing (boost soft-start hand-over) |
 | `g_pfcZcRejectCnt / g_pfcZcMismatchCnt` | 0 |
 | BLANK width | After PLL lock the thresholds scale with vPk, so BLANK is about 7° plus debounce, largely independent of input voltage (table in Section 9.2); without PLL lock the fixed 16 V / 24 V are used, giving a wider BLANK at low voltage |
 

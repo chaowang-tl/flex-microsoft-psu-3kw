@@ -50,9 +50,11 @@
 *                            with |cos| >= PLL_WIN)
 *   Zero crossing: current loops are frozen in BLANK (no update, no reset)
 *   and resume from the previous half-cycle. Leaving BLANK, the duty ramps
-*   from 0 with the synchronous rectifier pin still forced low; once the ramp
-*   reaches the closed-loop duty (frozen output) the loop takes over with a
-*   seeded error history (bumpless) and the rectifier pin is released.
+*   from 0 with the slow leg and the synchronous rectifier pin still forced
+*   low (the slow-leg body diode carries the current); once the ramp reaches
+*   the closed-loop duty (frozen output) the loop takes over with a seeded
+*   error history (bumpless), the slow leg is turned on and, in the same call,
+*   the rectifier pin is released.
 *
 *   Voltage loop: the PI feedback goes through a notch centred at 2x the PLL
 *   grid frequency, so the bulk 2x line ripple does not modulate the current
@@ -283,11 +285,13 @@ void PFC_LOOP_GridUpdate(void)
 * Calls           : PFC_PWM_*, PfcPolarityUpdate, PfcSoftStartBegin,
 *                   PfcDutyCompute, PfcInductorCurrentSelect
 * Called by       : SMPS_SM_TaskPhaseA (65 kHz, loop enabled)
-* Note            : Leaving BLANK: set SWAP and slow leg first, start the duty
-*                   ramp, then release only the boost-switch pin; the
-*                   synchronous rectifier pin is released when the ramp hands
-*                   over to the loop. The current loop is frozen (not reset)
-*                   across the zero crossing
+* Note            : Leaving BLANK: set SWAP, start the duty ramp, then release
+*                   only the boost-switch pin; the slow leg stays off. When the
+*                   ramp hands over to the loop, the slow leg is turned on and
+*                   the synchronous rectifier pin is released in the same call
+*                   (phase B hands over on its own, the slow leg follows phase
+*                   A). The current loop is frozen (not reset) across the zero
+*                   crossing
 *******************************************************************************/
 void PFC_LOOP_PhaseAUpdate(void)
 {
@@ -312,8 +316,9 @@ void PFC_LOOP_PhaseAUpdate(void)
         }
         else
         {
+            // Slow leg stays off (left forced low by BLANK) until the boost
+            // ramp hands over; its body diode carries the current meanwhile
             PFC_PWM_PhaseASwapSet(polarity);
-            PFC_PWM_SlowLegSet(polarity);
             PfcSoftStartBegin(&pfcSsA);
             PFC_PWM_DutyASet(0.0f);
             PFC_PWM_PhaseABoostEnable(polarity);
@@ -344,7 +349,9 @@ void PFC_LOOP_PhaseAUpdate(void)
 
     if (rampWasActive && !pfcSsA.active)
     {
-        // Hand-over: rectifier pin released and sync window starts at step 0
+        // Hand-over: slow leg on first, then rectifier pin released and sync
+        // window starts at step 0
+        PFC_PWM_SlowLegSet(polarity);
         PFC_PWM_PhaseASyncEnable(polarity);
         pfcSsA.syncCycles = 0U;
         pfcSsA.syncActive = true;
